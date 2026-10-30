@@ -15,7 +15,8 @@
     "eureka:typecheck": "bun run --filter eureka typecheck",
     "eureka:build": "bun run --filter eureka build",
     "eureka:test": "bun run --filter eureka test",
-    "custody": "bun run --filter custody demo",
+    "custody": "bun run --filter custody custody",
+    "custody:ablate": "bun run --filter custody ablate",
     "custody:test": "bun run --filter custody test",
     "custody:typecheck": "bun run --filter custody typecheck"
   }

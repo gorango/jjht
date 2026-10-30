@@ -8,8 +8,10 @@
     "node": ">=20"
   },
   "scripts": {
+    "custody": "bun src/index.ts demo",
     "demo": "bun src/index.ts demo",
     "start": "bun src/index.ts demo",
+    "ablate": "bun scripts/ablate.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "build": "tsc"
