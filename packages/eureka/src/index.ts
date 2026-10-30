@@ -20,10 +20,10 @@ import { resolve } from "node:path";
 
 import { loadDataset, ResearcherIndex } from "./domain/dataset.js";
 import { createPools } from "./agents/pool.js";
-import { bootstrap, diagnose, finalize, portfolioMarkdown } from "./agents/scheduler.js";
+import { bootstrap, createWatchdog, diagnose, finalize, portfolioMarkdown, settled } from "./agents/scheduler.js";
 import { MockRunner } from "./inference/mock.js";
 import { hasOpenRouter, openRouterModels, OPENROUTER_DEFAULTS } from "./inference/openrouter.js";
-import { initializeRuntime, join } from "./runtime/session.js";
+import { initializeRuntime, join, leave } from "./runtime/session.js";
 import { EurekaState, type Role, type RunConfig } from "./runtime/state.js";
 import { joinTrace } from "./runtime/trace.js";
 import { ARCHITECTURE } from "./architecture.js";
@@ -35,6 +35,9 @@ const flag = (name: string, fallback: number): number => {
   const parsed = raw === undefined ? Number.NaN : Number(raw);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
+
+const textFlag = (name: string): string | undefined =>
+  process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split("=")[1];
 
 const poolOverrides = (): Partial<Record<Role, number>> => {
   const raw = process.argv.find((arg) => arg.startsWith("--pools="))?.split("=")[1];
@@ -55,6 +58,9 @@ const buildConfig = (): RunConfig => ({
   profileTopN: flag("profile", 3),
   portfolioSize: flag("portfolio", 5),
   leaseTtlMs: flag("lease-ttl", 120_000),
+  mockLatencyMs: flag("mock-latency", 0),
+  chaos: textFlag("chaos") === "slow-worker" ? "slow-worker" : undefined,
+  scheduler: textFlag("scheduler") === "off-after-boot" ? "off-after-boot" : "on",
   poolSize: {
     profiler: 3,
     analyst: 3,
@@ -100,7 +106,7 @@ const run = async (): Promise<void> => {
   initializeRuntime({
     state,
     inferenceRunnerConfig: config.mock
-      ? { runner: new MockRunner() }
+      ? { runner: new MockRunner(config.mockLatencyMs) }
       : hasOpenRouter()
         ? { supportedModels: openRouterModels([config.strongModel, config.fastModel]) }
         : undefined,
@@ -121,12 +127,28 @@ const run = async (): Promise<void> => {
       `  pools: ${pools.map((pool) => `${pool.role}x${pool.agents.length}`).join(" ")}\n`,
   );
 
-  bootstrap(state);
+  const scheduler = bootstrap(state);
+  if (config.scheduler === "off-after-boot") {
+    // The Scheduler published the initial work, then leaves. The queues and the
+    // lease market must drain without it; only a non-participant watchdog closes
+    // the run. This is the claim docs/architecture.md makes, made measurable.
+    leave(scheduler);
+    state.schedulerId = undefined;
+    const watchdog = createWatchdog();
+    join(watchdog);
+    state.watchdogId = watchdog.getId();
+    state.note("run", "watchdog", "scheduler removed after boot; draining without it");
+    console.log("  scheduler removed after boot (watchdog still measures completion)");
+  }
 
   const timeoutMs = config.mock ? 20_000 : 900_000;
   const deadline = Date.now() + timeoutMs;
 
   while (!state.finalized && Date.now() < deadline) {
+    if (config.scheduler === "off-after-boot" && settled(state)) {
+      finalize(state, "all work settled without the scheduler");
+      break;
+    }
     await new Promise((done) => setTimeout(done, 100));
   }
 

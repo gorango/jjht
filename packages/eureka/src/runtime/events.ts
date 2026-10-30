@@ -21,6 +21,12 @@ export interface EventMap {
 
   "task.claimed": { role: Role; item: string; worker: string; generation: number };
   "task.failed": { role: Role; item: string; worker: string; reason: string };
+  /** A lease passed its TTL. The item is requeued and may be claimed again. */
+  "lease.expired": { role: Role; item: string; worker: string; generation: number; ttlMs: number };
+  /** Another worker took over an item after a lease expired. */
+  "task.reclaimed": { role: Role; item: string; worker: string; previousWorker: string; reason: string };
+  /** A late answer arrived after its lease was lost; its write was discarded. */
+  "task.discarded": { role: Role; item: string; worker: string; reason: string };
   "task.measured": {
     role: Role;
     item: string;

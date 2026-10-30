@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-10-30T14:12:22.013Z",
+  "workload": {
+    "command": "MOCK=1 bun src/index.ts run --companies=3 --challenges=2 --candidates=6 --profile=3 --mock-latency=50 --pools=<n>",
+    "companies": 3,
+    "challengesPerCompany": 2,
+    "mockLatencyMs": 50
+  },
+  "results": [
+    {
+      "pools": 1,
+      "wallClockMs": 1133,
+      "maxInFlight": 5,
+      "modelCalls": 52,
+      "inputTokens": 77478,
+      "outputTokens": 28218,
+      "costUsd": 0,
+      "runId": "run-2026-10-30T14-12-18-839Z"
+    },
+    {
+      "pools": 3,
+      "wallClockMs": 640,
+      "maxInFlight": 9,
+      "modelCalls": 53,
+      "inputTokens": 78374,
+      "outputTokens": 28449,
+      "costUsd": 0,
+      "runId": "run-2026-10-30T14-12-20-345Z"
+    },
+    {
+      "pools": 5,
+      "wallClockMs": 607,
+      "maxInFlight": 11,
+      "modelCalls": 52,
+      "inputTokens": 77922,
+      "outputTokens": 28218,
+      "costUsd": 0,
+      "runId": "run-2026-10-30T14-12-21-340Z"
+    }
+  ]
+}

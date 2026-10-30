@@ -139,12 +139,45 @@ export const createWorker = (state: EurekaState, spec: WorkerSpec, index: number
                 generation: claim.generation,
               });
 
+              let chaosDelayMs: number | undefined;
+              if (state.config.chaos === "slow-worker" && !state.chaosTriggered && spec.role === "writer") {
+                state.chaosTriggered = true;
+                const ttlMs = state.config.leaseTtlMs;
+                const itemId = item;
+                const previousWorker = self;
+                const generation = claim.generation;
+                // The slow worker is still inside `runLoop`; the market is what
+                // notices the expiry and requeues the item. The late answer is
+                // measured in the trace and then discarded.
+                chaosDelayMs = ttlMs + 400;
+                const timer = setTimeout(() => {
+                  emit("lease.expired", previousWorker, {
+                    role: spec.role,
+                    item: itemId,
+                    worker: previousWorker,
+                    generation,
+                    ttlMs,
+                  });
+                  state.enqueue(spec.role, itemId);
+                  emit("task.reclaimed", previousWorker, {
+                    role: spec.role,
+                    item: itemId,
+                    worker: "another worker",
+                    previousWorker,
+                    reason: `requeued after ${ttlMs}ms lease TTL`,
+                  });
+                  wake(state.queues[spec.role].length, spec.role, previousWorker);
+                }, ttlMs + 100);
+                timer.unref?.();
+              }
+
               let envelope: Record<string, unknown>;
               try {
                 envelope = {
                   role: spec.role,
                   item,
                   attempt,
+                  ...(chaosDelayMs ? { delayMs: chaosDelayMs } : {}),
                   input: spec.buildInput(state, item, attempt),
                 };
               } catch (error) {
@@ -228,10 +261,19 @@ export const createWorker = (state: EurekaState, spec: WorkerSpec, index: number
               });
             } catch (error) {
               const reason = error instanceof Error ? error.message : String(error);
-              state.attempts.set(active.item, active.attempt + 1);
-              state.market.release(`${spec.role}:${active.item}`, active.generation);
-              emit("task.failed", self, { role: spec.role, item: active.item, worker: self, reason });
-              if (active.attempt + 1 < MAX_ATTEMPTS) state.enqueue(spec.role, active.item);
+              const stale = /stale lease/i.test(reason);
+              if (stale) {
+                // Not a task failure: the work was already finished by the worker
+                // that took over. Count the spend, keep the duplicate in the trace.
+                state.chaosFinished = true;
+                emit("task.discarded", self, { role: spec.role, item: active.item, worker: self, reason });
+                wake(state.queues[spec.role].length, spec.role, self);
+              } else {
+                state.attempts.set(active.item, active.attempt + 1);
+                state.market.release(`${spec.role}:${active.item}`, active.generation);
+                emit("task.failed", self, { role: spec.role, item: active.item, worker: self, reason });
+                if (active.attempt + 1 < MAX_ATTEMPTS) state.enqueue(spec.role, active.item);
+              }
             } finally {
               // Keep draining this role's queue.
               wake(state.queues[spec.role].length, spec.role, self);

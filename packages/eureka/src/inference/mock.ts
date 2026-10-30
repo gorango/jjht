@@ -15,6 +15,8 @@ interface TaskEnvelope {
   role: "profiler" | "analyst" | "matchmaker" | "writer" | "critic";
   item: string;
   attempt: number;
+  /** Chaos only: hold this turn past the lease TTL. */
+  delayMs?: number;
   input: any;
 }
 
@@ -200,8 +202,12 @@ const respond = (task: TaskEnvelope): unknown => {
 };
 
 export class MockRunner implements InferenceRunner {
+  constructor(private readonly latencyMs = 0) {}
+
   async run(request: InferenceInput): Promise<InferenceOutput> {
     const task = readTask(request);
+    const delay = Math.max(this.latencyMs, task.delayMs ?? 0);
+    if (delay > 0) await new Promise((done) => setTimeout(done, delay));
     const answer = JSON.stringify(respond(task), null, 2);
     const inputTokens = estimateTokens(JSON.stringify(request.context.getItems()));
     const outputTokens = estimateTokens(answer);

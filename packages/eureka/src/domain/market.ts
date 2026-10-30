@@ -42,10 +42,19 @@ export class MemoryMarket {
     return { generation: lease.generation, expiresAt: lease.expiresAt };
   }
 
-  /** A worker may only publish a result if it still holds the current generation. */
+  /**
+   * A worker may only publish a result if it still holds the current generation
+   * *and* that lease has not expired. Expiry matters even when nobody has
+   * reclaimed the item yet: a result produced after the TTL is stale by
+   * definition, and applying it would hide the duplicate work from the trace.
+   */
   isCurrent(key: string, generation: number): boolean {
     const lease = this.leases.get(key);
-    return Boolean(lease && lease.generation === generation);
+    return Boolean(lease && lease.generation === generation && lease.expiresAt > Date.now());
+  }
+
+  expiresAtOf(key: string): number | undefined {
+    return this.leases.get(key)?.expiresAt;
   }
 
   release(key: string, generation: number): boolean {

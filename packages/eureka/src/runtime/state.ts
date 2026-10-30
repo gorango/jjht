@@ -41,6 +41,12 @@ export interface RunConfig {
   poolSize: Partial<Record<Role, number>>;
   /** Lease time-to-live. A stalled worker loses its claim after this. */
   leaseTtlMs: number;
+  /** Deterministic mock latency, so concurrency can be measured offline. */
+  mockLatencyMs: number;
+  /** Fault injection. `slow-worker` holds one writer past its lease TTL. */
+  chaos?: "slow-worker";
+  /** `on` (default) lets the Scheduler close the run; `off-after-boot` removes it. */
+  scheduler: "on" | "off-after-boot";
   /** Model routing. */
   strongModel: string;
   fastModel: string;
@@ -106,7 +112,13 @@ export class EurekaState extends RuntimeState {
 
   finalized = false;
   schedulerId?: string;
+  /** A non-participating closer used when the Scheduler is removed after boot. */
+  watchdogId?: string;
   summary?: import("./events.js").RunSummary;
+  /** The chaos run uses this once: exactly one slow worker, not every writer. */
+  chaosTriggered = false;
+  /** Set when the late answer has been measured and discarded. */
+  chaosFinished = false;
 
   note(kind: string, actor: string, detail: string): void {
     this.ledger.push({ at: Date.now(), kind, actor, detail });

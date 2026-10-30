@@ -17,8 +17,14 @@ import { emit, type RunSummary } from "../runtime/events.js";
 import { join } from "../runtime/session.js";
 import type { EurekaState } from "../runtime/state.js";
 
-const settled = (state: EurekaState): boolean => {
+export const settled = (state: EurekaState): boolean => {
   if (state.finalized) return false;
+  // `participant.joined` arrives before bootstrap has queued anything; an empty
+  // world is not a finished run.
+  if (state.totals.challenges === 0) return false;
+  // In a chaos run, wait for the deliberately late turn so its discard is in the
+  // trace before the run closes. This is fault injection, not normal operation.
+  if (state.config?.chaos === "slow-worker" && !state.chaosFinished) return false;
   if (state.market.size() > 0) return false;
   if (state.pending() > 0) return false;
   if (state.analyses.size < state.totals.challenges) return false;
@@ -112,9 +118,16 @@ export const portfolioMarkdown = (state: EurekaState, entries: PortfolioEntry[])
   return lines.join("\n");
 };
 
+/**
+ * The Scheduler evaluates completion on every event, not just decisions. A slow
+ * pool can finish a profiler after the last proposal is reviewed; if the
+ * Scheduler only watched decisions it would sit until the watchdog even though
+ * every queue was empty. `settled` is cheap, so checking often is the simple
+ * correct thing.
+ */
 class RunDecided extends SituationSpecification {
-  override isSatisfiedBy({ event }: SituationContext): boolean {
-    return event.type === "proposal.reviewed" || event.type === "proposal.abandoned" || event.type === "task.failed";
+  override isSatisfiedBy(_context: SituationContext): boolean {
+    return true;
   }
 }
 
@@ -124,7 +137,7 @@ export const finalize = (state: EurekaState, reason: string): RunSummary => {
 
   const entries = choosePortfolio(state);
   state.portfolio = entries;
-  const actor = state.schedulerId ?? "scheduler";
+  const actor = state.schedulerId ?? state.watchdogId ?? "scheduler";
   emit("portfolio.ready", actor, { entries });
 
   const summary: RunSummary = {
@@ -168,6 +181,14 @@ export const diagnose = (state: EurekaState): string => {
   ].join(" | ");
 };
 
+/** A participant in name only: it publishes the close, it never reacts or works. */
+export const createWatchdog = () =>
+  createHuman({
+    name: "Watchdog",
+    capabilities: ["observe"],
+    handlers: [],
+  });
+
 export const createScheduler = (state: EurekaState) =>
   createHuman({
     name: "Scheduler",
@@ -184,7 +205,7 @@ export const createScheduler = (state: EurekaState) =>
     ],
   });
 
-export const bootstrap = (state: EurekaState): void => {
+export const bootstrap = (state: EurekaState) => {
   const scheduler = createScheduler(state);
   join(scheduler);
   state.schedulerId = scheduler.getId();
@@ -207,4 +228,5 @@ export const bootstrap = (state: EurekaState): void => {
   state.totals.challenges = challenges;
   state.note("run", state.schedulerId, `queued ${challenges} challenges from ${companies} companies`);
   emit("work.available", state.schedulerId, { role: "analyst" });
+  return scheduler;
 };

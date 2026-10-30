@@ -52,6 +52,12 @@ const summarize = (type: string, payload: any): string => {
       return `${payload.role} ${payload.item} on ${payload.model}: ${payload.inputTokens}→${payload.outputTokens} tokens, $${payload.costUsd.toFixed(4)}, ${payload.durationMs}ms`;
     case "task.failed":
       return `${payload.role} failed on ${payload.item} (${payload.worker}): ${payload.reason}`;
+    case "lease.expired":
+      return `${payload.role} lease on ${payload.item} expired (${payload.worker}, ${payload.ttlMs}ms TTL)`;
+    case "task.reclaimed":
+      return `${payload.role} ${payload.item} reclaimed by ${payload.worker} from ${payload.previousWorker}`;
+    case "task.discarded":
+      return `${payload.role} ${payload.item} stale write discarded (${payload.worker}): ${payload.reason}`;
     case "researcher.profiled":
       return `${payload.researcherId} profiled (${payload.profile.expertise.length} expertise areas)`;
     case "challenge.analyzed":

@@ -15,9 +15,10 @@
     "build": "tsc",
     "trace": "bun src/index.ts trace",
     "openalex": "bun src/index.ts openalex",
-    "test": "bun test tests/critic.test.ts",
+    "test": "bun test tests",
     "refresh:calls": "bun scripts/refresh-calls.ts",
-    "eval": "bun scripts/eval.ts"
+    "eval": "bun scripts/eval.ts",
+    "concurrency": "bun scripts/concurrency.ts"
   },
   "dependencies": {
     "@mozaik-ai/core": "workspace:*",
