@@ -150,8 +150,9 @@ custody decision matches its committed expectation. All six checks are `true`.
 The `patched` arm is **not run**. It needs a second build from the baro handoff, and the runner
 labels it rather than faking a row.
 
-The model is canned in every arm and every live run. The trace labels `runner: "mock"` and
-`costUsd: 0`. No provider was called and the entry claims no model cost.
+The model is canned in every arm and every live run. The trace's `run.started` row carries
+`runner: "mock"` and `costUsd: 0`, and every inference span names `mock`. No provider was called and
+the entry claims no model cost.
 
 ## What this is not
 
@@ -162,10 +163,10 @@ The model is canned in every arm and every live run. The trace labels `runner: "
 - **Not evidence hashing.** "Evidence intact" means no destructive effect ran against a live lock.
   The SHA-256 bundle and `sha256sum -c` verifier from the design are not built.
 - **Not a statistical result.** Ten hand-written scenarios are not a sample. No p-value is quoted.
-- **Deferral is not awaited by the demo.** A deferred intent carries `retryAt` and the retry path
-  runs to the three-attempt cap and `intent.exhausted` in `tests/coordinator.test.ts`. The CLI exits
-  after the first window and prints that window's verdicts, so the table shows `DEFER`, not the
-  later exhausted decision.
+- **Deferral is not awaited by the demo.** A deferred intent carries `retryAt`. The retry path
+  reaches the three-attempt cap and records a reject with "retry cap" in
+  `tests/coordinator.test.ts`. The CLI exits after the first window and prints that window's
+  verdicts, so the table shows `DEFER`, not the later exhausted decision.
 - **Not a viewer.** The CLI table and `trace.jsonl` are the interface.
 - **Not a fix.** The runtime contains and defers. The baro handoff that turns an incident into a
   patch is not built.
