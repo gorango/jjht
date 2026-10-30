@@ -178,6 +178,7 @@ export const createWorker = (state: EurekaState, spec: WorkerSpec, index: number
                   role: spec.role,
                   item,
                   attempt,
+                  ...(spec.role === "writer" ? { revision: state.proposals.get(item)?.revision ?? 0 } : {}),
                   ...(chaosDelayMs ? { delayMs: chaosDelayMs } : {}),
                   input: spec.buildInput(state, item, attempt),
                 };

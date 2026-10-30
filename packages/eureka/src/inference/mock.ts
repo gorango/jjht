@@ -15,6 +15,8 @@ interface TaskEnvelope {
   role: "profiler" | "analyst" | "matchmaker" | "writer" | "critic";
   item: string;
   attempt: number;
+  /** Proposal revision, so the mock's forced fabrication fires once, not on every draft. */
+  revision?: number;
   /** Chaos only: hold this turn past the lease TTL. */
   delayMs?: number;
   input: any;
@@ -81,7 +83,7 @@ const respond = (task: TaskEnvelope): unknown => {
       ];
       // Deliberately hallucinate on the first pass so the Critic has something to
       // catch. This is the failure mode the EINSTEIN brief is built around.
-      const fabricated = task.attempt === 0 ? ["SYN-PUB-99999"] : [];
+      const fabricated = (task.revision ?? task.attempt) === 0 ? ["SYN-PUB-99999"] : [];
       const citations = [...real, ...fabricated];
       const publication = (researcher.publicationsDetailed as Array<{ id: string; title: string }>)[0];
       const titleLine = publication

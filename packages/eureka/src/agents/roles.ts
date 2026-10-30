@@ -358,7 +358,9 @@ Schema: {"title": string, "supervisors": {"academic": string, "industrial": stri
     proposal.markdown = String(result?.markdown ?? "");
     proposal.citations = citations;
     proposal.status = "review";
-    proposal.revision = context.attempt;
+    // `proposal.revision` belongs to the document (the Critic increments it); it
+    // is not the worker's failure-attempt counter. Conflating them abandoned
+    // proposals before their allowed revisions were used.
     proposal.supervisors = {
       academic: String(supervisors.academic ?? "").trim(),
       industrial: String(supervisors.industrial ?? "").trim(),
@@ -722,7 +724,6 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
         });
       } else {
         proposal.revision += 1;
-        state.attempts.set(proposal.id, proposal.revision);
         state.enqueue("writer", proposal.id);
         wake(state.queues["writer"].length, "writer", context.worker);
       }
