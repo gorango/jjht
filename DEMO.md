@@ -31,8 +31,8 @@ npm run mock
 Point at the final lines, not the trace:
 
 - 12 challenges → 12 proposals → 12 Critic rejections → **12 approved after revision**
-- **9 model turns in flight at once**
-- 0.6 s, `$0.00`
+- **14 model turns in flight at once** — every worker in the pool busy
+- about a second, `$0.00`
 
 > "The mock fabricates one citation on purpose, so you always see the Critic catch it and the Writer
 > fix it. Everything else — the runtime, the leases, the claims, the trace — is real." 

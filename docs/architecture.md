@@ -138,7 +138,7 @@ new document.
 - every challenge has been analysed,
 - every analysed challenge has a proposal that is `approved` or `rejected`, or is in `unmatched`.
 
-The Scheduler evaluates this on every decision event. In the mock run it fires ~130ms in, on the
+The Scheduler evaluates this on every decision event. In the mock run it fires about a second in, on the
 same event that approves the last proposal. A watchdog (`20s` mock, `15min` real) force-closes the
 run and prints a diagnosis (queues, leases, undecided challenges) so a stall is debuggable instead
 of silent.

@@ -13,8 +13,8 @@ Built for the **EINSTEIN: Science-to-Business Matchmaker** track of the NTP Novi
 
 ![The trace viewer after a full run](docs/trace-viewer.png)
 
-*A real run in the trace viewer: 12 challenges, 103 model calls, **9 turns in flight at once**,
-12 Critic rejections and 12 approvals. `npm run mock` reproduces it in 0.6s with no keys and no
+*A real run in the trace viewer: 12 challenges, 103 model calls, **14 turns in flight at once**,
+12 Critic rejections and 12 approvals. `npm run mock` reproduces it in about a second with no keys and no
 network, then `npm run trace` opens this page.*
 
 ---
@@ -94,7 +94,7 @@ A pipeline is a script that calls A, then B, then C. Here, **nobody calls anybod
   work and closes the run when the market and the queues are empty. Remove it after boot and the
   run still drains — it just would not know when to stop.
 
-Measured on the mock run in this repository: **9 model turns in flight at once**, across five
+Measured on the mock run in this repository: **14 model turns in flight at once** (the whole pool), across five
 roles, with a max pool of 3. The trace proves it — `inference.started` minus `inference.completed`
 over time is the concurrency curve.
 
@@ -158,7 +158,7 @@ Any OpenAI-compatible endpoint (DeepSeek direct, vLLM, Ollama) works through `OP
 | wall clock | 1.2s | ~30–60s |
 | model calls | 103 | 12 |
 | cost | $0.00 | ~$0.01 |
-| concurrency | 9 turns in flight | 3–5 turns in flight |
+| concurrency | 14 turns in flight (full pool) | 3–5 turns in flight |
 
 A full run at the default scale (6 companies, 12 challenges) is a few minutes and well under $0.25
 on these models.
