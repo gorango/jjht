@@ -8,16 +8,16 @@
     "node": ">=20"
   },
   "scripts": {
-    "start": "tsx src/index.ts run",
-    "run": "tsx src/index.ts run",
-    "mock": "MOCK=1 tsx src/index.ts run",
+    "start": "bun src/index.ts run",
+    "run": "bun src/index.ts run",
+    "mock": "MOCK=1 bun src/index.ts run",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "trace": "tsx src/index.ts trace",
-    "openalex": "tsx src/index.ts openalex",
-    "test": "node --import tsx --test tests/critic.test.ts",
-    "refresh:calls": "tsx scripts/refresh-calls.ts",
-    "eval": "tsx scripts/eval.ts"
+    "trace": "bun src/index.ts trace",
+    "openalex": "bun src/index.ts openalex",
+    "test": "bun test tests/critic.test.ts",
+    "refresh:calls": "bun scripts/refresh-calls.ts",
+    "eval": "bun scripts/eval.ts"
   },
   "dependencies": {
     "@mozaik-ai/core": "workspace:*",
@@ -25,7 +25,6 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }
