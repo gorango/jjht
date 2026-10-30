@@ -573,7 +573,8 @@ RULES:
 2. Any claim about a person that has no source, or whose source is not about that person, is unsupported: verdict "reject".
 3. A claim that is true but irrelevant to the pairing is not a reason to reject; note it.
 4. Any number about the company, the researcher or their data that does not appear in a cited source is a fabrication: verdict "reject". Exception: a number in the Plan table that is explicitly a project target (for example, "label 2,000 samples") is a plan, not a claim about the dataset, and must not be rejected for that reason.
-4b. sourceFacts gives the label/title for each allowed source. Use it to check names, titles and numbers instead of guessing what an id contains.
+4b. sourceFacts gives the label/title/detail for each allowed source, including its "about" owner ids. Use it to check names, titles, numbers and authorship instead of guessing what an id contains.
+4c. allowedSources and sourceFacts are known ids. knownSourceCount is the size of the full index, not a list. An id that appears in allowedSources is never fabricated.
 5. A proposal longer than 650 words is padded: verdict "reject", and say so.
 6. The proposal must contain every required section, a named publication title belonging to the researcher, a quantified year-one milestone, a named failure mode, supervisors and candidate, and a publication/IP clause; missing any of them is a reject. Code checks these before you see the proposal and its verdict overrides yours.
 7. Do not accept a proposal because it is well written. Check the evidence.
@@ -639,6 +640,7 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
         id: record.id,
         type: record.type,
         label: record.label,
+        about: record.about,
         detail: detailFor(record),
       }));
 
