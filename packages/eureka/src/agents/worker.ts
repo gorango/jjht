@@ -21,6 +21,7 @@ import {
   type SituationContext,
 } from "@mozaik-ai/core";
 
+import { realPeopleGuard } from "../domain/realPeople.js";
 import type { Claim } from "../domain/types.js";
 import { estimateCost } from "../inference/pricing.js";
 import { emit, wake } from "../runtime/events.js";
@@ -185,6 +186,27 @@ export const createWorker = (state: EurekaState, spec: WorkerSpec, index: number
                 state.market.release(`${spec.role}:${item}`, claim.generation);
                 state.attempts.set(item, attempt + 1);
                 emit("task.failed", self, { role: spec.role, item, worker: self, reason });
+                item = state.dequeue(spec.role);
+                continue;
+              }
+
+              const refusal = state.config.allowRealPeople ? undefined : realPeopleGuard(envelope);
+              if (refusal) {
+                state.market.release(`${spec.role}:${item}`, claim.generation);
+                state.attempts.set(item, MAX_ATTEMPTS);
+                current = undefined;
+                emit("inference.refused", self, {
+                  role: spec.role,
+                  item,
+                  worker: self,
+                  reason: `${refusal}; pass --allow-real-people to override`,
+                });
+                emit("task.failed", self, {
+                  role: spec.role,
+                  item,
+                  worker: self,
+                  reason: "real-person guard refused the turn",
+                });
                 item = state.dequeue(spec.role);
                 continue;
               }

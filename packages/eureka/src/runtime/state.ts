@@ -43,6 +43,8 @@ export interface RunConfig {
   leaseTtlMs: number;
   /** Deterministic mock latency, so concurrency can be measured offline. */
   mockLatencyMs: number;
+  /** Default false: real ORCID/OpenAlex identities never reach a model. */
+  allowRealPeople: boolean;
   /** Fault injection. `slow-worker` holds one writer past its lease TTL. */
   chaos?: "slow-worker";
   /** `on` (default) lets the Scheduler close the run; `off-after-boot` removes it. */

@@ -27,6 +27,7 @@ const DEFAULTS: Record<string, Price> = {
 };
 
 let overrides: Record<string, Price> | undefined;
+const warned = new Set<string>();
 
 const table = (): Record<string, Price> => {
   if (overrides) return overrides;
@@ -42,7 +43,22 @@ const table = (): Record<string, Price> => {
   return overrides;
 };
 
-export const priceOf = (model: string): Price => table()[model] ?? { in: 1, out: 3 };
+/**
+ * An unknown model id used to be silently priced at {in:1,out:3}, which makes a
+ * typo in EUREKA_MODEL look cheaper than it is. Warn once (or throw under
+ * EUREKA_PRICE_STRICT=1) and make the fallback visible in the run log.
+ */
+export const priceOf = (model: string): Price => {
+  const price = table()[model];
+  if (price) return price;
+  const message = `priceOf: no price for model "${model}"; using the fallback {in:1,out:3}. Set EUREKA_PRICES or EUREKA_PRICE_STRICT=1.`;
+  if (process.env.EUREKA_PRICE_STRICT === "1") throw new Error(message);
+  if (!warned.has(model)) {
+    warned.add(model);
+    console.warn(message);
+  }
+  return { in: 1, out: 3 };
+};
 
 export const estimateCost = (model: string, inputTokens: number, outputTokens: number): number => {
   const price = priceOf(model);

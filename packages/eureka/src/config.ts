@@ -31,6 +31,7 @@ export const buildConfig = (): RunConfig => ({
   portfolioSize: flag("portfolio", 5),
   leaseTtlMs: flag("lease-ttl", 120_000),
   mockLatencyMs: flag("mock-latency", 0),
+  allowRealPeople: process.argv.includes("--allow-real-people"),
   chaos: textFlag("chaos") === "slow-worker" ? "slow-worker" : undefined,
   scheduler: textFlag("scheduler") === "off-after-boot" ? "off-after-boot" : "on",
   poolSize: {

@@ -27,6 +27,8 @@ export interface EventMap {
   "task.reclaimed": { role: Role; item: string; worker: string; previousWorker: string; reason: string };
   /** A late answer arrived after its lease was lost; its write was discarded. */
   "task.discarded": { role: Role; item: string; worker: string; reason: string };
+  /** The real-person guard stopped a turn before it reached a model. */
+  "inference.refused": { role: Role; item: string; worker: string; reason: string };
   "task.measured": {
     role: Role;
     item: string;
