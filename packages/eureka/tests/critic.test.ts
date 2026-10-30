@@ -86,6 +86,7 @@ const validProposal = (): Proposal => ({
   revision: 0,
   criticNote: "",
   supervisors: { academic: "Prof. A", industrial: "B. Engineer" },
+  namedPublication: publicationTitle,
   candidate: "a master's graduate in computer engineering",
   researchQuestions: ["Can the pass be proved correct?"],
   plan: [{ year: 1, work: "Build a baseline on 2,000 samples", result: "A working baseline" }],

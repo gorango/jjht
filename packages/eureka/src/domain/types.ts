@@ -195,6 +195,8 @@ export interface Proposal {
   criticNote: string;
 
   supervisors: ProposalSupervisors;
+  /** Exact title, copied from the researcher's record, named in "Why this pair". */
+  namedPublication: string;
   candidate: string;
   researchQuestions: string[];
   plan: PlanYear[];

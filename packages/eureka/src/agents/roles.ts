@@ -231,6 +231,7 @@ Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "shar
       revision: 0,
       criticNote: "",
       supervisors: { academic: "", industrial: "" },
+      namedPublication: "",
       candidate: "",
       researchQuestions: [],
       plan: [],
@@ -285,13 +286,13 @@ Required markdown sections, with these exact headings and in this order:
 ## Supervisors and candidate
 Under "Research questions" give 2-3 numbered questions. Under "Plan" give a markdown table with one row per year for exactly three years and columns Year | Work | Result; year 1 must contain at least one quantified milestone (a number with a unit). Under "What each side brings" use two bullets, **Company:** and **Faculty:**. Under "Agreed up front" state a publication review window in days and who owns the rig/models versus the methods. Under "Risks" name at least one concrete failure mode. Under "Unverified evidence" list what you could not verify. Under "Supervisors and candidate" name the academic supervisor, the industrial supervisor, and describe the candidate profile.
 Every factual claim about the researcher or the company must cite a dataset id. Never invent a publication, project, patent or capability. If you lack a source for a sentence, drop the sentence or put it under "Unverified evidence".
-Name at least one publication title that belongs to this researcher, exactly as provided, in "Why this pair".
+Name at least one publication title that belongs to this researcher, exactly as provided, in "Why this pair", and also put that exact title in the "namedPublication" field.
 Citations must be bare ids exactly as given: "R1008", "C001-CH1", "SYN-PUB-10472". Never a phrase, a description, or a field name such as "company products".
 Budget: at most 650 words of markdown. One page, not a report.
 Do not quote the challenge back; summarise it in one sentence.
 Every number you write about the company, the researcher or their data (headcount, distances, volumes, durations, years, costs) must appear verbatim in a provided source. If the number is not there, write "to be confirmed" — never invent a number to make the proposal concrete.
 ${JSON_ONLY}
-Schema: {"title": string, "supervisors": {"academic": string, "industrial": string}, "candidate": string, "researchQuestions": string[], "plan": [{"year": number, "work": string, "result": string}], "whatEachSideBrings": {"company": string[], "faculty": string[]}, "whyThisPair": string, "agreedUpFront": {"publicationReviewDays": number, "ip": string}, "risks": string[], "unverified": string[], "markdown": string, "citations": string[], "claims": [{"text": string, "sources": string[]}]}`,
+Schema: {"title": string, "supervisors": {"academic": string, "industrial": string}, "namedPublication": string, "candidate": string, "researchQuestions": string[], "plan": [{"year": number, "work": string, "result": string}], "whatEachSideBrings": {"company": string[], "faculty": string[]}, "whyThisPair": string, "agreedUpFront": {"publicationReviewDays": number, "ip": string}, "risks": string[], "unverified": string[], "markdown": string, "citations": string[], "claims": [{"text": string, "sources": string[]}]}`,
 
   buildInput(state, item) {
     const proposal = state.proposals.get(item);
@@ -362,6 +363,7 @@ Schema: {"title": string, "supervisors": {"academic": string, "industrial": stri
       academic: String(supervisors.academic ?? "").trim(),
       industrial: String(supervisors.industrial ?? "").trim(),
     };
+    proposal.namedPublication = String(result?.namedPublication ?? "").trim();
     proposal.candidate = String(result?.candidate ?? "").trim();
     proposal.researchQuestions = strings(result?.researchQuestions);
     proposal.plan = Array.isArray(result?.plan)
@@ -487,7 +489,15 @@ export const structuralRejects = (proposal: Proposal, dataset: Dataset): HardRej
   const titles = (researcher?.publications ?? [])
     .map((id) => dataset.publications.get(id)?.title)
     .filter((title): title is string => typeof title === "string" && title.length >= 12);
-  if (titles.length === 0 || !titles.some((title) => normalizedMarkdown.includes(normalizeText(title)))) {
+  const namedInMarkdown = titles.filter((title) => normalizedMarkdown.includes(normalizeText(title)));
+  const declared = proposal.namedPublication?.trim() ?? "";
+  const declaredIsReal = declared
+    ? titles.some((title) => normalizeText(title) === normalizeText(declared))
+    : namedInMarkdown.length > 0;
+  const declaredIsShown = declared
+    ? normalizedMarkdown.includes(normalizeText(declared))
+    : namedInMarkdown.length > 0;
+  if (titles.length === 0 || !declaredIsReal || !declaredIsShown) {
     rejects.push({
       code: "no-publication-title",
       detail: "the proposal names no publication title that belongs to this researcher",
@@ -566,11 +576,42 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
       ...(researcher?.patents ?? []),
     ];
 
-    const sourceFacts = allowedSources
+    const detailFor = (record: NonNullable<ReturnType<typeof lookupSource>>): string => {
+      if (record.type === "publication") return String(state.dataset.publications.get(record.id)?.abstract ?? "").slice(0, 700);
+      if (record.type === "project") return String(state.dataset.projects.get(record.id)?.summary ?? "").slice(0, 500);
+      if (record.type === "challenge") {
+        const entry = state.dataset.byChallengeId.get(record.id);
+        return entry ? `${entry.challenge.text}\n${entry.challenge.detail}`.slice(0, 900) : "";
+      }
+      if (record.type === "company") {
+        const company = state.dataset.byCompanyId.get(record.id);
+        return company
+          ? `${company.employees} employees. ${company.products.join("; ")}. ${company.rd_capacity}`.slice(0, 700)
+          : "";
+      }
+      if (record.type === "researcher") {
+        const person = state.dataset.byResearcherId.get(record.id);
+        return person ? `Fields: ${person.fields.join("; ")}. Open to: ${person.open_to.join("; ")}` : "";
+      }
+      return "";
+    };
+    const relevant = new Set([
+      proposal.researcherId,
+      proposal.companyId,
+      proposal.challengeId,
+      ...proposal.citations,
+      ...claims.flatMap((claim) => claim.sources),
+    ]);
+    const sourceFacts = [...relevant]
       .map((id) => lookupSource(state.dataset, id))
       .filter((record): record is NonNullable<typeof record> => Boolean(record))
       .slice(0, 24)
-      .map((record) => ({ id: record.id, type: record.type, label: record.label }));
+      .map((record) => ({
+        id: record.id,
+        type: record.type,
+        label: record.label,
+        detail: detailFor(record),
+      }));
 
     return {
       proposalId: proposal.id,

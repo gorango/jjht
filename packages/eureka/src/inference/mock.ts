@@ -142,6 +142,7 @@ const respond = (task: TaskEnvelope): unknown => {
           academic: `${researcher.name} (${researcher.title}, ${researcher.department})`,
           industrial,
         },
+        namedPublication: publication?.title ?? "",
         candidate: `a master's graduate in ${researcher.fields[0] ?? company.sector}, employed by ${company.name} for the three years`,
         researchQuestions: [
           "Which part of the stated problem can be solved with the methods the faculty already uses?",
