@@ -27,6 +27,7 @@ import { EurekaState, type Role, type RunConfig } from "./runtime/state.js";
 import { joinTrace } from "./runtime/trace.js";
 import { ARCHITECTURE } from "./architecture.js";
 import { serveRuns } from "./trace-server.js";
+import { openalexProbe } from "./openalex.js";
 
 const flag = (name: string, fallback: number): number => {
   const raw = process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split("=")[1];
@@ -158,6 +159,11 @@ const latestRun = (): string => {
 
 const main = async (): Promise<void> => {
   const command = process.argv[2] ?? "run";
+
+  if (command === "openalex") {
+    await openalexProbe();
+    return;
+  }
 
   if (command === "trace") {
     const runId = process.argv.find((arg) => arg.startsWith("--run="))?.split("=")[1] ?? latestRun();

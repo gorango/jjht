@@ -13,7 +13,8 @@
     "mock": "MOCK=1 tsx src/index.ts run",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "trace": "tsx src/index.ts trace"
+    "trace": "tsx src/index.ts trace",
+    "openalex": "tsx src/index.ts openalex"
   },
   "dependencies": {
     "@mozaik-ai/core": "^4.1.0",

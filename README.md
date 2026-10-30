@@ -68,6 +68,7 @@ npm install
 npm run mock                       # offline, deterministic, no API key, ~1s
 npm start                          # real models (needs a provider key)
 npm run trace                      # serve the trace viewer at http://localhost:4173
+npm run openalex                   # optional: verify the OpenAlex key, pull UNS context
 ```
 
 `npm run mock` is the honest demo: the runtime, the concurrency, the leases, the Critic and the
