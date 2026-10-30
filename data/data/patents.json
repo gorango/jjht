@@ -1,0 +1,1450 @@
+{
+ "name": "EINSTEIN Matchmaker synthetic dataset",
+ "version": "2.0",
+ "note": "Synthetic. Every person, company, publication, project and patent is invented; any resemblance to real ones is a coincidence. Institutions are real faculties of the University of Novi Sad, used as a setting only.",
+ "patents": [
+  {
+   "id": "SYN-PAT-001",
+   "title": "Capacitive soil moisture probe with a multi-depth sensing array",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "",
+   "inventors": [
+    {
+     "researcher_id": "R0662",
+     "name": "Nenad Ilić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-002",
+   "title": "Starch-based compostable film with an antimicrobial plant extract",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "",
+   "inventors": [
+    {
+     "researcher_id": "R0274",
+     "name": "Stefan Đorđević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-003",
+   "title": "Screen-printed electrode for nitrate detection in water",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "",
+   "inventors": [
+    {
+     "researcher_id": "R0693",
+     "name": "Jovana Ristić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-004",
+   "title": "Lattice support structure that breaks away cleanly after printing",
+   "year": 2016,
+   "status": "expired",
+   "abstract": "",
+   "inventors": [
+    {
+     "researcher_id": "R0276",
+     "name": "Dejan Bogdanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-005",
+   "title": "Method and System for Calibration-Free Camera Height Estimation in Indoor Environments Using Structural Line Clustering",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention describes a computational method for estimating the installation height of a ceiling-mounted camera above a flat floor using only a single captured image, without requiring a physical calibration target. Line segments are extracted from the image, clustered into structural groups corresponding to architectural features, and fitted to a parametric model of a Manhattan-world room geometry. The estimated height is output with an associated confidence interval. The method is applicable to existing ceiling camera infrastructure in warehouses, factories, and public buildings and requires no hardware modification. A corresponding system claim covers an embedded processing unit implementing the method in real time.",
+   "inventors": [
+    {
+     "researcher_id": "R0033",
+     "name": "Žarko Gavrilović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-006",
+   "title": "Method and Apparatus for Adaptive Blink-Artefact Compensation in Remote Eye-Tracking Systems for Driver Monitoring",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "The invention relates to a signal processing method for removing blink-induced dropout artefacts from remote infrared eye-tracker streams in real time. A two-stage approach is described: a blink onset predictor based on a lightweight logistic regression model trained on pre-blink eyelid velocity cues, and a Hermite spline interpolation scheme that reconstructs missing pupil diameter values during the blink interval. The method operates at 250 Hz on a microcontroller and reduces mean pupil reconstruction error to below 0.05 mm compared with measured post-blink values. Applicable to driver monitoring units installed in passenger and commercial vehicles.",
+   "inventors": [
+    {
+     "researcher_id": "R0014",
+     "name": "Csaba Fehér"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-007",
+   "title": "Method and Apparatus for Closed-Loop Flow Rate Control in UAV-Mounted Spray Boom Systems",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "A spray boom assembly for unmanned aerial vehicles comprising a proportional solenoid valve disposed upstream of each nozzle group, a micro-turbine flow sensor in the supply manifold, and a microcontroller implementing a proportional–integral control law that adjusts valve aperture to maintain a commanded volumetric flow rate within ±3% of setpoint across the battery discharge cycle. The assembly communicates target flow rate commands from the aircraft flight computer via a CAN bus interface and logs sensor data at 50 Hz for post-flight agronomic analysis. Claims cover the valve-sensor-controller arrangement, the gain-scheduling method for battery voltage compensation, and the CAN communication protocol definition.",
+   "inventors": [
+    {
+     "researcher_id": "R0868",
+     "name": "Spasoje Petrović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-008",
+   "title": "Electrolyte composition and procedure for electrodeposition of polypyrrole-zinc composite coatings with enhanced adhesion on carbon steel substrates",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A citrate-based aqueous electrolyte composition is described for co-deposition of polypyrrole and zinc onto carbon steel substrates. The electrolyte contains zinc sulphate (0.08–0.15 mol/L), pyrrole monomer (0.04–0.08 mol/L), trisodium citrate (0.2–0.4 mol/L), and a non-ionic surfactant at 0.5–1.0 g/L, at pH 5.5–6.5. The deposition procedure specifies a pulsed current protocol with a duty cycle of 0.4–0.6 at 40–50 mA/cm². The resulting composite coatings contain 3–6 wt% polypyrrole and exhibit adhesion class 0 and improved corrosion resistance in neutral salt spray testing relative to plain zinc coatings deposited from the same bath without pyrrole.",
+   "inventors": [
+    {
+     "researcher_id": "R0855",
+     "name": "Sara Ivanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-009",
+   "title": "Method and Device for Anomaly-Preserving Adaptive Bit Allocation in Compressed Sensor Data Streams",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "A method for compressing sensor data streams on resource-constrained embedded processors wherein a CUSUM-based detector flags anomalous signal segments in real time and a bit allocator redistributes the saved bits from normal segments to flagged segments within a fixed per-frame bit budget. The device comprises a microcontroller executing the detector and allocator in under 15 CPU cycles per sample and a non-volatile memory unit storing compressed output. The method preserves signal peaks associated with mechanical fault events at compression ratios where conventional uniform-bit-rate coders suppress such peaks below detection threshold.",
+   "inventors": [
+    {
+     "researcher_id": "R0641",
+     "name": "Branislav Stojanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-010",
+   "title": "Vibration-Compensated Solenoid Valve Assembly for Agricultural UAV Spray Payloads",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "The invention describes a solenoid nozzle valve assembly incorporating a mechanical anti-vibration sleeve and an adaptive current-drive circuit that adjusts coil energisation timing as a function of real-time accelerometer readings from the UAV flight controller. The design reduces actuation delay variation caused by airframe vibration from a measured range of 8–31 ms to 4–7 ms across tested frequency bands (0.5–80 Hz), improving spatial accuracy of variable-rate spray commands at UAV operating speeds up to 6 m s⁻¹. Filed with the Intellectual Property Office of the Republic of Serbia, co-inventors Aleksandar Đurić and Nemanja Varga.",
+   "inventors": [
+    {
+     "researcher_id": "R0601",
+     "name": "Teodora Jakovljević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-011",
+   "title": "Surface Treatment Process for Precision Valve Seats Using Combined Laser Micro-Texturing and Fluorosilane Functionalisation",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A two-stage process for treating metallic valve-seat surfaces is described. In the first stage, a femtosecond laser produces a regular array of micro-dimples (diameter 30–80 µm, depth 5–15 µm) across the seating face. In the second stage, a C12 perfluoroalkylsilane solution is applied by vapour-phase deposition at 60–80 °C for 90 min, functionalising the laser-modified surface. The combined treatment yields water contact angles above 140° and reduces slurry erosion rates by 30–45% compared with untreated seats under standardised test conditions.",
+   "inventors": [
+    {
+     "researcher_id": "R0085",
+     "name": "Borislav Jokić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-012",
+   "title": "Method and System for Reference-Free Quality Scoring of Optical Character Recognition Output in Document Processing Pipelines",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A computer-implemented method estimates the character error rate of OCR output for a document page without access to a ground-truth transcription. The method extracts a feature vector comprising character n-gram perplexity under a domain-adapted language model, out-of-vocabulary token proportion, OCR engine confidence statistics, and text-line geometry regularity metrics. A regression model trained on labelled examples maps the feature vector to a predicted error rate. The predicted score is used to route pages to a manual review queue, reducing review volume while maintaining coverage of high-error pages. The patent covers the feature extraction procedure, the training methodology, and the routing logic applied in production document ingestion pipelines.",
+   "inventors": [
+    {
+     "researcher_id": "R0460",
+     "name": "Predrag Ljubojević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-013",
+   "title": "Embedded Gateway Device for Bidirectional Protocol Translation Between ISO 11783 and CANopen Networks with Run-Time Configurable Mapping Tables",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "The device is a dual-CAN embedded module containing firmware that translates process-data objects between an ISO 11783 ISOBUS network and a CANopen DS4xx device network. Mapping tables defining the correspondence between ISOBUS DDIs and CANopen object dictionary indices are stored in non-volatile flash and can be updated over the ISOBUS virtual terminal interface without reflashing the device. The architecture supports simultaneous operation on both networks at different baud rates and provides a watchdog-supervised fail-safe state that places the ISOBUS segment in a passive listening mode if the CANopen side loses heartbeat continuity. Filed with the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0248",
+     "name": "Darko Zarić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-014",
+   "title": "Method and apparatus for real-time zone-override fusion of proximal canopy reflectance data with geo-referenced prescription map layers in variable-rate fertiliser application systems",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "The invention concerns a method for dynamically switching between prescription-map-derived nitrogen rates and active optical sensor-derived rates during fertiliser application. A field controller continuously compares the real-time sensor index to a pre-loaded zone-specific statistical envelope derived from the prescription map layer. When the sensor reading falls outside the envelope by a configurable threshold, the controller substitutes the sensor-derived rate; otherwise, it computes a weighted average. The apparatus comprises a modulated-light canopy sensor, an onboard processing unit with zone-lookup logic, and an ISOBUS-compliant actuator interface. Validated on pneumatic spreaders in winter wheat trials in Serbia, 2019–2020.",
+   "inventors": [
+    {
+     "researcher_id": "R0964",
+     "name": "Ljiljana Todić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-015",
+   "title": "Process for preparing alginate–pectin microcapsules containing viable probiotic bacteria for incorporation into cold-stored food products",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "The invention describes a two-step extrusion and ionic gelation process for producing alginate–pectin composite microcapsules loaded with probiotic bacterial cultures at densities of at least 9 log CFU/g. Key features include a pre-cooling step of the bacterial suspension to 8 °C prior to encapsulation to reduce thermal stress, a defined ratio of low-methoxyl pectin to sodium alginate between 0.3:1 and 0.5:1 by weight, and a controlled calcium chloride concentration of 1.5–2.0% w/v for gelation. The resulting capsules are intended for direct addition to fermented dairy and plant-based beverages, providing improved probiotic survival during refrigerated shelf life of up to 28 days.",
+   "inventors": [
+    {
+     "researcher_id": "R0535",
+     "name": "Anja Rakić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-016",
+   "title": "Baffle insert arrangement for improving airflow uniformity in batch drying chambers for food products",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A modular baffle insert system designed to be retrofitted into the inlet plenum of existing batch drying chambers. The inserts consist of adjustable perforated sheet-metal panels mounted on a rail frame that fits standard chamber door openings without structural modification. Panel perforation patterns are determined from CFD-derived flow targets for a given chamber volume and trolley loading configuration. The arrangement was demonstrated to increase the airflow uniformity index from below 0.62 to above 0.75 in chambers with volumes between 2 and 10 m³. Patent held jointly by the University of Novi Sad and Mesarstvo Đorđević d.o.o.",
+   "inventors": [
+    {
+     "researcher_id": "R0994",
+     "name": "Boris Nedić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-017",
+   "title": "Adaptive Threshold Vibration Monitoring Node with Dual-Mode Sampling for Rotating Machinery",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A wireless sensor node for continuous bearing condition monitoring comprises a triaxial MEMS accelerometer, a low-power microcontroller, and a sub-GHz radio transceiver. The node operates in a low-power survey mode at reduced sampling frequency and switches autonomously to a high-rate diagnostic mode when an on-chip RMS estimator exceeds an adaptive threshold. The threshold adapts to baseline vibration level over a configurable initialisation window, reducing false triggers caused by operating-point changes. Patent covers the threshold adaptation algorithm, the dual-mode state machine firmware architecture, and the hardware layout of the sensor node enclosure.",
+   "inventors": [
+    {
+     "researcher_id": "R0045",
+     "name": "Bogdan Bajić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-018",
+   "title": "Circuit and method for electrode-offset cancellation in a capacitively coupled biopotential amplifier with sub-nanoampere DC servo current",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention covers a DC servo loop architecture for use in capacitively coupled instrumentation amplifiers intended for wearable biopotential acquisition. The loop uses a switched-capacitor integrator clocked at 8 Hz to sense residual offset at the output and apply a correction current at the input through a high-impedance current DAC, keeping total servo current below 20 nA. The approach tolerates electrode polarisation offsets up to ±400 mV without saturating the main amplifier chain. The patent was filed in Serbia through the Intellectual Property Office and subsequently extended via PCT.",
+   "inventors": [
+    {
+     "researcher_id": "R0905",
+     "name": "Filip Mijatović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-019",
+   "title": "Method and Embedded Device for Noise-Adaptive Acoustic Event Detection in Non-Stationary Environments",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The patent describes a two-stage detection architecture implemented on a microcontroller in which a first stage continuously estimates the non-stationary noise floor using a recursive minimum statistics algorithm and updates a bank of frequency-weighted detection thresholds. A second stage applies a compact fixed-point classifier only when the first stage signals a candidate event, reducing average power consumption compared with continuous classification. The architecture is designed for wearable and ambient health monitoring devices operating on batteries with capacities below 1000 mAh and is validated for respiratory and fall-impact event classes.",
+   "inventors": [
+    {
+     "researcher_id": "R0179",
+     "name": "Vera Đukić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-020",
+   "title": "Micro-Fabricated Electrostatic Deadweight Reference Cell for In-Situ Calibration of Wearable Piezoresistive Force Sensors",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "A micro-fabricated calibration cell integrated on a flexible polyimide substrate comprises a sealed cavity enclosing a tungsten proof mass suspended by a thin-film piezoresistive spring. An electrostatic actuator plate, energised on command by a firmware routine, deflects the proof mass to apply a repeatable, geometry-defined reference force to the co-located measurement bridge. The design eliminates external mechanical reference standards for periodic recalibration and is dimensioned to add less than 0.3 mm to the total sensor assembly thickness. Claims cover the cell geometry, the five-mask fabrication process, and the firmware actuation protocol.",
+   "inventors": [
+    {
+     "researcher_id": "R0713",
+     "name": "Milena Janković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-021",
+   "title": "Adjustable modular pressure-mapping insert for prosthetic socket interface monitoring",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A thin-film sensor insert comprising 32 individually addressable pressure transducers arranged in an anatomically informed grid pattern, housed in a flexible substrate of uniform 1.8 mm thickness, designed for placement between a prosthetic liner and socket wall without altering socket internal geometry. The insert incorporates a miniaturised wireless data-acquisition unit attached to the proximal socket trim and transmits sampled pressure values at 50 Hz to a paired receiver. The geometry of the sensor array is sized for trans-tibial socket applications and the substrate material maintains flexibility across a Shore A range of 20 to 60. Filed at the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0329",
+     "name": "Zoran Kapor"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-022",
+   "title": "Modul za in-situ detekciju grešaka adhezije slojeva u FDM štampačima zasnovan na ugradbenom CNN procesoru",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "Patent opisuje hardverski modul koji se montira na kućište FDM štampača i koji integriše monohromatsku kameru rezolucije 5 MP, ugradbeni računar s namenskim neuronim procesorom i serijsko komunikaciono sučelje prema upravljačkoj elektronici štampača. Modul vrši inferenciju CNN modela za detekciju grešaka adhezije na svakom završenom sloju i šalje strukturirani signal upozorenja sa koordinatama defektne regije. Zaštita se odnosi na specifičnu mehaničku konfiguraciju nosača kamere, elektronsku shemu za napajanje modula iz štampačevog napona i protokol razmene poruka s firmware-om štampača.",
+   "inventors": [
+    {
+     "researcher_id": "R0496",
+     "name": "Saša Kosanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-023",
+   "title": "Method for reducing humidity-induced signal drift in lateral-flow immunoassay strips by desiccant cartridge integration in multi-strip foil pouches",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "This patent application describes a pouch design for lateral-flow immunoassay strips incorporating a segmented desiccant cartridge that maintains relative humidity below 30% at the strip surface over storage periods of up to 24 months under ambient conditions of up to 85% RH. The design uses a laser-welded barrier film separating the desiccant from the strip while allowing equilibrium humidity transfer. Laboratory and field data demonstrate stabilisation of IC50 values within 15% of initial calibration across a six-month outdoor storage study in Vojvodina agricultural conditions.",
+   "inventors": [
+    {
+     "researcher_id": "R0159",
+     "name": "Danilo Filipović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-024",
+   "title": "Method for real-time thickness monitoring and closed-loop control of polymer solution casting on continuous flat-sheet casting machines",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "The invention describes an arrangement in which one or more laser triangulation sensors are mounted at fixed cross-web positions above a continuous casting machine. Sensor output is processed by a control unit that adjusts the doctor-blade gap via a servo actuator according to a proportional–integral control law. The method is applicable to casting speeds between 0.2 and 5.0 m min⁻¹ and wet film thicknesses between 50 and 400 µm. Claims cover the sensor positioning scheme, the rolling-baseline control chart used to detect process drift, and the blade-adjustment algorithm.",
+   "inventors": [
+    {
+     "researcher_id": "R1025",
+     "name": "Aleksandar Bačić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-025",
+   "title": "Method for early detection of fermentation batch deviation using a panel of metabolite ratio indicators derived from spent broth LC-MS analysis",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A method is described for identifying deviating fermentation batches in real time by calculating a set of seven metabolite ratios from spent broth samples collected at defined process time points and comparing these ratios against control limits established from historical reference batches. The method applies to submerged bacterial fermentation processes producing extracellular enzymes or organic acids. It requires a single LC-MS analysis per time-point sample and produces a scalar deviation index that can trigger process intervention or batch rejection decisions without operator expertise in metabolomics data interpretation.",
+   "inventors": [
+    {
+     "researcher_id": "R1005",
+     "name": "Rastko Đukić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-026",
+   "title": "Method for inline determination of cleaning-in-place endpoint in ultrafiltration systems using combined permeate UV absorbance and conductivity criteria",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention describes a method for determining the endpoint of a cleaning-in-place cycle in cross-flow ultrafiltration systems processing protein-containing streams. The method uses simultaneous inline measurement of permeate-side UV absorbance at 280 nm and electrical conductivity to generate a composite cleaning completion index. A CIP cycle is considered complete when both signals fall below predefined thresholds for a defined duration, replacing fixed-time cleaning protocols. The method reduces reagent consumption and membrane exposure to cleaning agents compared with conventional time-based protocols, without compromising cleaning efficacy as assessed by pure water flux recovery measurement.",
+   "inventors": [
+    {
+     "researcher_id": "R0269",
+     "name": "Ivona Bogdanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-027",
+   "title": "Earth-Tube Heat Exchange System for Temperature Stabilisation of Outdoor Open Raceway Ponds",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "This patent application covers a passive heat exchange arrangement in which a closed-loop pipe circuit buried at 2.0–3.0 m soil depth is integrated with the recirculation channel of an outdoor open raceway pond. The arrangement transfers geothermal heat to the culture medium during cold nights without mechanical heating equipment. The application describes the pipe geometry, burial depth optimisation procedure, and connection configuration to the raceway paddle-wheel loop. Claims cover both the physical apparatus and the method for determining burial depth based on local soil thermal properties and target minimum culture temperature.",
+   "inventors": [
+    {
+     "researcher_id": "R0825",
+     "name": "Attila Varga"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-028",
+   "title": "Method and Apparatus for Dynamic Shader Variant Selection Based on Screen-Space Projected Coverage in a Tile-Based Graphics Pipeline",
+   "year": 2018,
+   "status": "granted",
+   "abstract": "A graphics processing system and method in which a host processor computes the screen-space projected bounding area of each renderable object prior to draw-call submission and selects a pre-compiled fragment shader variant from an ordered set of complexity tiers based on that coverage estimate and per-tier threshold parameters. The selection logic executes entirely on the host CPU and requires no driver or GPU microcode modifications. Applicable to tile-based and immediate-mode GPU architectures running OpenGL ES 3.x or Vulkan. Reduces fragment instruction throughput requirements without manual per-asset LOD authoring.",
+   "inventors": [
+    {
+     "researcher_id": "R0155",
+     "name": "Miloš Vranješ"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-029",
+   "title": "Method and Apparatus for On-Line Equivalent Series Resistance Estimation of DC-Link Capacitors in Grid-Connected Inverters",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A method for estimating the equivalent series resistance of electrolytic capacitors in the DC-link stage of a grid-connected inverter using measurements of DC-link current ripple and voltage ripple already available to the inverter control system. A recursive least squares filter running on the inverter's embedded processor updates the ESR estimate at each control cycle. No additional sensors or external test signals are required. The estimate may be used to trigger maintenance alerts when ESR exceeds a configurable degradation threshold. The apparatus comprises a standard inverter control board with firmware implementing the described estimation algorithm.",
+   "inventors": [
+    {
+     "researcher_id": "R0230",
+     "name": "Borislav Vojnović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-030",
+   "title": "Gasket cross-section profile with integrated vapour barrier ridge for sealed outdoor enclosures",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A gasket cross-section geometry in which a narrow raised ridge, positioned at the midpoint of the sealing face, increases local contact pressure by a factor of 1.8 to 2.4 relative to the mean, thereby creating a low-permeance vapour barrier zone within the compressed elastomer. The ridge height is specified as a function of groove width and compression ratio to remain within the elastic deformation limit of the seal material. Laboratory measurements on EPDM prototypes demonstrated a 60 % reduction in steady-state vapour permeance compared with a plain rectangular cross-section at the same compression ratio and groove geometry. The design is applicable to static seals in outdoor electrical cabinets, photovoltaic junction boxes, and instrumentation housings.",
+   "inventors": [
+    {
+     "researcher_id": "R0786",
+     "name": "Svetlana Sabo"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-031",
+   "title": "Process for Preparing MnOx-Coated Natural Zeolite Filter Granules with Enhanced Catalytic Activity for Manganese Removal from Drinking Water",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A method for coating clinoptilolite zeolite granules (0.5–2.0 mm) with catalytically active MnOx layers by repeated immersion in aqueous KMnO₄ solution (5–20 g/L), controlled pH reduction to 5.5–6.5 to induce surface reduction and precipitation, and intermediate calcination at 200–250 °C. The procedure yields coatings with specific surface area above 45 m²/g and Mn loadings of 3–5% w/w reproducibly within four treatment cycles. Coated granules show first-order Mn(II) oxidation rate constants at least 2.5 times higher than equivalently coated quartz sand, with mechanical durability sufficient for standard backwash operation. The patent covers the preparation sequence, temperature and pH parameter ranges, and intended application in packed-bed drinking-water filters.",
+   "inventors": [
+    {
+     "researcher_id": "R0254",
+     "name": "Strahinja Todorović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-032",
+   "title": "Method and Apparatus for Real-Time Spectral Drift Compensation in Conveyor-Mounted Near-Infrared Sorting Systems",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "The invention relates to a method for automatically compensating spectral drift in a line-scan NIR sensor mounted above a moving conveyor belt, caused by illumination ageing and lens contamination. A drift detection module continuously monitors the statistical distribution of incoming unlabelled spectra and triggers a normalisation parameter update when the detected distribution shift exceeds a preset threshold, without requiring labelled reference samples or line downtime. The apparatus comprises the NIR sensor, an embedded processing unit, and a software module implementing kernel mean matching for distribution alignment. The method maintains classification accuracy within 2 percentage points of the initial calibration value over periods of at least six months under industrial operating conditions.",
+   "inventors": [
+    {
+     "researcher_id": "R0521",
+     "name": "Andrea Krstić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-033",
+   "title": "Process for producing certified-grade biochar from sunflower husk by controlled slow pyrolysis with integrated temperature–residence-time feedback",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "A process for producing biochar from sunflower husk feedstock meeting European Biochar Certificate Basic grade specifications. The process comprises pre-drying to below 10 wt% moisture, staged heating at 8–12 K min⁻¹ to a final temperature of 580–640 °C in a fixed-bed tube reactor under inert gas, and an isothermal holding step of 55–80 minutes controlled by a thermocouple-feedback loop. Biochar discharged from the reactor is passivated by controlled air admission. The specification covers reactor geometry constraints and acceptable feedstock particle size range (0.3–1.2 mm). Assigned to the Faculty of Technology, University of Novi Sad.",
+   "inventors": [
+    {
+     "researcher_id": "R0992",
+     "name": "Đorđe Vukelić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-034",
+   "title": "Method and circuit arrangement for tiered watchdog supervision of multi-peripheral embedded sensor nodes",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "A hardware and firmware arrangement for supervising the operational state of embedded sensor nodes carrying multiple independent peripheral subsystems. The arrangement uses three independently clocked watchdog timers assigned to distinct supervision layers: the main application scheduler, the wireless communication driver, and the analog measurement front-end. Each timer triggers a graduated recovery response specific to its layer, avoiding a full device reset unless lower-tier recovery fails within a defined window. The arrangement reduces unnecessary measurement gaps caused by full resets and is suitable for implementation on standard microcontroller platforms without additional external components. Granted by the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0754",
+     "name": "Žarko Jakovljević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-035",
+   "title": "Coupled-Inductor Assembly for Interleaved Boost Power Factor Correction Converter",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A coupled-inductor assembly for use in a two-phase interleaved boost PFC converter, comprising a single EE-core magnetic structure wound with two electrically isolated windings whose coupling coefficient is set by a defined air-gap geometry in the centre limb. The assembly achieves differential-mode ripple current cancellation at the converter input and output terminals without requiring separate discrete inductors, reducing PCB area and total winding copper loss. The geometry and winding arrangement are specified so that the coupling coefficient falls within the range 0.45–0.60, which was identified as optimal for maximising ripple cancellation while limiting proximity-effect losses at switching frequencies between 80 kHz and 130 kHz.",
+   "inventors": [
+    {
+     "researcher_id": "R0343",
+     "name": "Dimitrije Puzović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-036",
+   "title": "Gasket groove profile with graduated side-wall draft angle for polymer lid enclosures subject to differential thermal expansion",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "A groove cross-section geometry for seating elastomeric O-rings in polymer enclosure lids is described, in which the side-wall draft angle varies from 5° at the groove base to 12° at the opening. This graduated geometry distributes contact stress more uniformly along the O-ring circumference when the lid material and the metal frame to which it is mounted undergo differential thermal expansion. The design reduces peak stress at groove corners by approximately 20 % compared with uniform-draft grooves of equivalent depth, without requiring changes to standard O-ring dimensions. The groove can be machined or moulded and is applicable to lids manufactured from glass-fibre-reinforced polyester or polycarbonate.",
+   "inventors": [
+    {
+     "researcher_id": "R0926",
+     "name": "Sofija Ristić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-037",
+   "title": "Method and System for Adaptive Threshold Calibration of Solder Joint Classifiers Using Unlabelled Target-Domain Images",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "A method for recalibrating the decision thresholds of a trained solder joint classification neural network when the network is transferred to a new production line without requiring labelled images from that line. The method collects a small batch of unlabelled images from the target line, estimates the marginal class-prior distribution using a temperature-scaled confidence histogram, and adjusts per-class thresholds to minimise expected calibration error under the estimated prior. The procedure runs in under ten seconds on embedded inference hardware and is compatible with any classifier that produces class-conditional probability outputs.",
+   "inventors": [
+    {
+     "researcher_id": "R0437",
+     "name": "Valentina Bulatović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-038",
+   "title": "Method and Apparatus for Humidity-Compensated Threshold Adjustment in Flying-Probe In-Circuit Test Systems",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A method for dynamically adjusting measurement acceptance thresholds in a flying-probe in-circuit test system based on real-time ambient humidity and board conditioning history. A humidity sensor integrated with the test fixture provides a continuous relative-humidity reading that is combined with a stored conditioning-time parameter to compute a leakage-resistance correction term. This correction term modifies the guard-band thresholds applied to resistance and capacitance measurements, reducing false-failure call rates caused by moisture-induced leakage without relaxing detection sensitivity for genuine defects. The method does not require modifications to board layout or test fixture hardware beyond the addition of the humidity sensor.",
+   "inventors": [
+    {
+     "researcher_id": "R0690",
+     "name": "Tijana Fejsa"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-039",
+   "title": "Method and apparatus for in-process kinematic recalibration of a multi-axis robot arm using on-board temperature sensors and a sparse external measurement system",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention discloses a recalibration system for articulated robot arms comprising a set of resistance temperature detectors distributed across robot joints, an interface to a sparse external position measurement device such as a laser tracker, and an on-controller filter algorithm that combines temperature readings with intermittent position measurements to update the robot's kinematic parameter table in real time. The method enables continuous accuracy recovery during production operation without requiring the robot to move to a dedicated calibration pose. Claims cover the sensor placement selection procedure, the filter update law, and the controller integration interface.",
+   "inventors": [
+    {
+     "researcher_id": "R0851",
+     "name": "Vladimir Ivanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-040",
+   "title": "Passive EMC Input Filter Assembly with Temperature-Compensated Y-Capacitor Array for Variable-Speed Drive Applications",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "An EMC input filter assembly for three-phase variable-speed drives incorporates a Y-capacitor array in which each capacitor cell is paired with a negative-temperature-coefficient compensation network. The compensation network maintains effective CM capacitance within ±5% of nominal across the operating temperature range −10 °C to +85 °C, preventing the insertion-loss degradation observed in standard film capacitor designs at elevated cabinet temperatures. The assembly is rated for 400 V AC, 32 A continuous, and fits within the footprint of a standard 15 kW drive input terminal block. Patent granted by the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0283",
+     "name": "Ana Mamužić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-041",
+   "title": "Method and System for Real-Time Safety Distance Computation in Collaborative Robot Cells Using Fused Depth and Lidar Data",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A method for computing, in real time, the minimum Euclidean distance between any human body segment and any moving component of a collaborative manipulator, using data fused from at least one time-of-flight depth camera and one 2D lidar scanner mounted in a complementary configuration above a shared workspace. The method applies an unscented Kalman filter to produce per-segment position and velocity estimates at a rate of not less than 20 Hz, from which a protective separation distance compliant with ISO/TS 15066 Annex A is derived and output as a safety-rated analogue signal. Granted to the University of Novi Sad; inventors listed in the patent filing.",
+   "inventors": [
+    {
+     "researcher_id": "R0615",
+     "name": "Dušan Vlaisavljević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-042",
+   "title": "Method and apparatus for real-time adjustment of wire feed speed in GMAW based on infrared pool width measurement",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A method for closed-loop control of gas metal arc welding in which a mid-wave infrared camera measures weld pool width at a sampling rate of at least 20 Hz, and a controller adjusts wire feed speed within defined bounds to maintain pool width within a target range. The apparatus includes a purge-air shield protecting the infrared sensor window from spatter contamination and a calibration procedure referenced to workpiece surface emissivity. The invention is applicable to robotic and mechanised GMAW of carbon steel, low-alloy steel, and aluminium alloys.",
+   "inventors": [
+    {
+     "researcher_id": "R0445",
+     "name": "Valentina Simić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-043",
+   "title": "Reconfigurable Fault Injection Board for Automotive ECU I/O Lines with Solid-State Relay Matrix and Microcontroller Interface",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A hardware board comprising a matrix of solid-state relays arranged to selectively connect any of up to 32 ECU I/O lines to open-circuit, battery voltage, or ground conditions under software control. A microcontroller receives fault commands over a standard serial interface and drives the relay gates within a guaranteed 2 ms switching latency. The board includes overcurrent protection on each channel and a watchdog that returns all channels to a safe default state if the host controller fails to send a heartbeat within a configurable timeout. The design targets low-cost laboratory HiL bench applications.",
+   "inventors": [
+    {
+     "researcher_id": "R0356",
+     "name": "Darko Ninkov"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-044",
+   "title": "Method and Circuit Arrangement for Adaptive Threshold-Triggered Vibration Data Acquisition on Low-Power Microcontroller Platforms",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The patent covers a hardware-software method in which an analogue comparator on a microcontroller's input pin monitors a running RMS estimate of an accelerometer signal and triggers a DMA burst acquisition only when the estimate exceeds a configurable threshold stored in non-volatile memory. The threshold may be updated by a host application over UART or BLE without reflashing firmware. The arrangement reduces idle current draw by 55–70% compared to continuous DMA acquisition in laboratory measurements on an STM32L4 platform. The patent is assigned to the University of Novi Sad.",
+   "inventors": [
+    {
+     "researcher_id": "R0206",
+     "name": "Vesna Knežević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-045",
+   "title": "Method and Device for Adaptive Threshold Setting in Vibration-Based Bearing Condition Monitoring Under Variable Operating Speed",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "The invention describes a method for automatically adjusting alarm and warning thresholds for vibration-derived health indicators—specifically RMS and kurtosis computed in selectable frequency bands—as a function of measured shaft rotational speed sampled from a tachometer signal. A lookup table of baseline healthy-condition feature distributions, indexed by speed bin, is updated online using an exponentially weighted moving average. Threshold levels are recomputed at each measurement interval as multiples of the current baseline standard deviation. The associated device comprises a signal conditioning unit, a microcontroller executing the threshold adaptation algorithm, and a relay output for maintenance alert signalling. The method reduces false alarm rates under variable-speed operation by approximately 60% relative to fixed-threshold implementations in validation tests.",
+   "inventors": [
+    {
+     "researcher_id": "R0822",
+     "name": "Vladana Radić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-046",
+   "title": "Geometrically optimised corner cushioning insert with integrated rib structure for consumer electronics packaging",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A protective packaging corner insert comprising an expanded polystyrene or expanded polyethylene body with a defined arrangement of internal ribs and fillet radii configured to distribute impact load over a larger foam volume during corner and edge drop events. The rib geometry is defined by three parameters—rib wall thickness, rib height ratio, and fillet radius—optimised through finite element analysis to reduce peak transmitted acceleration by at least 25% relative to a solid insert of equal mass for products in the 1–3 kg weight class dropped from heights up to 1000 mm. Filed at the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0683",
+     "name": "Emilija Marić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-047",
+   "title": "Method and apparatus for assigning a logistics phase label to a thermal excursion event record in a transport monitoring system",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "A method for processing a sequence of temperature records and associated logistics event signals from a multi-point wireless sensor network installed in a refrigerated transport vehicle. The method applies a probabilistic state-sequence estimator to a fused data stream comprising temperature readings, door-open sensor signals, GPS position data, and transport management system event timestamps to assign each flagged excursion interval a logistics phase label from a defined taxonomy. The apparatus comprises a low-power embedded processor, non-volatile storage, and a LPWAN radio transceiver. Filed with the Intellectual Property Office of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0903",
+     "name": "Ivan Zec"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-048",
+   "title": "Method and apparatus for projective surface rectification of cylindrical container barcodes in motion",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "A machine vision method for decoding linear barcodes on moving cylindrical containers by estimating the visible arc width from a single camera frame, applying a piece-wise projective rectification to map the curved label region to a planar image, and then decoding with a standard 1D barcode engine. The method operates without prior knowledge of container diameter by deriving a radius estimate from the detected silhouette edges. It is suitable for implementation on industrial PCs and ARM-class embedded controllers at conveyor speeds up to 1.5 m/s. Filed with the Intellectual Property Office of the Republic of Serbia; national application number retained by the University of Novi Sad.",
+   "inventors": [
+    {
+     "researcher_id": "R0602",
+     "name": "Ksenija Ranković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-049",
+   "title": "Method and System for Automated Localisation of Buried Elongated Objects in Ground-Penetrating Radar B-Scan Imagery",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A computer-implemented method for detecting and localising buried elongated objects in GPR B-scan images. The method applies a configurable background subtraction stage, extracts amplitude envelope images, passes tiled patches through a trained convolutional neural network to generate apex probability heatmaps, and applies non-maximum suppression to produce object localisation coordinates and associated depth estimates. The method outputs results in a structured format compatible with GIS ingestion. The patent covers the combination of the patch-tiling strategy with the depth correction procedure based on auxiliary soil-moisture sensor input.",
+   "inventors": [
+    {
+     "researcher_id": "R1023",
+     "name": "Milena Nedić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-050",
+   "title": "Method and system for parametric generation and constraint-propagation update of folding-carton dielines from dimensional input data",
+   "year": 2019,
+   "status": "granted",
+   "abstract": "A computer-implemented method for generating a folding-carton dieline from a set of user-supplied internal dimensions. The method constructs a directed acyclic graph of geometric features, each defined by one or more algebraic expressions referencing master dimension variables. On modification of any master variable, the system propagates changes through the graph and regenerates all dependent feature geometries without user intervention. The generated dieline is exported in CFF2 and SVG formats. The system includes validation checks for minimum flap width, glue-flap overlap, and tuck-tongue clearance against user-configurable tolerance tables.",
+   "inventors": [
+    {
+     "researcher_id": "R0626",
+     "name": "Ildikó Papp"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-051",
+   "title": "Method and Apparatus for Adaptive Illumination Control in Inline Flexographic Print Verification Based on Substrate Reflectance Profiling",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "The invention describes a method for automatically adjusting the spectral intensity and angular distribution of an LED illumination bar in a camera-based inline print verification system. Before a production run, a calibration strip printed on the substrate is scanned and a reflectance profile is extracted per wavelength band. A control algorithm selects illumination parameters from a pre-computed lookup table to maximise the contrast ratio at the camera sensor for the specific substrate. The apparatus includes a multi-channel LED bar, a reflectance probe, and an embedded controller. The method reduces the need for manual illumination setup when substrates change between jobs.",
+   "inventors": [
+    {
+     "researcher_id": "R0798",
+     "name": "Ana Vojnović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-052",
+   "title": "Process for the preparation of polyaluminium sulphate coagulant from aluminium hydroxide sludge generated in anodising wastewater treatment",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention describes a process comprising: acid digestion of dried anodising sludge in dilute sulphuric acid (1.5–2.5 mol/L, 60–75 °C), removal of insoluble impurities by pressure filtration, controlled neutralisation of the aluminium sulphate liquor with sodium hydroxide or calcium carbonate to achieve an Al/OH molar basicity of 1.8–2.2, and optional concentration by evaporation. The resulting polyaluminium sulphate product has an aluminium content of not less than 9 wt% as Al2O3 and a basicity of 70–80%. The patent covers both liquid and spray-dried solid product forms and specifies iron content limits applicable to drinking water treatment use.",
+   "inventors": [
+    {
+     "researcher_id": "R0105",
+     "name": "Veljko Lazić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-053",
+   "title": "Coextruded Five-Layer Film Structure Comprising Amorphous Polyethylene Terephthalate Barrier Ply and Polyolefin Skin Layers",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "A coextruded film comprising two polyolefin outer plies, two tie-layer plies based on maleic-anhydride-grafted polyethylene, and a central ply of amorphous polyethylene terephthalate of 15–35 µm thickness. The structure achieves an oxygen transmission rate below 50 cm³/(m²·day·bar) at 23 °C while maintaining mechanical recyclability when blended with standard polyethylene recyclate streams at up to 10 % by mass contamination. The claimed invention covers the composition ranges and extrusion temperature windows that prevent crystallisation of the PET ply during processing. Application filed with the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0172",
+     "name": "Snežana Puzović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-054",
+   "title": "Seal-Layer Blend Composition for Heat-Sealable Cast Polyolefin Films with Reduced Seal-Initiation Temperature",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A blend composition for the seal layer of cast polyolefin films comprising 65–80 wt% metallocene linear low-density polyethylene with 1-octene comonomer, 15–25 wt% very-low-density polyethylene with density in the range 0.895–0.905 g/cm³, and 5–10 wt% low-density polyethylene with melt flow index below 1.0 g/10 min. The composition achieves a seal-initiation temperature below 100 °C at standard jaw conditions (0.3 N/mm², 0.4 s) and a plateau seal strength above 27 N/25 mm, providing a usable sealing window of at least 30 °C. Applicable to monolayer films and as the seal layer of coextruded or laminated multilayer structures for VFFS packaging.",
+   "inventors": [
+    {
+     "researcher_id": "R0715",
+     "name": "Bojan Grbić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-055",
+   "title": "Method and Device for In-Process Springback Compensation in CNC Press-Brake Bending by Iterative Punch Re-Strike with Optical Angle Feedback",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention relates to a method for compensating springback in air-bending operations performed on a CNC hydraulic press-brake. An optical angle sensor measures the bend angle at the moment of punch retraction. If the measured angle deviates from the target by more than a preset threshold, the controller calculates a corrective punch-depth increment using a preloaded surrogate model and executes one or more re-strike sub-strokes within the same machine cycle. The device includes a sensor mounting bracket compatible with standard European V-die tooling systems and a controller interface module. The method is claimed for ferrous and non-ferrous sheet materials in the thickness range 0.5 mm to 6.0 mm.",
+   "inventors": [
+    {
+     "researcher_id": "R0308",
+     "name": "Jovan Bogićević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-056",
+   "title": "Method and System for Automated Fabric Roll Assignment in Multi-Layer Spread Planning",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "The invention relates to a computerised method for assigning fabric rolls of heterogeneous remaining lengths to multi-layer cutting spreads in garment and textile production. The method accepts as input a list of available roll lengths, required spread lengths, and layer counts per cutting plan, and outputs a roll-to-spread assignment minimising total tail-end waste. The core procedure applies a Lagrangian relaxation of a set-covering formulation solved iteratively with subgradient updates. The system interfaces with standard inventory management data exports and outputs assignments in a format compatible with common spreading machine control software. Granted by the Intellectual Property Office of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0775",
+     "name": "Radovan Janković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-057",
+   "title": "Wrist-Worn Multi-Modal Biosensor Device with Integrated Signal Quality Gating and Low-Power Inference Engine",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A wrist-worn device comprising independent acquisition channels for photoplethysmography, electrodermal activity, and skin temperature, a three-axis accelerometer, and an embedded microcontroller executing a signal quality index algorithm that suppresses corrupted signal epochs before feature extraction. A fixed-point machine learning inference module produces a physiological load estimate at configurable intervals of 30 to 300 seconds and transmits the result via Bluetooth Low Energy. Power management circuitry dynamically adjusts sampling rates based on accelerometer-derived activity level to extend battery life. Granted by the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R1038",
+     "name": "Ognjen Vranješ"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-058",
+   "title": "Kinematic coupling insert system for modular electronics assembly fixtures with embedded seating verification",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A modular fixture system for holding small electronic sub-assemblies during automated assembly and inspection operations. The system comprises a base plate with a three-point kinematic coupling interface and interchangeable insert bodies carrying product-specific locating features. Each insert carries a passive magnetic target readable by proximity sensors embedded in the base plate, enabling automatic verification of correct seating and insert identity before cycle start. The coupling interface achieves positional repeatability below 3 µm over a design life of 500 exchange cycles. Granted by the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0463",
+     "name": "Jana Turčanová"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-059",
+   "title": "Method and System for Zoom-Adaptive Coordinate Quantisation in Vector Tile Encoding",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "This patent describes a method for selecting integer quantisation grid resolution in vector map tile encoding as a function of zoom level, geographic latitude, and dominant feature geometry type in the tile. The method uses a lookup table derived from empirical error analysis to choose between 2,048, 4,096, and 8,192 unit grids per tile, minimising mean positional error while remaining compatible with standard vector tile decoders. The system includes a tile server module implementing the selection logic and a client-side metadata header extension communicating the active grid resolution to rendering engines.",
+   "inventors": [
+    {
+     "researcher_id": "R0831",
+     "name": "Petar Ivković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-060",
+   "title": "Method and System for Adaptive Frequency-Band Selection in Vibro-Acoustic Blind Source Separation",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "A method for separating vibro-acoustic signals from multiple rotating machinery sources recorded by a sensor array with fewer channels than active sources. The method computes a local non-stationarity index per frequency sub-band and selects sub-bands where source sparsity assumptions are most reliably satisfied before applying a sparse-recovery mixing-matrix estimator. A subsequent SOBI step refines separation in selected bands. The system comprises a sensor interface, a real-time sub-band selector module, and a source reconstruction stage suitable for embedded deployment. Application is foreseen in drive-train monitoring and workshop-level acoustic diagnostics.",
+   "inventors": [
+    {
+     "researcher_id": "R0446",
+     "name": "Katarina Filipović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-061",
+   "title": "Embedded fiducial frame system for rapid extrinsic camera recalibration in modular manufacturing cells",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A structural cell frame incorporating laser-engraved fiducial markers at geometrically optimised positions on aluminium extrusion cross-members. The marker positions are determined during cell design by an offline algorithm that maximises geometric conditioning across the expected camera viewpoint volume. A camera with known intrinsic parameters recovers its extrinsic pose from a single image of visible markers using a PnP solver. The system reduces recalibration time per camera to under five minutes and does not require specialised calibration artefacts or production downtime beyond image capture.",
+   "inventors": [
+    {
+     "researcher_id": "R0293",
+     "name": "Stefan Jakovljević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-062",
+   "title": "Method and Circuit Arrangement for Periodic Gate Charge Measurement in Operating IGBT Converters for Degradation Monitoring",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "The invention describes a method for measuring the gate charge characteristic of an IGBT during normal converter operation by inserting a controlled brief gate sweep sequence synchronised with the PWM dead time, acquiring gate current and gate-emitter voltage waveforms, and computing the gate charge plateau integral. A comparator circuit triggers an alert when the plateau integral exceeds a factory-calibrated threshold by a defined fraction. The arrangement requires no additional power semiconductors and adds less than 2 µs latency to the dead time per measurement event. The method is applicable to any voltage-source inverter topology.",
+   "inventors": [
+    {
+     "researcher_id": "R0163",
+     "name": "Andrija Šarić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-063",
+   "title": "Gate Driver Circuit with Adjustable Negative Turn-Off Bias Derived from Switching-Node Voltage for Gallium-Nitride Transistors",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A gate-driver circuit that generates a negative turn-off bias voltage for enhancement-mode GaN transistors directly from energy stored in the switching-node voltage transition, requiring no auxiliary winding or separate negative supply. A small capacitor and a fast-recovery clamp diode sample the switching-node falling edge and feed a charge-storage network that provides a turn-off rail of −1 V to −3 V selectable by a resistor divider. The circuit operates from a single positive supply rail of +5 V to +6 V and adds less than 1 nH of additional gate-loop inductance. Measured on a 650 V GaN half-bridge switching at 500 kHz.",
+   "inventors": [
+    {
+     "researcher_id": "R0660",
+     "name": "Zoran Todić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-064",
+   "title": "Ferrite Shield Assembly with Segmented Gap Structure for Road-Embedded Wireless Charging Transmitter Pads",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "A ferrite shield assembly for road-embedded inductive power transfer transmitter pads in which the ferrite layer is divided into discrete rectangular tiles separated by controlled gaps of 0.5–2.0 mm. The gap pattern is arranged to reduce crack propagation under repeated mechanical loading from vehicle traffic while maintaining magnetic flux channelling performance within 4% of a monolithic ferrite assembly of equivalent cross-section. The assembly includes a polymer encapsulant filling the inter-tile gaps. Intended for transmitter pads operating at 85 kHz in dynamic wireless charging installations for low-speed vehicles.",
+   "inventors": [
+    {
+     "researcher_id": "R0475",
+     "name": "Vladimir Simić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-065",
+   "title": "Method and Circuit Arrangement for Dead-Time Adaptive Control in Bidirectional LLC/CLLC Resonant Converters",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A method for adaptively adjusting dead time in a bidirectional LLC or CLLC resonant converter based on a real-time estimate of MOSFET output charge derived from measured drain-source voltage slope during the commutation interval. A low-cost analogue differentiator circuit and a comparator threshold circuit feed a dead-time correction signal to the gate driver. The approach eliminates the need for a current sensor for dead-time optimisation and maintains ZVS across a battery terminal voltage range spanning at least 40 % of nominal. The patent covers the circuit topology and the associated control algorithm.",
+   "inventors": [
+    {
+     "researcher_id": "R0126",
+     "name": "Dejan Hadžić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-066",
+   "title": "Configurable Truncated Partial-Product Multiplier Cell with Runtime Approximation Level Selection",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A multiplier circuit in which the number of discarded partial product rows is selectable at runtime through a two-bit configuration register, allowing the arithmetic precision and associated power consumption to be adjusted dynamically without circuit reconfiguration. The selection logic adds a small multiplexer tree between the partial product generation stage and the carry-save adder array. The circuit is described for 8-bit and 16-bit unsigned operand widths and is suitable for integration into reconfigurable image processing pipelines where workload quality requirements vary over time.",
+   "inventors": [
+    {
+     "researcher_id": "R0887",
+     "name": "Rastko Mijatović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-067",
+   "title": "Method and Circuit for Background Bin-Width Calibration of an Inverter-Chain Time-to-Digital Converter",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A background calibration circuit and associated method for correcting bin-width nonuniformity in an inverter-chain time-to-digital converter. A pseudo-random dither signal is applied to the input timing event, and the resulting output code histogram is accumulated in a digital register bank. A lookup table of per-bin correction factors is updated at intervals of no more than 4096 reference clock cycles. The method does not require interruption of normal TDC operation and adds fewer than 3 000 logic gate equivalents. Applicable to TDCs embedded in all-digital or hybrid phase-locked loops operating between 100 MHz and 2 GHz.",
+   "inventors": [
+    {
+     "researcher_id": "R0716",
+     "name": "Michal Lačok"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-068",
+   "title": "Method and Circuit Arrangement for Adaptive Wordlength Selection in Pipelined Fixed-Point Signal Processing Datapaths",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "The invention concerns a method for selecting per-stage wordlengths in a pipelined fixed-point arithmetic datapath such that signal-to-quantisation-noise ratio at the output exceeds a configurable threshold while the total number of flip-flops and DSP slices is minimised. A hardware circuit arrangement accompanying the method includes a configurable truncation unit at each pipeline stage, a downstream SNR monitor comparing a reference signal with the pipeline output, and a control finite state machine that adjusts truncation boundaries during a calibration phase. The method is suited for use in FPGA-implemented signal processing systems where wordlength flexibility is available through parameterised HDL generation.",
+   "inventors": [
+    {
+     "researcher_id": "R0287",
+     "name": "Filip Lazić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-069",
+   "title": "Method and System for Generating Auditable Inspection Reports from Neuro-Symbolic Scene Graph Analysis",
+   "year": 2025,
+   "status": "pending",
+   "abstract": "The invention describes a computational method in which a trained neural object-detection module produces bounding-box annotations for a captured image; these annotations are encoded as extensional facts and supplied to an answer set programming engine loaded with declarative acceptance rules corresponding to an industrial inspection standard. The engine produces both a pass/fail decision and a structured report citing the specific rules and image regions that support each decision. The method is applicable to printed-circuit-board inspection, mechanical-component surface inspection, and similar manufacturing quality-control tasks where regulatory auditability of rejection decisions is required.",
+   "inventors": [
+    {
+     "researcher_id": "R0628",
+     "name": "Andrea Pavlović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-070",
+   "title": "Method and Circuit Arrangement for Reducing Near-Field Electromagnetic Leakage in a Synchronous AES Encryption Core by Complemented Differential Routing of Internal State Buses",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A circuit arrangement for an AES encryption core in a programmable logic device comprises paired complemented routing of the 128-bit internal state buses and the SubBytes output buses, wherein each signal net is assigned a routed twin carrying its logical complement at a separation of no more than two routing tracks. A placement constraint method automates the assignment of twin nets during synthesis. The arrangement reduces near-field EM leakage amplitude by at least 8 dB at the encryption clock frequency without altering functional correctness or throughput, as verified on Xilinx Zynq-7000 and UltraScale+ devices.",
+   "inventors": [
+    {
+     "researcher_id": "R0054",
+     "name": "Nina Dimitrijević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-071",
+   "title": "Method and Device for Switching Gain Adaptation in Sliding Mode Controllers for Hydraulic Servo Actuators Using Online Disturbance Envelope Estimation",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "The invention describes a hardware-implementable method in which a recursive signal processing unit continuously estimates the upper bound of external disturbances acting on a hydraulic servo actuator from closed-loop pressure and position signals. The estimated bound is fed to a gain scheduling unit that adjusts the switching gain of a sliding mode controller in real time, maintaining reachability while reducing unnecessary switching energy. The device is intended for integration into standard industrial programmable logic controllers or motion control units connected to proportional servo valves.",
+   "inventors": [
+    {
+     "researcher_id": "R0410",
+     "name": "Nada Jeremić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-072",
+   "title": "Modular underactuated finger mechanism with interchangeable compliant joint inserts for prosthetic applications",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "A prosthetic finger mechanism comprising a rigid structural shell and a set of interchangeable compliant joint inserts fabricated by fused deposition modelling. The inserts are retained by a bayonet fitting and can be exchanged without tools, allowing the stiffness of each phalanx joint to be adjusted post-fitting to match the user's residual grip force. The mechanism is driven by a single tendon and incorporates a proximal spring return. The claim covers the bayonet retention geometry, the insert cross-section profile, and the method of pre-loading the return spring through insert rotation during assembly. Filed with the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0731",
+     "name": "Miloš Jokić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-073",
+   "title": "Flexible piezoresistive sensor array with integrated thermal drift compensation taxels and method for manufacturing the same",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A flexible tactile sensor array comprises a plurality of active sensing taxels arranged in a matrix on a carbon-black-loaded silicone substrate, and a set of reference taxels that remain mechanically unloaded during operation. The reference taxels are spatially distributed within the matrix at a density of at least one per sixteen active taxels. Signal-conditioning circuitry uses the reference taxel resistance to estimate local temperature and applies a compensation coefficient to adjacent active taxels, reducing temperature-induced zero-drift. The manufacturing method includes a screen-printing step for the conductive ink and a controlled curing profile that minimises inter-taxel sensitivity variation.",
+   "inventors": [
+    {
+     "researcher_id": "R0192",
+     "name": "Goran Starčević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-074",
+   "title": "Method and apparatus for real-time adaptive feed-rate adjustment in CNC milling based on acoustic emission wear state estimation",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A method for adjusting the programmed feed rate of a CNC milling spindle in real time using wear state estimates derived from acoustic emission signals. The apparatus comprises a wideband piezoelectric sensor mounted on the spindle housing, a dedicated signal conditioning board performing band-pass filtering and RMS computation at configurable gate lengths, a wear-state classifier executing on an embedded processor, and an OPC-UA client module that writes feed-rate override values to the CNC controller. The patent covers the threshold-based state machine logic and the communication protocol between the monitoring unit and the CNC interface. Filed with the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0219",
+     "name": "Goran Mirković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-075",
+   "title": "Segmented inductive charging pad with impedance-signature-based sub-coil activation for position-tolerant wireless power transfer",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "A floor-mounted inductive charging pad comprising four overlapping planar sub-coils arranged in a 2×2 array, each independently switchable by a central controller. The controller determines the lateral position of a secondary coil carried by an automated guided vehicle by evaluating a set of reflected impedance signatures measured sequentially from each sub-coil prior to full power delivery. Based on the estimated position, one or two adjacent sub-coils are activated to maximise magnetic coupling. The method requires no additional sensors on the vehicle and operates within the standard resonant inverter hardware already present in the charging station. Granted by the Intellectual Property Office of the Republic of Serbia; European regional phase pending.",
+   "inventors": [
+    {
+     "researcher_id": "R0174",
+     "name": "Dušan Tošić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-076",
+   "title": "Postupak i uređaj za kompenzaciju termalnog poremećaja u planarnom elektromagnetnom aktuatoru sa levitacijom",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "Pronalazak se odnosi na postupak kompenzacije termalno indukovanih pozicionih grešaka u planarnim elektromagnetnim aktuatorima sa magnetnom levitacijom. Postupak obuhvata merenje temperature u diskretnim tačkama rasporeda zavojnica, procenu raspodele termalnog polja primenom unapred identifikovanog parametarskog modela i prilagođavanje struja napajanja svake zavojnice radi kompenzacije promena magnetne sile izazvanih promenama otpornosti. Time se smanjuje poziciona greška indukovana zagrevanjem bez potrebe za dodatnim pozicionim senzorima. Prijava je podneta Zavodu za intelektualnu svojinu Republike Srbije.",
+   "inventors": [
+    {
+     "researcher_id": "R0021",
+     "name": "Vukica Stevanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-077",
+   "title": "Method and device for adaptive calibration of an EMG-driven joint torque estimator in a wearable exoskeleton using fatigue-indexed model parameter updating",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "The invention describes a procedure for continuously updating the activation dynamics parameters of a Hill-type muscle model embedded in an exoskeleton controller, using a median frequency shift index computed in real time from surface electromyography signals acquired during rehabilitation sessions. The update rule applies a first-order recursive estimator triggered by a configurable fatigue threshold, preventing torque estimation drift over sessions lasting up to 60 minutes. The method is hardware-agnostic and has been reduced to practice on an embedded ARM/GPU compute board consuming under 15 W.",
+   "inventors": [
+    {
+     "researcher_id": "R0531",
+     "name": "Olivera Bošković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-078",
+   "title": "Method and apparatus for adaptive superheat control in a positive-displacement expander organic Rankine cycle unit",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "The patent describes a control method for maintaining expander inlet superheat within a defined safe band in ORC units equipped with scroll or screw expanders, using a combination of pump-speed modulation and a partial-bypass valve positioned upstream of the expander. The method includes an adaptive gain-scheduling scheme that adjusts PI controller parameters based on an estimated heat-source enthalpy flow computed from available temperature and flow-rate measurements. The invention is applicable to ORC units operating with working fluids in the molecular weight range of 100–250 g/mol and heat-source temperatures between 80 and 220 °C. The patent was filed jointly by the University of Novi Sad and a regional engineering firm.",
+   "inventors": [
+    {
+     "researcher_id": "R0576",
+     "name": "Dimitrije Vučković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-079",
+   "title": "Monolithic XY Flexure Stage with Integrated Overload-Protection Stops",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "A monolithic planar XY micro-positioning stage machined from a single metal blank, incorporating a set of rigid mechanical stop features formed integrally within the blank to limit hinge deflection to a safe fraction of the material yield strain under accidental overload. The stop geometry is defined by a clearance gap that closes before the flexure hinge reaches 70% of its fatigue-limit stress amplitude. The stage is intended for use in optical alignment and micro-assembly equipment where accidental contact loads must not cause permanent deformation or fracture of the compliant elements. The invention covers the geometric relationship between stop clearance, hinge minimum thickness, and material yield strength required to guarantee protection across a specified range of overload magnitudes.",
+   "inventors": [
+    {
+     "researcher_id": "R0373",
+     "name": "Jelena Filipović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-080",
+   "title": "Hydraulic spool valve metering-edge profile with stepped chamfer for noise attenuation",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A metering-edge profile for hydraulic directional spool valves comprising a primary chamfer of 30–40° followed by a secondary micro-chamfer of 10–15° at the upstream face of the valve land. The two-stage profile reduces the peak adverse pressure gradient at the metering gap, suppressing vortex shedding responsible for tonal noise in the 200–500 Hz range. The profile is machinable using standard CNC grinding equipment without additional tooling. Testing at flow rates from 10 to 50 L/min demonstrated a 5–8 dB(A) reduction in overall sound pressure level compared with single-chamfer reference geometries at equivalent flow coefficients.",
+   "inventors": [
+    {
+     "researcher_id": "R0525",
+     "name": "Goran Žigić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-081",
+   "title": "Device and method for in-situ measurement of effective friction coefficient in rope-sheave contacts under operating loads",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A measurement device comprising a split sheave instrumented with radial and tangential force transducers, a data acquisition module, and a processing unit that computes the effective friction coefficient from the measured normal and tangential force resultants at the rope contact arc. The device clamps onto a standard sheave pin without modification of the host structure and is designed for use during normal hoisting operation. The processing unit applies a bending-stiffness correction to the classical capstan formula before outputting the friction coefficient. Intended for condition monitoring and maintenance scheduling in industrial crane and elevator installations.",
+   "inventors": [
+    {
+     "researcher_id": "R0061",
+     "name": "Ljiljana Puzović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-082",
+   "title": "Modular bipolar electrocoagulation–electrooxidation cell assembly for batch and continuous treatment of heavy-metal-bearing industrial rinsewaters",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention covers a modular cell assembly in which interchangeable bipolar electrode frames allow a single reactor housing to operate in EC mode (iron or aluminium frames) or EO mode (BDD-coated titanium frames) depending on the contaminant mix. Key features include integrated pH probes positioned between stages, a common DC power supply with individual stage current control, and a removable sludge collection tray allowing rapid in-situ removal without draining the reactor. The design reduces the footprint of two-stage EC–EO treatment to that of a single conventional unit. Granted by the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0194",
+     "name": "Dimitrije Marković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-083",
+   "title": "Embossing Die Assembly with Adjustable Dot-Dome Profile for Variable Substrate Caliper Compensation",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "An embossing die assembly for Braille and tactile symbol production on paperboard and laminate substrates in which the dome radius of each pin is independently adjustable via a threaded micro-insert mechanism. The adjustment allows a single die to compensate for caliper variation of ±0.15 mm without retooling, maintaining dot height within EN ISO 17351 tolerance across substrate batches. The device is intended for use on sheet-fed and reel-fed embossing presses operating at standard line speeds. Priority date 2019, granted by the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0500",
+     "name": "Sara Vulin"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-084",
+   "title": "Method and apparatus for generating a spectral reference signature from an embossed diffractive security element and comparing it against a stored database record",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A method for authenticating a diffractive security element embossed on a substrate comprises illuminating the element with a collimated monochromatic source at a fixed incident angle, collecting angle-resolved diffraction spectra at two or more receiver positions via fibre-optic probes, extracting a feature vector by principal component projection, and comparing it against a pre-stored reference signature using a cosine-similarity threshold. An apparatus implementing the method is described, comprising a handheld housing, a 532 nm diode laser, dual spectrometers, and a Bluetooth interface. The method achieves identification accuracy above 95 % on labels aged up to 24 months under ambient conditions.",
+   "inventors": [
+    {
+     "researcher_id": "R0436",
+     "name": "Ana Bogićević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-085",
+   "title": "Optical fibre probe assembly with integrated adipose tissue thickness compensation layer for diffuse reflectance spectroscopy of skeletal muscle",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "The invention describes a fibre-optic probe assembly in which a compliant silicone spacer of predefined thickness and scattering coefficient is interposed between the probe face and the skin surface, providing a passive optical correction for the variable adipose tissue contribution in diffuse reflectance measurements of skeletal muscle. The spacer geometry is optimised to stabilise the effective source–detector path length for adipose layer thicknesses between 3 and 12 mm, reducing inter-subject StO₂ variability in CW-NIRS measurements without requiring individual adipose thickness characterisation. The assembly is compatible with standard NIRS instrument fibre connectors and can be manufactured from biocompatible materials for repeated clinical use.",
+   "inventors": [
+    {
+     "researcher_id": "R0184",
+     "name": "Jasmina Andrić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-086",
+   "title": "Multi-well electrical stimulation chamber with integrated carbon electrode arrays for parallel cardiomyocyte conditioning",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A stimulation chamber device adapted to standard multi-well cell culture plates, comprising paired carbon-rod electrode assemblies positioned in each well at a fixed inter-electrode gap, connected to a central controller capable of delivering independently programmable biphasic square-wave pulses per row or per individual well. The design ensures field uniformity within ±10% across the well floor area and accommodates well formats from 12 to 96 wells. The device is intended for reproducible electrical conditioning of cardiomyocyte cultures in drug screening and tissue maturation workflows. Claim coverage includes the electrode positioning geometry, the electrode mounting frame, and the multi-channel pulse delivery architecture.",
+   "inventors": [
+    {
+     "researcher_id": "R0249",
+     "name": "Srđan Grujić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-087",
+   "title": "Method and apparatus for non-contact estimation of core body temperature in individuals with spinal cord injury using segmented infrared thermograms and a compartmental thermal model",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "The invention describes a method for estimating core body temperature in persons with spinal cord injury without invasive or semi-invasive probes. A ceiling- or wall-mounted infrared imaging device captures thermograms of a seated or supine subject. A software module segments the image into supra- and sub-lesion anatomical regions, extracts weighted mean skin temperatures, and feeds these into a two-compartment thermoregulatory model whose parameters have been individualised from a short calibration session. The estimated core temperature is output continuously and can trigger configurable environmental control actions. The application was filed with the Intellectual Property Office of the Republic of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0024",
+     "name": "Mina Lalić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-088",
+   "title": "Electrode array and control circuit for sequential electrowetting-on-dielectric actuation of droplets in a digital microfluidic device",
+   "year": 2008,
+   "status": "expired",
+   "abstract": "A planar electrode array for digital microfluidic devices in which each electrode is individually addressable through a multiplexed low-voltage CMOS control circuit. The dielectric stack consists of a parylene-C base layer (1.5–3 µm) covered by a fluoropolymer hydrophobic coating. A timing circuit synchronises electrode activation sequences with an optical droplet-position sensor to maintain reliable splitting and merging operations at generation frequencies up to 15 Hz. The design reduces the number of external control lines from N to log₂(N) + 2 for an N-electrode array, simplifying integration with standard laboratory instrumentation.",
+   "inventors": [
+    {
+     "researcher_id": "R1028",
+     "name": "Spasoje Popović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-089",
+   "title": "Three-terminal magnetic memory cell with exchange-biased spin-orbit torque write path and integrated thermometer",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "A three-terminal magnetic memory cell comprising a magnetic tunnel junction read element and a separate spin-orbit torque write channel incorporating an antiferromagnet/ferromagnet exchange-bias stack for field-free deterministic switching. An anomalous Hall resistance sensing element within the write channel serves as an on-chip temperature monitor to compensate for self-heating effects during write operations. The cell architecture allows the write current path to be electrically isolated from the tunnel junction, reducing read-disturb errors. Fabrication is compatible with back-end-of-line processes below 350 °C. Application to cache memory and neuromorphic computing arrays is described.",
+   "inventors": [
+    {
+     "researcher_id": "R0046",
+     "name": "Aleksandar Ostojić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-090",
+   "title": "Pulsed-voltage plasma nitriding process with adaptive duty-cycle control based on in situ optical emission feedback",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "A method and apparatus for plasma nitriding of steel components in which the duty cycle of a pulsed DC glow discharge is continuously adjusted by a feedback controller that monitors the intensity ratio of the NH (336 nm) and N2 (337 nm) emission bands by optical emission spectroscopy. The controller maintains the NH/N2 intensity ratio within a target window corresponding to a selected compound layer phase composition (γ'-dominant or ε-dominant) throughout the treatment, compensating for gas composition drift and temperature fluctuations. The invention covers both the control algorithm and the hardware integration of the spectrometer into the power supply feedback loop.",
+   "inventors": [
+    {
+     "researcher_id": "R0250",
+     "name": "Petar Dragić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-091",
+   "title": "Procedure for the Preparation of BiVO₄/TiO₂ Composite Photocatalyst by Sol-Gel Coating for Visible-Light Wastewater Treatment Applications",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "The patent covers a multi-step sol-gel coating procedure in which pre-synthesised monoclinic BiVO₄ particles are suspended in a titanium isopropoxide–ethanol solution, hydrolysed under controlled humidity, and calcined at 350–420 °C to produce a BiVO₄/TiO₂ composite with defined heterojunction geometry. The procedure specifies BiVO₄ weight fractions of 25–35%, calcination ramp rate, and atmosphere, and claims visible-light photocatalytic activity for the degradation of textile azo dyes. The patent is assigned to the University of Novi Sad.",
+   "inventors": [
+    {
+     "researcher_id": "R0958",
+     "name": "Biljana Stojanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-092",
+   "title": "Hardfacing Electrode Composition and Deposition Method for Agricultural Soil-Engaging Tools",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A flux-cored electrode composition comprising chromium carbide, vanadium carbide, and a bainitic steel matrix binder, formulated specifically for manual metal-arc deposition on the leading-bevel faces of ploughshares and subsoiler tines. The composition balances high carbide volume fraction (35–40%) with sufficient matrix toughness to suppress spalling during initial soil contact. The deposition procedure specifies preheat temperature, inter-pass cooling, and bead-sequence pattern. Compared to a standard chromium-carbide electrode tested under identical field conditions, the patented composition reduced mass loss by approximately 30% over 60 ha in loamy Chernozem soil.",
+   "inventors": [
+    {
+     "researcher_id": "R0909",
+     "name": "Aleksandar Marković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-093",
+   "title": "Concave bar profile geometry for reduced grain damage in axial threshing units",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A concave bar cross-sectional profile characterised by a leading-face angle of 22°–26° from vertical and a rounded trailing edge with radius 4–6 mm, intended for use in axial combine harvester threshing units processing wheat and barley. The profile geometry was derived from DEM-based contact force analysis showing that the conventional 90° leading face concentrates impact stress at the grain crease. Prototype bars machined to the claimed geometry and installed in a laboratory axial unit reduced grain cracking by 31% relative to standard bars at 1 100 rpm and 12 mm clearance. Filed with the Intellectual Property Office of Serbia.",
+   "inventors": [
+    {
+     "researcher_id": "R0643",
+     "name": "Đuro Andrić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-094",
+   "title": "Process for the production of arabinoxylan oligosaccharide powder with controlled degree of polymerisation from wheat bran by combined enzymatic hydrolysis and membrane ultrafiltration",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A process comprising alkaline extraction of arabinoxylan from wheat bran, enzymatic hydrolysis with a GH10 endo-xylanase under defined time-temperature conditions, cross-flow ultrafiltration through a 3 kDa polyethersulfone membrane to isolate the DP 3–6 oligosaccharide fraction, and spray drying to produce a stable powder. The resulting powder contains at least 70 % arabinoxylan oligosaccharides by dry weight and supports selective growth of Bifidobacterium species in vitro. The patent covers the combination of process steps and the specified DP range of the product.",
+   "inventors": [
+    {
+     "researcher_id": "R0782",
+     "name": "Bojan Bulatović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-095",
+   "title": "Process for Sequential Aqueous and Supercritical CO₂ Extraction of Polyphenols and Tocopherols from Rosehip Seed",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "A two-stage extraction process applied to rosehip seeds generated as a by-product of jam and puree manufacturing. The first stage employs pressurised hot water at 60 °C and 100 bar to recover ascorbic acid and polyphenolic compounds. The spent seed material is then dried and subjected to supercritical CO₂ extraction at 330–380 bar, 55–65 °C with an ethanol co-solvent of 4–6 vol% to recover tocopherols and carotenoids. The patent covers the sequential combination, the intermediate drying step parameters, and the CO₂ pressure and temperature window. Filed at the Intellectual Property Office of the Republic of Serbia; granted 2022.",
+   "inventors": [
+    {
+     "researcher_id": "R0922",
+     "name": "Mina Dobanovački"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-096",
+   "title": "Process for Covalent Immobilisation of Engineered Fungal Laccase on Lignocellulose-Derived Carbon Supports and Use Thereof in Continuous Phenolic Compound Oxidation",
+   "year": 2025,
+   "status": "pending",
+   "abstract": "The invention describes a method for preparing an immobilised laccase biocatalyst by covalent attachment of a recombinant fungal laccase variant, carrying at minimum the G208D substitution, to carbon microparticles obtained by hydrothermal carbonisation of lignocellulosic biomass and functionalised with aminosilane reagents. The method specifies ranges for glutaraldehyde concentration, reaction temperature, pH, and contact time that achieve immobilisation yields above 70% with retained activity above 55%. Claimed applications include repeated-batch and continuous-flow oxidative treatment of agro-industrial process streams containing phenolic compounds.",
+   "inventors": [
+    {
+     "researcher_id": "R0742",
+     "name": "Dušan Kovačević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-097",
+   "title": "Process for Preparing Dense Hydroxyapatite–Bioglass Composite Bodies by Spark Plasma Sintering with Suppressed Tricalcium Phosphate Formation",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "A process for fabricating dense HA–bioglass composite bodies in which bioglass powder with a median particle diameter above 5 µm is mixed with mechanochemically synthesised hydroxyapatite at 5–15 wt% bioglass content, cold-pressed at 50–100 MPa, and sintered by spark plasma sintering at 850–900 °C under 50 MPa uniaxial pressure for 5–10 minutes. Under these conditions, the TCP content in the product is below 2 wt% as determined by Rietveld refinement, and relative density exceeds 96%. The process is distinguished from prior art by the combined specification of BG particle size and the reduced temperature range.",
+   "inventors": [
+    {
+     "researcher_id": "R0384",
+     "name": "Đorđe Pekez"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-098",
+   "title": "Process for continuous fluidised-bed coating of hygroscopic salt granules with vegetable fat and apparatus therefor",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "The patent covers a continuous fluidised-bed coating process in which sodium chloride or potassium chloride granules of 300–600 µm median diameter are coated with a molten vegetable fat mixture delivered through a pressure nozzle maintained above the fat melting point. The apparatus includes a temperature-controlled nozzle housing, a recirculation loop for unused melt and an inline moisture sensor for endpoint detection. The process yields coated granules with moisture uptake below 1 % w/w at 0.75 aw after 24 hours, suitable for use as flow-conditioned, moisture-stable salt ingredients in compound feed and processed food manufacture.",
+   "inventors": [
+    {
+     "researcher_id": "R0394",
+     "name": "Ratko Radulović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-099",
+   "title": "Process for reactive co-extrusion of thermoplastic starch and plant protein concentrate with in-line gelatinisation monitoring",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "The invention describes a process for producing a thermoplastic starch–plant protein composite by reactive co-extrusion in a co-rotating twin-screw extruder, wherein a near-infrared or ultrasonic sensor integrated into the barrel provides a continuous signal used to adjust barrel temperature set-points via a feedback loop, maintaining gelatinisation degree within ±5 percentage points of a target value. The process includes adding a dicarboxylic acid compatibiliser at 0.3–0.8 wt% relative to dry blend mass. The patent claims the process itself and the in-line control scheme; it does not claim the material composition. Filed with the Intellectual Property Office of the Republic of Serbia; PCT extension under evaluation.",
+   "inventors": [
+    {
+     "researcher_id": "R1044",
+     "name": "Branka Lalić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-100",
+   "title": "Process for the preparation of phospholipid-enriched fractions from oilseed press cakes using supercritical CO₂ and ethanol as co-solvent",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention describes a two-stage supercritical CO₂ fractionation process applied to oilseed press cakes, in which a first extraction stage at 150–200 bar and 40–50 °C removes neutral lipids, followed by a second stage at 250–350 bar and 50–65 °C with 3–8 mol% ethanol co-solvent to selectively recover phospholipid-enriched fractions. The process operates without organic solvent waste streams beyond residual ethanol recoverable by distillation. Phosphatidylcholine content in the product fraction is at least three times that of the starting cake oil. The patent covers the process parameters and the two-separator configuration.",
+   "inventors": [
+    {
+     "researcher_id": "R0860",
+     "name": "Miroslav Gajić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-101",
+   "title": "Method for continuous enzymatic synthesis of pharmaceutical-grade phosphatidylcholine using immobilised lipase in a packed-bed reactor",
+   "year": 2025,
+   "status": "pending",
+   "abstract": "The invention describes a process for producing phosphatidylcholine of pharmaceutical purity (≥96%) by continuous enzymatic transesterification of lysophosphatidylcholine with fatty acid acyl donors in a packed-bed reactor containing lipase immobilised on acrylic carrier beads. The method specifies substrate feed ratios, solvent composition, water activity control, temperature range, and flow rate parameters that together yield volumetric productivity above 4 g/L·h with enzyme operational lifetime exceeding 20 days. A downstream module for solvent removal and aqueous dispersion of the product is also claimed.",
+   "inventors": [
+    {
+     "researcher_id": "R0526",
+     "name": "Ivana Ljubojević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-102",
+   "title": "Postupak kontinualne enzimske sinteze kratkolančanih estara aroma uz simultano uklanjanje vode pervaporacijom",
+   "year": 2023,
+   "status": "granted",
+   "abstract": "Patent opisuje integrisani postupak za kontinualnu proizvodnju estara aroma (etil-acetat, butil-acetat, izoamil-acetat i srodni C2–C6 estri) reakcijom odgovarajuće karboksilne kiseline i alkohola u prisustvu imobilisane lipaze Candida antarctica B, uz simultano odvođenje vode nastalog u reakciji kroz polimernu pervaporacionu membranu. Patentom je zaštićen specifičan raspored reaktorskog suda, membranske jedinice i povratnog voda za reciklažu neizreagovalih supstrata, koji omogućava ravnotežni prinos iznad 95% bez upotrebe organskih rastvarača i pri specifičnoj potrošnji energije ispod 5 MJ/kg produkta.",
+   "inventors": [
+    {
+     "researcher_id": "R0260",
+     "name": "Nebojša Tomić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-103",
+   "title": "Transrectal near-infrared spectroscopy probe assembly for postoperative anastomotic perfusion monitoring",
+   "year": 2025,
+   "status": "pending",
+   "abstract": "A probe assembly for continuous transrectal near-infrared spectroscopy monitoring of colorectal anastomotic tissue oxygen saturation in the immediate postoperative period. The device comprises a flexible silicone shaft of 12 mm outer diameter carrying two NIRS emitter–detector pairs at a fixed spacing of 25 mm, a retention balloon inflatable to 15 mL, and a shielded cable for connection to a bedside NIRS processing unit. The assembly is designed for single-patient use, insertion under direct endoscopic guidance, and retention for up to 72 hours. The invention is co-owned by the University of Novi Sad and the Faculty of Technical Sciences.",
+   "inventors": [
+    {
+     "researcher_id": "R0714",
+     "name": "Filip Kecman"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-104",
+   "title": "Instrumented barbell collar for bilateral lateral force differential measurement",
+   "year": 2026,
+   "status": "pending",
+   "abstract": "A barbell collar incorporating an array of strain gauge bridges embedded in a machined aluminium body to measure transverse and axial forces transmitted from the barbell shaft to the collar in real time. The device includes wireless data transmission at up to 200 Hz and onboard analogue-to-digital conversion. Intended applications include monitoring bilateral loading asymmetry during Olympic-style weightlifting training without requiring fixed laboratory force platforms. The patent covers the collar geometry, gauge placement configuration, and calibration procedure.",
+   "inventors": [
+    {
+     "researcher_id": "R0200",
+     "name": "Uroš Cvetković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-105",
+   "title": "Flexible piezoelectric sensor patch with integrated charge amplifier for low-amplitude vibration measurement",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "The invention relates to a flexible sensor patch comprising a PVDF-TrFE active layer between screen-printed silver electrodes, encapsulated in a polyurethane laminate, with a miniaturised charge amplifier circuit bonded directly to the patch surface using anisotropic conductive film. The patch can be adhesively bonded to curved or planar surfaces and operates in the 5–200 Hz frequency range at acceleration amplitudes below 0.5 g. The design eliminates the need for separate cabling between the sensing element and signal conditioning circuitry, reducing susceptibility to triboelectric noise. Application fields include structural health monitoring of agricultural storage structures, drone landing gear, and wearable motion sensing.",
+   "inventors": [
+    {
+     "researcher_id": "R0073",
+     "name": "Lidija Arsić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-106",
+   "title": "Method for aerosol-jet printing of enzyme-containing bioink layers on flexible electrode substrates with controlled humidity chamber",
+   "year": 2022,
+   "status": "granted",
+   "abstract": "The invention relates to a method and apparatus for aerosol-jet deposition of enzyme-containing inks on flexible printed electrode substrates. A humidity-controlled enclosure (60–85% RH) surrounding the deposition zone prevents rapid desiccation of the aqueous enzyme carrier during flight and impact, preserving enzymatic activity. The method is applicable to oxidase and dehydrogenase enzymes immobilised in a poly(vinyl alcohol) matrix. Printed enzyme layers produced by the method retain more than 80% of reference activity measured by solution-phase assay, compared to 40–55% retention without humidity control. The patent covers the process parameters, enclosure design, and carrier ink composition ranges.",
+   "inventors": [
+    {
+     "researcher_id": "R0759",
+     "name": "Radomir Crnković"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-107",
+   "title": "Method for Covalent Immobilisation of Molecularly Imprinted Polymer Films on Silicon Dioxide Quartz Crystal Microbalance Surfaces via Methacryloxy Silane Coupling Agents and Application Thereof to Detection of Small Organic Molecules in Aqueous Matrices",
+   "year": 2023,
+   "status": "pending",
+   "abstract": "The patent covers a multi-step surface functionalisation procedure for silicon dioxide quartz crystal microbalance resonators comprising: controlled vapour-phase deposition of (3-methacryloxypropyl)trimethoxysilane at defined humidity and temperature; UV-initiated co-polymerisation of methacrylic acid and ethylene glycol dimethacrylate in the presence of a target template molecule; and a defined sequential solvent removal protocol. The procedure results in covalently anchored molecularly imprinted polymer films of 15–30 nm thickness with a sensor-to-sensor reproducibility of less than 10% CV of sensitivity slopes across a batch of at least six resonators. Claims cover the fabrication method, the resulting coated resonator device, and its use in quantitative detection of pesticides, pharmaceuticals, and hormones in drinking water and wastewater matrices.",
+   "inventors": [
+    {
+     "researcher_id": "R0435",
+     "name": "Vladan Dobanovački"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-108",
+   "title": "Method for Selective Passivation of Grain Boundary Surface Sites in Polycrystalline Metal-Oxide Sensor Films Using Low-Dose Ion Implantation",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "A method for reducing water vapour cross-sensitivity in polycrystalline metal-oxide chemiresistive sensor films by implanting fluorine or chlorine ions at doses of 10¹³–10¹⁵ cm⁻² into the grain boundary regions of the film, followed by thermal annealing at 250–350 °C to recover crystal order while retaining halide species at grain boundary sites. The method selectively passivates surface hydroxyl groups responsible for water adsorption without requiring deposition of a separate physical barrier layer, thereby preserving analyte access kinetics. Applicable to SnO₂, ZnO, and In₂O₃ thin-film platforms on silicon or ceramic substrates.",
+   "inventors": [
+    {
+     "researcher_id": "R0640",
+     "name": "Đuro Krstić"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-109",
+   "title": "Method and apparatus for in-situ kinematic calibration of a serial manipulator arm using constrained configuration sampling",
+   "year": 2020,
+   "status": "granted",
+   "abstract": "A calibration method for serial robot arms in which a constrained configuration sampling strategy selects measurement poses that remain within a user-defined collision-free region, such as an orchard row corridor, while maximising the observability index of the identification Jacobian. The apparatus comprises a lightweight reflective target mountable on the tool flange and a handheld total station for pose measurement. An embedded optimisation routine selects the next measurement configuration interactively. The method reduces required measurement time by approximately 40% compared to exhaustive grid sampling while achieving equivalent parameter identification accuracy.",
+   "inventors": [
+    {
+     "researcher_id": "R0119",
+     "name": "Andrea Kosanović"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-110",
+   "title": "Electrode assembly for continuous ohmic heating of viscous plant-based food dispersions with reduced fouling",
+   "year": 2024,
+   "status": "pending",
+   "abstract": "An electrode assembly for use in a tubular continuous ohmic heater designed specifically for viscous plant-based food dispersions with dry matter content between 10% and 35%. The assembly features a segmented graphite-polymer composite electrode surface with a helical flow-directing insert that reduces product residence time variance and minimises electrode fouling by starch and protein deposits. Internal geometry parameters and electrode gap dimensions are specified to maintain field strength uniformity within ±5% across the flow cross-section at product conductivities typical of legume and vegetable purées (0.3–1.4 S/m). Filing covers Serbia and selected EU member states under the regional patent cooperation route.",
+   "inventors": [
+    {
+     "researcher_id": "R0405",
+     "name": "Danica Ljubojević"
+    }
+   ]
+  },
+  {
+   "id": "SYN-PAT-111",
+   "title": "Encapsulation device for attaching fibre Bragg grating sensors to metallic pipeline surfaces",
+   "year": 2021,
+   "status": "granted",
+   "abstract": "The invention relates to a mechanical encapsulation housing for mounting a fibre Bragg grating sensor onto the outer surface of a metallic pipe. The housing comprises a stainless steel split-tube body, an epoxy-fill port, and a swaged end cap with a strain-relief sleeve for the pigtail fibre. The device is designed to transfer axial and hoop strains from the pipe wall to the FBG element with a transfer efficiency above 0.95 while providing protection against soil abrasion, moisture ingress, and cathodic protection currents. The housing can be installed on pipes in the diameter range DN100 to DN600 without interrupting pipeline service.",
+   "inventors": [
+    {
+     "researcher_id": "R0130",
+     "name": "Branka Zec"
+    }
+   ]
+  }
+ ]
+}
