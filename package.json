@@ -15,7 +15,8 @@
     "build": "tsc",
     "trace": "tsx src/index.ts trace",
     "openalex": "tsx src/index.ts openalex",
-    "test": "node --import tsx --test tests/critic.test.ts"
+    "test": "node --import tsx --test tests/critic.test.ts",
+    "refresh:calls": "tsx scripts/refresh-calls.ts"
   },
   "dependencies": {
     "@mozaik-ai/core": "^4.1.0",

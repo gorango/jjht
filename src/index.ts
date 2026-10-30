@@ -80,7 +80,8 @@ const run = async (): Promise<void> => {
 
   const state = new EurekaState();
   state.config = config;
-  state.dataset = loadDataset();
+  const skip = flag("skip", 0);
+  state.dataset = loadDataset(skip > 0 ? { companyOffset: skip } : {});
   state.index = new ResearcherIndex(state.dataset.researchers);
 
   for (const researcher of state.dataset.researchers) state.sourceIds.add(researcher.id);

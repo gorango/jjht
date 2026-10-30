@@ -132,6 +132,7 @@ npm start -- --companies=10 --challenges=2 --candidates=6 --profile=3 --portfoli
 | Flag | Default | Meaning |
 | --- | --- | --- |
 | `--companies` | 6 | Companies to process (dataset has 153) |
+| `--skip` | 0 | Skip the first N companies (demo a specific sector) |
 | `--challenges` | 2 | Challenges per company (489 in total) |
 | `--candidates` | 6 | Researchers retrieved per challenge |
 | `--profile` | 3 | Candidates enriched with a model-written profile |
@@ -292,6 +293,14 @@ rank or rate people by worth. Retrieval ranks *overlap with a stated problem*, a
 - **Portfolio is greedy.** No global optimisation (e.g. max-coverage with mutual exclusivity);
   with 153 companies that is a real, if small, quality gap.
 - **No persistence between runs.** State lives in memory; `runs/` is the durable artefact.
+- **Open-call matching was prototyped and removed.** A Funding Scout attached live Horizon Europe
+  calls to each pair. The portal's search API returns only the topic *title* — the `topicDetails`
+  JSON endpoint that used to carry descriptions now 404s — so ranking ~314 open topics on keywords
+  produced false pairs: a Modbus/OT-security challenge matched a built-environment call, and a
+  game-development challenge matched a space-transport call at 100% "confidence". Gating the choice
+  behind the Matchmaker made it fire almost never. Shipping a wrong call in a proposal is worse than
+  shipping none, so the feature is out. If a call source with descriptions appears, the integration
+  point is `pairs.ranked`; the deterministic citation check already knows how to verify a call id.
 
 ---
 

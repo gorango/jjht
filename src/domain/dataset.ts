@@ -49,6 +49,8 @@ export interface DatasetOptions {
   /** Cap how many researchers are indexed. Useful for a fast local demo. */
   researcherLimit?: number;
   companyLimit?: number;
+  /** Skip the first N companies — handy for demoing a specific sector. */
+  companyOffset?: number;
 }
 
 export const loadDataset = (options: DatasetOptions = {}): Dataset => {
@@ -58,7 +60,10 @@ export const loadDataset = (options: DatasetOptions = {}): Dataset => {
   const patentFile = readJson<{ patents: Patent[] }>("patents.json");
 
   const researchers = researcherFile.researchers.slice(0, options.researcherLimit ?? undefined);
-  const companies = companyFile.companies.slice(0, options.companyLimit ?? undefined);
+  const companies = companyFile.companies.slice(
+    options.companyOffset ?? 0,
+    (options.companyOffset ?? 0) + (options.companyLimit ?? companyFile.companies.length),
+  );
 
   const publications = new Map<string, Publication>();
   for (const publication of readJsonl<Publication>("publications.jsonl")) {

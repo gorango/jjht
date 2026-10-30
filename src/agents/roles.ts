@@ -207,12 +207,12 @@ Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "shar
       .sort((a, b) => b.fit - a.fit);
 
     for (const score of scores) state.scores.set(score.key, score);
-    emit("pairs.ranked", context.worker, { challengeId: item, scores, generation: context.generation });
 
     const best = scores[0];
     if (!best) {
       state.note("match", context.worker, `${item}: no viable pair — left unmatched on purpose`);
       state.unmatched.add(item);
+      emit("pairs.ranked", context.worker, { challengeId: item, scores, generation: context.generation });
       wake(state.queues["matchmaker"].length, "matchmaker", context.worker);
       return;
     }
@@ -229,10 +229,14 @@ Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "shar
       revision: 0,
       criticNote: "",
     };
+    // Create the proposal *before* announcing the ranking: the Funding Scout looks
+    // it up when deciding whether to hand work to the Writer.
     state.proposals.set(proposal.id, proposal);
     state.totals.proposals += 1;
+    emit("pairs.ranked", context.worker, { challengeId: item, scores, generation: context.generation });
+
     state.enqueue("writer", proposal.id);
-    wake(state.queues["writer"].length, "writer", context.worker);
+    wake(state.queues.writer.length, "writer", context.worker);
     wake(state.queues["matchmaker"].length, "matchmaker", context.worker);
   },
 };
