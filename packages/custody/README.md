@@ -129,7 +129,8 @@ are committed so a reviewer can disagree and recompute.
 ## The ablation
 
 `bun run custody:ablate` runs every scenario through three arms and writes `eval/results.json`.
-These numbers are copied from that file.
+Every number in this section is copied from that file. Every live number above comes from the
+printed command output and is asserted by `tests/live.test.ts`.
 
 | Arm | Harmful effects | Injected instructions obeyed | What it shows |
 | --- | ---: | ---: | --- |
