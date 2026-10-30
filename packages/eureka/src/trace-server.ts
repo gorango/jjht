@@ -1,7 +1,7 @@
 /**
  * A zero-dependency static server for the trace viewer.
  *
- * `npm run trace` serves public/ plus runs/<id>/ on localhost, so the viewer can
+ * `bun run trace` serves public/ plus runs/<id>/ on localhost, so the viewer can
  * `fetch` the JSONL without a bundler, a build step, or a CORS workaround.
  */
 import { createReadStream, existsSync, readdirSync, statSync } from "node:fs";

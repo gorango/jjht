@@ -1,9 +1,9 @@
 /**
  * EUREKA — entry point.
  *
- *   npm run mock     # deterministic, offline, no API key
- *   npm start        # real models (needs a provider key in .env)
- *   npm run trace    # serve the trace viewer for the latest run
+ *   bun run mock     # deterministic, offline, no API key
+ *   bun start        # real models (needs a provider key in .env)
+ *   bun run trace    # serve the trace viewer for the latest run
  */
 import "dotenv/config";
 
@@ -155,7 +155,7 @@ const run = async (): Promise<void> => {
       "  ───────────────────────────────────────────────────────",
       `  trace    runs/${state.runId}/trace.jsonl`,
       `  portfolio runs/${state.runId}/portfolio.md`,
-      `  view     npx tsx src/index.ts trace`,
+      `  view     bun run trace`,
       "",
     ].join("\n"),
   );
@@ -169,7 +169,7 @@ const latestRun = (): string => {
     .map((entry) => entry.name)
     .sort();
   const last = dirs[dirs.length - 1];
-  if (!last) throw new Error("no runs yet — run `npm run mock` first");
+  if (!last) throw new Error("no runs yet — run `bun run mock` first");
   return last;
 };
 

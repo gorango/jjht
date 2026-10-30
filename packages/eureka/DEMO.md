@@ -8,8 +8,8 @@ wrong live is a slow model call, and the fallbacks are at the bottom.
 ```bash
 cd /home/g/m/jigjoy
 git status                       # clean
-npm run mock                     # ~1s, regenerates runs/<id>/
-npm run trace -- --port=4173     # leave running in a second terminal
+bun run mock                     # ~1s, regenerates runs/<id>/
+bun run trace -- --port=4173     # leave running in a second terminal
 ```
 
 Open `http://localhost:4173/` in a browser tab and leave it there. Open
@@ -25,7 +25,7 @@ Open `http://localhost:4173/` in a browser tab and leave it there. Open
 **0:15 — run it live.**
 
 ```bash
-npm run mock
+bun run mock
 ```
 
 Point at the final lines, not the trace:
@@ -83,9 +83,9 @@ the system is telling you what it could not prove.
 | Failure | Do this |
 |---|---|
 | Model calls hang | Use the mock. It is a complete run, not a demo mode. |
-| Viewer won't load | `npm run trace -- --run=<id>` from `runs/`; or show `examples/run-full/trace.jsonl` raw. |
+| Viewer won't load | `bun run trace -- --run=<id>` from `runs/`; or show `examples/run-full/trace.jsonl` raw. |
 | No projector / no laptop | `examples/run-full/portfolio.md` and `docs/trace-viewer.png` render on GitHub. |
-| "Is it real?" | `npm run eval` — 47%/84% in two seconds, and `git log` shows the rejected designs. |
+| "Is it real?" | `bun run eval` — 47%/84% in two seconds, and `git log` shows the rejected designs. |
 
 ## 60-second cut
 

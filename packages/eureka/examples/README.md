@@ -7,7 +7,7 @@ at least three proposals.
 | --- | --- | --- | --- |
 | Date | 2026-10-30 | 2026-10-29 | 2026-10-30 |
 | Provider | OpenRouter (`deepseek/deepseek-v4-pro` / `deepseek-v4.1-flash`) | same | deterministic mock |
-| Command | `npm start -- --companies=6 --challenges=2` | `--companies=4 --challenges=1` | `npm run mock -- --companies=3 --challenges=2` |
+| Command | `bun start -- --companies=6 --challenges=2` | `--companies=4 --challenges=1` | `bun run mock -- --companies=3 --challenges=2` |
 | Companies / challenges | 6 / 12 | 4 / 4 | 3 / 6 |
 | Proposals | 10 | 3 | 6 |
 | Approved | 7 | 3 | 6 |

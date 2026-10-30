@@ -1,7 +1,7 @@
 /**
  * Retrieval evaluation against hand labels.
  *
- *   npm run eval
+ *   bun run eval
  *
  * Answers the question the rubric actually asks ("are the pairs right?") rather
  * than the easier one the trace answers ("do the sources resolve?").

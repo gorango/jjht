@@ -2,7 +2,7 @@
  * Print a labelling sheet: for each sampled challenge, the retrieval top-k with
  * enough of each researcher's profile to judge a match by hand.
  *
- *   npx tsx scripts/label-sheet.ts > eval/sheet.md
+ *   bun scripts/label-sheet.ts > eval/sheet.md
  */
 import { loadDataset, ResearcherIndex } from "../src/domain/dataset.js";
 

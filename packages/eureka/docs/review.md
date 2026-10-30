@@ -3,7 +3,7 @@
 Snapshot taken at **10:30 CET on Friday 30 October**, in the middle of the build window.
 Repository: `jigjoy` / EUREKA, HEAD `27fa75a`, working tree plus the new `docs/rules/` set.
 Submission deadline: **Saturday 31 October, 14:00 CET**. This document is the working plan; the
-official material it refers to lives in [`docs/rules/`](rules/README.md).
+official material it refers to lives in [`docs/rules/`](../../../docs/rules/README.md).
 
 ---
 

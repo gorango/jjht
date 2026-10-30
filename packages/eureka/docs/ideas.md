@@ -2,7 +2,7 @@
 
 A decision record for the ideas raised in the 30 October brainstorming session: what was proposed,
 what survives contact with the rules and the rubric, and what we are doing instead. Companion to
-[`review.md`](review.md) and [`docs/rules/`](rules/README.md).
+[`review.md`](review.md) and [`docs/rules/`](../../../docs/rules/README.md).
 
 **Decision: no pivot.** Deepen EUREKA. Import exactly one idea from the conversation — human-injected
 fault scenarios — as an optional mode inside the existing project. Rationale and revisit conditions

@@ -1,0 +1,31 @@
+{
+  "name": "eureka",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "EUREKA — an evidence-first, concurrent researcher–company matchmaker built on Mozaik",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts run",
+    "run": "tsx src/index.ts run",
+    "mock": "MOCK=1 tsx src/index.ts run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "trace": "tsx src/index.ts trace",
+    "openalex": "tsx src/index.ts openalex",
+    "test": "node --import tsx --test tests/critic.test.ts",
+    "refresh:calls": "tsx scripts/refresh-calls.ts",
+    "eval": "tsx scripts/eval.ts"
+  },
+  "dependencies": {
+    "@mozaik-ai/core": "^4.1.0",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

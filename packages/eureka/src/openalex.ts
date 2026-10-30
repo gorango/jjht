@@ -6,7 +6,7 @@
  * University of Novi Sad context for a proposal's "why this pair" section,
  * without sending a real person's profile to a model.
  *
- *   npx tsx src/index.ts openalex
+ *   bun run openalex
  */
 const BASE = "https://api.openalex.org";
 export const UNS_INSTITUTION = "I170726198"; // University of Novi Sad, ROR 00xa57a59

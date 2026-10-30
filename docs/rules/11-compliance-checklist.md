@@ -27,7 +27,7 @@ not an official document. Update the "evidence" column when files move.
 | Project name | ✅ | EUREKA. |
 | Description | ✅ | `docs/rules/05-submission.md` §Submission copy. |
 | Explanation of how agents run concurrently | ✅ | README §"Why this is not a pipeline in disguise"; submission copy. |
-| Demo video / deploy / screenshots (optional) | ⚠️ optional | `docs/trace-viewer.png`; a live deployment is not published. |
+| Demo video / deploy / screenshots (optional) | ⚠️ optional | `packages/eureka/docs/trace-viewer.png`; a live deployment is not published. |
 | Submitted by 31 Oct 14:00 CET; last entry counts | ☐ | Set a reminder for 13:00. |
 | Repo can be opened, run and verified | ⚠️ | Fix `npm ci` (lockfile out of sync); regenerate stale `examples/`; see main review. |
 
@@ -35,7 +35,7 @@ not an official document. Update the "evidence" column when files move.
 
 | Requirement | Status | Evidence |
 | --- | --- | --- |
-| Architecture diagram | ✅ | README §Architecture; `docs/architecture.md`; `examples/*/architecture.mmd`. |
+| Architecture diagram | ✅ | `packages/eureka/README.md` §Architecture; `packages/eureka/docs/architecture.md`; `packages/eureka/examples/*/architecture.mmd`. |
 | Trace of one full run showing where the Critic stepped in | ⚠️ partially | `examples/run-full/trace.jsonl` has 9 rejections; `examples/run-openrouter/trace.jsonl` has **0** and is the one linked first. Point the README at `run-full` as the evidence. |
 | At least three proposals for three different pairs | ✅ | `examples/run-openrouter/portfolio.md` (3), `examples/run-full/portfolio.md` (5). |
 | README answers "how would this plug into the EINSTEIN network and EINSTEIN Stars?" | ✅ | README §"How this plugs into the EINSTEIN network and EINSTEIN Stars". |
