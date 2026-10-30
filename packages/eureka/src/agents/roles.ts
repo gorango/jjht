@@ -285,7 +285,7 @@ Required markdown sections, with these exact headings and in this order:
 ## Unverified evidence
 ## Supervisors and candidate
 Under "Research questions" give 2-3 numbered questions. Under "Plan" give a markdown table with one row per year for exactly three years and columns Year | Work | Result; year 1 must contain at least one quantified milestone (a number with a unit). Under "What each side brings" use two bullets, **Company:** and **Faculty:**. Under "Agreed up front" state a publication review window in days and who owns the rig/models versus the methods. Under "Risks" name at least one concrete failure mode. Under "Unverified evidence" list what you could not verify. Under "Supervisors and candidate" name the academic supervisor, the industrial supervisor, and describe the candidate profile.
-Every factual claim about the researcher or the company must cite a dataset id. Never invent a publication, project, patent or capability. If you lack a source for a sentence, drop the sentence or put it under "Unverified evidence".
+Every factual claim about the researcher or the company must cite a dataset id. Never invent a publication, project, patent, capability, piece of equipment, facility, partner, location, headcount or number. If you lack a source for a sentence, drop the sentence or put it under "Unverified evidence". Do not decorate a source with plausible details it does not state.
 Name at least one publication title that belongs to this researcher, exactly as provided, in "Why this pair", and also put that exact title in the "namedPublication" field.
 Citations must be bare ids exactly as given: "R1008", "C001-CH1", "SYN-PUB-10472". Never a phrase, a description, or a field name such as "company products".
 Budget: at most 650 words of markdown. One page, not a report.
@@ -437,7 +437,7 @@ Schema: {"title": string, "supervisors": {"academic": string, "industrial": stri
 /* Critic                                                                      */
 /* -------------------------------------------------------------------------- */
 
-const MAX_REVISIONS = 2;
+const MAX_REVISIONS = 3;
 
 export interface CitationCheck {
   valid: string[];
@@ -610,7 +610,10 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
       if (record.type === "company") {
         const company = state.dataset.byCompanyId.get(record.id);
         return company
-          ? `${company.employees} employees. ${company.products.join("; ")}. ${company.rd_capacity}`.slice(0, 700)
+          ? `${company.name}, ${company.sector}, ${company.location}, founded ${company.founded}, ${company.employees} employees. Products: ${company.products.join("; ")}. R&D: ${company.rd_capacity}. ${company.about}`.slice(
+              0,
+              900,
+            )
           : "";
       }
       if (record.type === "researcher") {
