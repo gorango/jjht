@@ -43,23 +43,23 @@ runtime.
 | baro handoff burns time | medium | no PR | outbox + goal file is enough; the interface is the claim |
 | A judge asks for a threat model | low | credibility | one page in docs: attacker can write telemetry, not code; can steal a token; cannot modify the airlock |
 
-## Open decisions (for the wayfinder session)
+## Decisions
 
-1. **Live correlation:** window + shared pending set, or a dedicated Airlock participant? (See
-   [03-airlock](03-airlock.md), open question 1.)
-2. **Denial semantics:** `refuse_action` vs a tool-level refusal.
-3. **Second key:** human lease vs typed confirmation vs both.
-4. **Taint authority:** ingestion layer vs Watch model (must be ingestion).
-5. **How many roles actually run models:** could be 3 (Watch, Contain, Scribe) with the rest
-   deterministic. Fewer models = more reliable demo, but fewer "agents".
-6. **Adapter scope:** Docker only, or also a Kubernetes stub to show the interface generalises?
-7. **Evidence format:** JSON bundle vs signed manifest; is a hash enough for the claim?
-8. **Scenario authorship:** who writes the three scenarios not written by the author, to avoid
-   self-grading?
-9. **What "no action" looks like in the demo:** a quiet incident that closes cleanly — does it earn
-   a slot in a three-minute pitch?
-10. **The name:** CUSTODY vs VETO vs TWO-KEY vs QUORUM. CUSTODY carries both meanings (evidence
-    custody, custody of authority); the others are punchier but narrower.
+All ten open decisions are resolved; the canonical detail lives in the wayfinder tickets, indexed in
+the [map](wayfinder/map.md).
+
+| Decision | Ticket |
+| --- | --- |
+| Live correlation | [Live correlation mechanism](wayfinder/tickets/C03-live-correlation.md) |
+| Denial semantics | [Denial semantics](wayfinder/tickets/C09-denial-semantics.md) |
+| Second key | [Second key mechanics](wayfinder/tickets/C07-second-key.md) |
+| Taint authority | [Taint authority and boundary](wayfinder/tickets/C10-taint-authority.md) |
+| Model-driven roles | [Model-driven roles and the offline runner](wayfinder/tickets/C06-model-roles-and-offline-runner.md) |
+| Adapter scope | [Adapter scope](wayfinder/tickets/C11-adapter-scope.md) |
+| Evidence format | [Evidence format and chain of custody](wayfinder/tickets/C12-evidence-format.md) |
+| Scenario authorship | [Scenario authorship and self-grading](wayfinder/tickets/C08-scenario-authorship.md) |
+| No-action demo | [Vertical slice contract](wayfinder/tickets/C15-vertical-slice-contract.md) |
+| Name and framing | [Name and one-line framing](wayfinder/tickets/C16-name-and-framing.md) |
 
 ## Submission checklist (do not skip)
 

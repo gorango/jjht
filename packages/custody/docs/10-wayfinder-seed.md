@@ -18,6 +18,15 @@ reports `naive > 0`, `custody = 0`.
 - **Track:** Freestyle. One entry per team; the entry can change until Sat 31 Oct 14:00 CET.
 - **Constraints:** must use Mozaik and run two or more concurrent agents; no production mutation;
   demo must work offline; one person, ~14 usable hours.
+- **North star (not this map):** *an authority layer for any agent that can touch production —
+  capability-scoped, evidence-locked, auditable — demonstrated by closing one loop from attack to
+  merged fix to a replay that no longer works.* This is the reason the slice exists. It is **not**
+  the destination: do not ticket the whole platform, and do not let the map grow toward it.
+- **Dual-build constraint:** the scenario runner must be able to execute one scenario against both
+  the vulnerable and the patched build. Without that, the closed loop is unprovable after the fact,
+  and retrofitting it costs more than designing for it.
+- **Integration seam:** baro takes a *goal file*, not an issue URL, and is invoked as a subprocess.
+  The handoff contract is the goal and the PR — never baro's internals.
 - **Skills to consult:** `grilling`, `domain-modeling`, `prototype` for any UI/UX ticket; `research`
   for the adapter capability questions.
 - **Standing preference:** decisions, not deliverables. The scaffold already exists; tickets should
@@ -39,10 +48,13 @@ Ordered as a rough frontier. Blocking edges are suggestions; wire them in the tr
 | 6 | Second key: lease, typed confirmation, or both? | grilling | 5 | Determines the human participant and the demo beat |
 | 7 | Docker adapter: which actions are honestly reversible? | research | 8 | Claiming an undo you do not have is the one unrecoverable credibility risk |
 | 8 | Adapter scope: Docker only, or also a K8s stub? | grilling | 11 | Scope, not capability |
-| 9 | Ablation design: arms, scenarios, and the pass condition | grilling | 11 | The number the pitch rests on |
-| 10 | Get a GitHub test repo + token for filing issues | task | 11 | Blocks the real handoff demo |
+| 9 | Ablation and verification design: arms, scenarios, and the pass condition | grilling | 11, 14 | The number the pitch rests on; must include a patched-replay arm, not just a control arm |
+| 10 | Get a GitHub test repo + token for filing issues | task | 14 | Blocks the real handoff demo. Note: the current `origin` repo is private |
 | 11 | Prototype: the airlock/lease timeline in the viewer | prototype | 12 | Proof of concurrency, not decoration |
 | 12 | Name and one-line framing | grilling | — | CUSTODY vs VETO vs TWO-KEY vs QUORUM |
+| 13 | Scenario runner: one scenario, two build states | prototype | 9 | The mechanism that makes "the attack no longer works" checkable |
+| 14 | Baro handoff contract: goal file, `--local-only`, PR verification | grilling | 9, 10 | Defines what the slow loop promises, and what the demo may claim |
+| 15 | Repo visibility and name before submission | task | 12 | Public, and named after the thing being submitted |
 
 ## Not yet specified (fog)
 

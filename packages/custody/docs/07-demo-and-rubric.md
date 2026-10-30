@@ -60,7 +60,8 @@ with hashes.
 > agent can execute. The PR is the slow loop; containment is the fast one."
 
 **2:55 — close.**
-> "The deliverable is not a SOC. It is an authority model for agents that can touch production."
+> "The deliverable is not a SOC. It is an authority model for agents that can touch production —
+> and the loop closes: contain, fix, prove."
 
 ## 60-second cut
 

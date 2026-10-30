@@ -78,15 +78,14 @@ one veto is enough. They exist so the trace explains *who* stopped the action an
 
 ## Open questions for the wayfinder session
 
-1. **Correlation.** In the live runtime, `handle` sees one call at a time. How does the airlock know
-   which other loops have pending calls? Options: (a) a short await plus a shared pending set keyed
-   by loop id, (b) a dedicated Airlock participant that owns the set and releases transitions, (c)
-   deterministic ordering with no window. (a) is implemented in spirit; (b) is more elegant but
-   needs `runLoop` to suspend, which the public API does not expose.
-2. **Denial semantics.** Is `refuse_action` acceptable to judges as "the action did not happen", or
-   does it look like a workaround? Alternative: have the tool itself consult the airlock verdict and
-   return a structured refusal.
-3. **Second key.** Is a human participant holding a lease enough, or does the demo need a physical
-   confirmation (typed phrase) to be convincing?
-4. **Taint propagation.** Who sets `tainted`? If the Watch model sets it, a compromised Watch can
-   clear it. The bit should be set by the ingestion layer, before any model sees the text.
+1. **Correlation — resolved.** A dedicated Airlock participant owns a per-incident window, while
+   each agent's handler suspends its own loop and awaits the joint decision. The public API does
+   suspend: `handle()` is awaited inside `AgentLoop.run`, so no Mozaik patch is needed. See
+   [Live correlation mechanism](wayfinder/tickets/C03-live-correlation.md) and
+   [the correlation fact sheet](research/c01-correlation-mechanics.md).
+2. **Denial semantics — resolved.** Rewrite to the registered `refuse_action` no-op; see
+   [Denial semantics](wayfinder/tickets/C09-denial-semantics.md).
+3. **Second key — resolved.** A typed confirmation grants a 30 s single-intent lease; see
+   [Second key mechanics](wayfinder/tickets/C07-second-key.md).
+4. **Taint propagation — resolved.** Ingestion sets per-field taint before any model; see
+   [Taint authority and boundary](wayfinder/tickets/C10-taint-authority.md).

@@ -77,5 +77,6 @@ thesis is dead.
 ## Docs
 
 Start with [`docs/00-thesis.md`](docs/00-thesis.md), then [`docs/01-architecture.md`](docs/01-architecture.md).
-The plan and the open decisions are in [`docs/08-plan-risks-and-decisions.md`](docs/08-plan-risks-and-decisions.md);
-the wayfinder seed is [`docs/10-wayfinder-seed.md`](docs/10-wayfinder-seed.md).
+The decision-complete plan is the [wayfinder map](docs/wayfinder/map.md); the build contract is the
+[Vertical slice contract](docs/wayfinder/tickets/C15-vertical-slice-contract.md). The two fact sheets
+are in [`docs/research/`](docs/research/). Background: [`docs/08-plan-risks-and-decisions.md`](docs/08-plan-risks-and-decisions.md).

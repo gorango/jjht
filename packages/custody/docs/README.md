@@ -1,10 +1,12 @@
 # CUSTODY — design notes
 
-Everything decided, verified, or still open about the Freestyle pivot, written down so a
-wayfinder session can start from the frontier instead of from scratch.
+Everything decided, verified, or still open about the Freestyle pivot. The wayfinder map is
+**complete**: all 22 tickets are closed, and execution follows the
+[Vertical slice contract](wayfinder/tickets/C15-vertical-slice-contract.md).
 
 **Status: scaffold.** The decision core (closed action schema, invariants, airlock reconciliation)
-is implemented and tested. No agent is wired to it yet; no infrastructure is touched.
+is implemented and tested. No agent is wired to it yet; no infrastructure is touched. The plan is
+decision-complete; the slice is the next phase.
 
 | Doc | What it answers |
 | --- | --- |
@@ -19,6 +21,9 @@ is implemented and tested. No agent is wired to it yet; no infrastructure is tou
 | [08-plan-risks-and-decisions](08-plan-risks-and-decisions.md) | The remaining hours, cut lines, risks, open decisions. |
 | [09-mozaik-api-notes](09-mozaik-api-notes.md) | Verified v4.1.0 signatures and the pitfalls that cost time. |
 | [10-wayfinder-seed](10-wayfinder-seed.md) | Destination, candidate decision tickets, fog, out of scope. |
+| [wayfinder/map](wayfinder/map.md) | The completed map: 21 decisions, the remaining fog, and what is out of scope. |
+| [wayfinder/tickets/C15](wayfinder/tickets/C15-vertical-slice-contract.md) | The command contract, concurrency proof, cut order, and acceptance checklist for the build. |
+| [research/](research/) | The two fact sheets: Mozaik correlation mechanics and Docker reversibility. |
 
 ## Run it
 
