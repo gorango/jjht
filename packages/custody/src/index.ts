@@ -113,6 +113,7 @@ const printMoney = (report: ScenarioReport, verbose: boolean): number => {
       : `INFLIGHT ${report.inflightMax}`,
   );
   console.log(`expected outcomes: ${report.expectedMatches}/${report.expectedTotal} match`);
+  console.log(`effects executed: ${report.executed.length}`);
   console.log(`trace: ${report.tracePath}`);
 
   if (verbose) printVerbose(report);

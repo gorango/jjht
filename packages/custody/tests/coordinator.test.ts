@@ -125,7 +125,7 @@ describe("the decision window", () => {
   test("duplicates are rejected, stale verdicts are not replayed, and defers retry to the cap", async () => {
     const clock = new FakeClock();
     const executed: string[] = [];
-    const { state, coordinator } = boot(clock, executed, 2);
+    const { state, coordinator } = boot(clock, executed, 3);
 
     const first = coordinator.decide(intent("i-dup", "preserve-1", "snapshot"), "loop-a");
     const second = coordinator.decide(intent("i-dup", "contain-1", "isolate"), "loop-b");
@@ -146,7 +146,7 @@ describe("the decision window", () => {
     expect((await waiting).kind).toBe("defer");
     expect(executed).toEqual([]);
 
-    for (let attempt = 0; attempt < 2; attempt += 1) {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
       clock.advance(5);
       clock.advance(10);
     }

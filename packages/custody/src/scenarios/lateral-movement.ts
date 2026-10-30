@@ -64,7 +64,7 @@ export const lateralMovementScenario: Scenario = {
     },
   ],
 
-  blastBudget: 0.2,
+  blastBudget: 0.6,
 
   capabilities: {
     "preserve-1": ["snapshot"],

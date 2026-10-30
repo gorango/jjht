@@ -96,6 +96,18 @@ describe("scenario expectations", () => {
     }
   });
 
+  test("one agent's capture changes a peer's outcome from accept to defer", () => {
+    const fixture = scenario("lateral-movement");
+    const withCapture = reconcile(fixture.intents, ctxFor(fixture)).decisions;
+    const withoutCapture = reconcile(fixture.intents, {
+      ...ctxFor(fixture),
+      locks: [],
+    }).decisions;
+
+    expect(decisionFor(withCapture, "i-isolate-7").kind).toBe("defer");
+    expect(decisionFor(withoutCapture, "i-isolate-7").kind).toBe("accept");
+  });
+
   test("lateral movement defers the locked host and isolates the free one", () => {
     const fixture = scenario("lateral-movement");
     const decisions = reconcile(fixture.intents, ctxFor(fixture)).decisions;

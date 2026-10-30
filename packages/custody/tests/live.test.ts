@@ -3,6 +3,7 @@ import { existsSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+import { ablate } from "../src/eval/ablate.js";
 import { moneyScenario } from "../src/scenarios/money.js";
 import { SCENARIOS } from "../src/scenarios/index.js";
 
@@ -16,6 +17,7 @@ interface Row {
 
 const root = resolve(import.meta.dir, "..");
 const traces: string[] = [];
+const liveExecuted: number[] = [];
 
 const tempTrace = (name: string): string => {
   const file = join(tmpdir(), `custody-${name}-${crypto.randomUUID()}.jsonl`);
@@ -111,15 +113,25 @@ describe("the live run", () => {
         if (scenario.intents.length === 0) {
           expect(result.stdout).toContain("NO ACTION: ");
           expect(result.stdout).toContain("effects executed: 0");
+          liveExecuted.push(0);
         } else {
           expect(result.stdout).toContain(
             `expected outcomes: ${scenario.intents.length}/${scenario.intents.length} match`,
           );
+          const count = /effects executed: (\d+)/.exec(result.stdout);
+          expect(count, result.stdout).not.toBeNull();
+          liveExecuted.push(Number(count?.[1] ?? -1));
         }
       },
       20_000,
     );
   }
+
+  test("the live runs execute the same number of effects as the custody arm", () => {
+    const custody = ablate(SCENARIOS).totals.custody;
+    expect(liveExecuted).toHaveLength(SCENARIOS.length);
+    expect(liveExecuted.reduce((sum, count) => sum + count, 0)).toBe(custody?.executed);
+  });
 
   test(
     "benign: closes with no action and executes nothing",

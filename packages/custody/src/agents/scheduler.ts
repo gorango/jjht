@@ -428,15 +428,6 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
   ]);
   join(scribe);
 
-  // Fixture lock times are relative to the fixture's own clock (tests use 2000).
-  // Keep an active capture active; let an expired one stay expired.
-  const fixtureNow = 2_000;
-  for (const lock of scenario.locks) {
-    const remaining = lock.until - fixtureNow;
-    if (remaining <= 0) continue;
-    state.lockEvidence({ ...lock, until: clock.now() + remaining });
-  }
-
   ingest(state, "watch", scenario.telemetry);
 
   const watchLoopId = `loop-${(loopCounter += 1)}`;
