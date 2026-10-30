@@ -22,67 +22,16 @@ import { loadDataset, ResearcherIndex } from "./domain/dataset.js";
 import { createPools } from "./agents/pool.js";
 import { bootstrap, createWatchdog, diagnose, finalize, portfolioMarkdown, settled } from "./agents/scheduler.js";
 import { MockRunner } from "./inference/mock.js";
-import { hasOpenRouter, openRouterModels, OPENROUTER_DEFAULTS } from "./inference/openrouter.js";
+import { hasOpenRouter, openRouterModels } from "./inference/openrouter.js";
 import { initializeRuntime, join, leave } from "./runtime/session.js";
-import { EurekaState, type Role, type RunConfig } from "./runtime/state.js";
+import { EurekaState } from "./runtime/state.js";
 import { joinTrace } from "./runtime/trace.js";
 import { ARCHITECTURE } from "./architecture.js";
+import { auditRun } from "./audit.js";
 import { serveRuns } from "./trace-server.js";
 import { openalexProbe } from "./openalex.js";
-
-const flag = (name: string, fallback: number): number => {
-  const raw = process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split("=")[1];
-  const parsed = raw === undefined ? Number.NaN : Number(raw);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-
-const textFlag = (name: string): string | undefined =>
-  process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split("=")[1];
-
-const poolOverrides = (): Partial<Record<Role, number>> => {
-  const raw = process.argv.find((arg) => arg.startsWith("--pools="))?.split("=")[1];
-  if (!raw) return {};
-  const result: Partial<Record<Role, number>> = {};
-  for (const pair of raw.split(",")) {
-    const [role, size] = pair.split(":");
-    if (!role || !size) continue;
-    result[role as Role] = Number(size);
-  }
-  return result;
-};
-
-const buildConfig = (): RunConfig => ({
-  companyLimit: flag("companies", 6),
-  challengesPerCompany: flag("challenges", 2),
-  candidatesPerChallenge: flag("candidates", 6),
-  profileTopN: flag("profile", 3),
-  portfolioSize: flag("portfolio", 5),
-  leaseTtlMs: flag("lease-ttl", 120_000),
-  mockLatencyMs: flag("mock-latency", 0),
-  chaos: textFlag("chaos") === "slow-worker" ? "slow-worker" : undefined,
-  scheduler: textFlag("scheduler") === "off-after-boot" ? "off-after-boot" : "on",
-  poolSize: {
-    profiler: 3,
-    analyst: 3,
-    matchmaker: 3,
-    writer: 3,
-    critic: 2,
-    ...poolOverrides(),
-  },
-  // With OpenRouter configured, model ids are OpenRouter ids (vendor/model), not
-  // the bundled names — so the defaults change with the provider.
-  strongModel:
-    process.env.MOCK === "1" || process.env.MOCK === "true"
-      ? "mock"
-      : process.env.EUREKA_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.strong : "gpt-5.5"),
-  fastModel:
-    process.env.MOCK === "1" || process.env.MOCK === "true"
-      ? "mock"
-      : process.env.EUREKA_FAST_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.fast : "gpt-5.4-mini"),
-  mock: process.env.MOCK === "1" || process.env.MOCK === "true",
-});
-
-const fmt = (value: number): string => value.toLocaleString("en-US");
+import { buildConfig, flag, fmt } from "./config.js";
+import { startServe } from "./serve.js";
 
 const run = async (): Promise<void> => {
   const config = buildConfig();
@@ -207,6 +156,17 @@ const main = async (): Promise<void> => {
     const runId = process.argv.find((arg) => arg.startsWith("--run="))?.split("=")[1] ?? latestRun();
     const port = flag("port", 4173);
     serveRuns(port, runId);
+    return;
+  }
+
+  if (command === "audit") {
+    const runId = process.argv[3] ?? latestRun();
+    process.exitCode = auditRun(runId);
+    return;
+  }
+
+  if (command === "serve") {
+    await startServe(flag("port", 4300));
     return;
   }
 

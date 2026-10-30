@@ -14,6 +14,8 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "trace": "bun src/index.ts trace",
+    "audit": "bun src/index.ts audit",
+    "serve": "bun src/index.ts serve",
     "openalex": "bun src/index.ts openalex",
     "test": "bun test tests",
     "refresh:calls": "bun scripts/refresh-calls.ts",
