@@ -22,6 +22,7 @@ import { loadDataset, ResearcherIndex } from "./domain/dataset.js";
 import { createPools } from "./agents/pool.js";
 import { bootstrap, diagnose, finalize, portfolioMarkdown } from "./agents/scheduler.js";
 import { MockRunner } from "./inference/mock.js";
+import { hasOpenRouter, openRouterModels, OPENROUTER_DEFAULTS } from "./inference/openrouter.js";
 import { initializeRuntime, join } from "./runtime/session.js";
 import { EurekaState, type Role, type RunConfig } from "./runtime/state.js";
 import { joinTrace } from "./runtime/trace.js";
@@ -62,8 +63,12 @@ const buildConfig = (): RunConfig => ({
     critic: 2,
     ...poolOverrides(),
   },
-  strongModel: process.env.EUREKA_MODEL ?? "gpt-5.5",
-  fastModel: process.env.EUREKA_FAST_MODEL ?? "gpt-5.4-mini",
+  // With OpenRouter configured, model ids are OpenRouter ids (vendor/model), not
+  // the bundled names — so the defaults change with the provider.
+  strongModel:
+    process.env.EUREKA_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.strong : "gpt-5.5"),
+  fastModel:
+    process.env.EUREKA_FAST_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.fast : "gpt-5.4-mini"),
   mock: process.env.MOCK === "1" || process.env.MOCK === "true",
 });
 
@@ -85,9 +90,15 @@ const run = async (): Promise<void> => {
   for (const id of state.dataset.byChallengeId.keys()) state.sourceIds.add(id);
   for (const id of state.dataset.byCompanyId.keys()) state.sourceIds.add(id);
 
+  const provider = config.mock ? "mock" : hasOpenRouter() ? "openrouter" : "bundled";
+
   initializeRuntime({
     state,
-    inferenceRunnerConfig: config.mock ? { runner: new MockRunner() } : undefined,
+    inferenceRunnerConfig: config.mock
+      ? { runner: new MockRunner() }
+      : hasOpenRouter()
+        ? { supportedModels: openRouterModels([config.strongModel, config.fastModel]) }
+        : undefined,
   });
 
   const trace = joinTrace(state);
@@ -99,7 +110,7 @@ const run = async (): Promise<void> => {
 
   console.log(
     `\nEUREKA ${state.runId}\n` +
-      `  ${config.mock ? "MOCK model (offline, deterministic)" : `models ${config.strongModel} / ${config.fastModel}`}\n` +
+      `  ${config.mock ? "MOCK model (offline, deterministic)" : `${provider} · ${config.strongModel} / ${config.fastModel}`}\n` +
       `  ${state.dataset.companies.length} companies, ${state.dataset.researchers.length} researchers, ` +
       `${state.dataset.publications.size} publications indexed\n` +
       `  pools: ${pools.map((pool) => `${pool.role}x${pool.agents.length}`).join(" ")}\n`,

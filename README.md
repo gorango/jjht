@@ -78,16 +78,49 @@ is visible in every run.
 
 ### Real models
 
-Copy `.env.example` to `.env` and set **one** provider key (`OPENAI_API_KEY`,
-`ANTHROPIC_API_KEY` or `GEMINI_API_KEY`; DeepSeek works through `OPENAI_BASE_URL`).
+Copy `.env.example` to `.env` and set **one** provider key.
+
+**OpenRouter** (what this repository was developed against — one key, any model):
 
 ```bash
-EUREKA_MODEL=gpt-5.5             # planner / matchmaker / writer
-EUREKA_FAST_MODEL=gpt-5.4-mini   # profiler / analyst / critic
+OPENROUTER_API_KEY=sk-or-v1-...
+EUREKA_MODEL=deepseek/deepseek-v4-pro          # matchmaker + writer
+EUREKA_FAST_MODEL=deepseek/deepseek-v4.1-flash # profiler, analyst, critic
 ```
 
-Model names must exist in `@mozaik-ai/core`'s `supportedModels` (or pass your own through
-`inferenceRunnerConfig`).
+OpenRouter speaks OpenAI's chat-completions dialect, so it runs on Mozaik's generic
+`OpenAIChatCompletions` adapter (`src/inference/openrouter.ts`) — no custom runner. Two details
+that matter:
+
+- Model ids are **OpenRouter ids** (`vendor/model`). The run declares them on
+  `inferenceRunnerConfig.supportedModels`, because the runtime rejects an unknown model string
+  before it makes a network call.
+- `provider.sort: throughput` steers routing to the fastest upstream. The same writer prompt took
+  48s on one route and 186s on another otherwise. `OPENROUTER_REASONING=1` re-enables reasoning;
+  it is off by default because these models were spending 4–5k reasoning tokens on a one-page
+  proposal. `OPENROUTER_EXTRA_BODY='{...}'` replaces the whole body fragment.
+
+**Single provider** (bundled Mozaik model names):
+
+```bash
+OPENAI_API_KEY=...        # EUREKA_MODEL=gpt-5.5        EUREKA_FAST_MODEL=gpt-5.4-mini
+ANTHROPIC_API_KEY=...     # EUREKA_MODEL=claude-sonnet-4-6  EUREKA_FAST_MODEL=claude-haiku-4-5
+GEMINI_API_KEY=...        # EUREKA_MODEL=gemini-3.1-pro-preview  EUREKA_FAST_MODEL=gemini-3.5-flash
+```
+
+Any OpenAI-compatible endpoint (DeepSeek direct, vLLM, Ollama) works through `OPENAI_BASE_URL`.
+
+### Measured
+
+| | mock (offline) | OpenRouter, 2 companies / 2 challenges |
+| --- | --- | --- |
+| wall clock | 1.2s | ~30–60s |
+| model calls | 103 | 12 |
+| cost | $0.00 | ~$0.01 |
+| concurrency | 9 turns in flight | 3–5 turns in flight |
+
+A full run at the default scale (6 companies, 12 challenges) is a few minutes and well under $0.25
+on these models.
 
 ### Scale knobs
 
@@ -194,9 +227,15 @@ achieve that, so the system does not rely on it:
 | Potential for real use in EINSTEIN | 15 | Deterministic retrieval scales to the full dataset; portfolio instead of leaderboard; integration sketch below |
 | Responsible use of data | 10 | Synthetic dataset only by default; no scoring or ranking of people by worth; "no match" is a first-class outcome; unmatched challenges are reported |
 
-Required extras from the brief: architecture diagram (§Architecture), trace of one full run
-showing the Critic (`runs/<id>/trace.jsonl`), and at least three proposals
-(`runs/<id>/portfolio.md`).
+Required extras from the brief:
+
+- **Architecture diagram** — §Architecture and `docs/architecture.md`.
+- **Trace of one full run, showing where the Critic stepped in** —
+  `examples/run-openrouter/trace.jsonl` (real OpenRouter run, 3 proposals, 1 challenge left
+  unmatched). Every `proposal.reviewed` entry carries the verdict, the Critic's note and the claim
+  ledger (`data.claims`). `examples/run-mock/` is the same system with the rejection loop forced,
+  for a zero-cost look. See [`examples/README.md`](examples/README.md).
+- **At least three proposals** — `examples/run-openrouter/portfolio.md`.
 
 ---
 

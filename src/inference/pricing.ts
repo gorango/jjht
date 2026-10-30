@@ -19,6 +19,10 @@ const DEFAULTS: Record<string, Price> = {
   "gemini-3.5-flash": { in: 0.3, out: 2.5 },
   "gemini-3.1-pro-preview": { in: 1.25, out: 10 },
   "deepseek-v4-flash": { in: 0.28, out: 0.42 },
+  "deepseek/deepseek-v4-pro": { in: 1.6, out: 3.2 },
+  "deepseek/deepseek-v4.1-flash": { in: 0.045, out: 0.5 },
+  "deepseek/deepseek-v4.1-flash-1017": { in: 0.15, out: 0.6 },
+  "qwen/qwen3.7-flash": { in: 0.03, out: 0.13 },
   "deepseek-v4-pro": { in: 0.55, out: 2.2 },
 };
 

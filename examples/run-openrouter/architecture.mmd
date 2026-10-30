@@ -1,0 +1,39 @@
+flowchart LR
+  subgraph data["Evidence"]
+    DS[(synthetic dataset\n1,047 researchers · 153 companies\n10,779 publications)]
+    IDX[ResearcherIndex\nmodel-free retrieval]
+  end
+
+  subgraph bus["Mozaik runtime — one event bus, no central scheduler"]
+    SCHED[Scheduler\nowner of the completion condition]
+    MKT[[lease market\nCAS + generation]]
+    Q[(queues: profiler / analyst / matchmaker / writer / critic)]
+  end
+
+  subgraph pools["Concurrent participants"]
+    P[Profiler ×3]
+    A[Analyst ×3]
+    M[Matchmaker ×3]
+    W[Writer ×3]
+    C[Critic ×2]
+    PORT[Portfolio\ndeterministic]
+  end
+
+  subgraph out["Deliverables"]
+    TR[trace.jsonl\ntime · tokens · cost per task]
+    PF[portfolio.md\nclaim-backed proposals]
+  end
+
+  DS --> IDX --> Q
+  SCHED --> Q
+  Q --> P & A & M & W & C
+  P & A & M & W & C <-. claim / release .-> MKT
+  A -- challenge.analyzed --> M
+  P -- researcher.profiled --> M
+  M -- pairs.ranked --> W
+  W -- proposal.drafted --> C
+  C -- proposal.reviewed:reject --> W
+  C -- proposal.reviewed:approve --> PORT
+  C -- claim.rejected --> W
+  PORT --> PF
+  P & A & M & W & C & SCHED -. every event .-> TR

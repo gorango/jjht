@@ -33,6 +33,7 @@ const JSON_ONLY = "Reply with one JSON object and nothing else. No prose, no mar
 
 export const profiler: WorkerSpec = {
   role: "profiler",
+  maxOutputTokens: 500,
   model: "fast",
   instruction: `[[role:profiler]] You are the Research Profiler in a system that matches university researchers with companies.
 Read one researcher record and produce a compact profile for a matchmaking system.
@@ -77,6 +78,7 @@ Schema: {"summary": string, "expertise": string[], "openTo": string[], "industry
 
 export const analyst: WorkerSpec = {
   role: "analyst",
+  maxOutputTokens: 400,
   model: "fast",
   instruction: `[[role:analyst]] You are the Industry Analyst. Turn one company challenge into the technical capability the company actually needs, in the language of research areas.
 Do not invent facts about the company. Restate the problem and extract needs as short noun phrases.
@@ -144,9 +146,11 @@ Schema: {"problem": string, "needs": string[], "keywords": string[]}`,
 
 export const matchmaker: WorkerSpec = {
   role: "matchmaker",
+  maxOutputTokens: 900,
   model: "strong",
   instruction: `[[role:matchmaker]] You are the Matchmaker. Given one company challenge and a short list of candidate researchers, rank the pairs and explain each ranking in one sentence that a company CTO and a professor would both accept.
 Prefer a specific, defensible overlap over a vague one. If no candidate is a real fit, return an empty ranked list — saying "no good match" is a valid and valuable answer.
+Keep each reason under 40 words. Rank at most 3 candidates.
 ${JSON_ONLY}
 Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "sharedTerms": string[], "risks": string[]}]}`,
 
@@ -194,7 +198,8 @@ Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "shar
         companyId: entry.company.id,
         challengeId: item,
         researcherId: row.researcherId,
-        fit: Number(row.fit ?? 0),
+        // Models return fit either as a 0–1 score or as a 0–100 percentage; normalise.
+        fit: clampFit(Number(row.fit ?? 0)),
         why: String(row.why ?? ""),
         sharedTerms: Array.isArray(row.sharedTerms) ? row.sharedTerms : (byId.get(row.researcherId)?.sharedTerms ?? []),
         risks: Array.isArray(row.risks) ? row.risks : [],
@@ -238,9 +243,12 @@ Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "shar
 
 export const writer: WorkerSpec = {
   role: "writer",
+  maxOutputTokens: 1800,
   model: "strong",
   instruction: `[[role:writer]] You are the Proposal Writer. Write a one-page proposal that a company manager and a professor would actually sit down over: the concrete problem, what the two sides would do in the first year, what each side brings, and what would make it fail.
 Every factual claim about the researcher or the company must cite a dataset id. Never invent a publication, project, patent or capability. If you lack a source for a sentence, drop the sentence.
+Citations must be bare ids exactly as given: "R1008", "C001-CH1", "SYN-PUB-10472". Never a phrase, a description, or a field name such as "company products".
+Budget: at most 550 words of markdown. One page, not a report.
 ${JSON_ONLY}
 Schema: {"title": string, "markdown": string, "citations": string[], "claims": [{"text": string, "sources": string[]}]}`,
 
@@ -273,7 +281,11 @@ Schema: {"title": string, "markdown": string, "citations": string[], "claims": [
         patents: researcher.patents.slice(0, 2),
       },
       profile: state.profiles.get(researcher.id),
-      score,
+      // Deliberately no `key`: the internal pair key ("C001::C001-CH1::R0071")
+      // looks like a citation id and models copy it into the references.
+      score: score
+        ? { fit: score.fit, why: score.why, sharedTerms: score.sharedTerms, risks: score.risks }
+        : undefined,
       revision: proposal.revision,
       criticNote: proposal.criticNote,
       previousCitations: proposal.citations,
@@ -325,8 +337,30 @@ Schema: {"title": string, "markdown": string, "citations": string[], "claims": [
 
 const MAX_REVISIONS = 2;
 
+export interface CitationCheck {
+  valid: string[];
+  unknown: string[];
+}
+
+/**
+ * The deterministic half of the Critic. Pure and exported so it can be tested
+ * without a runtime, a model or a network: a citation either resolves in the
+ * dataset or it does not, and no prompt can change that.
+ */
+export const checkCitations = (
+  citations: readonly string[],
+  sourceIds: ReadonlySet<string>,
+): CitationCheck => {
+  const unique = [...new Set(citations)];
+  return {
+    valid: unique.filter((id) => sourceIds.has(id)),
+    unknown: unique.filter((id) => !sourceIds.has(id)),
+  };
+};
+
 export const critic: WorkerSpec = {
   role: "critic",
+  maxOutputTokens: 900,
   model: "fast",
   instruction: `[[role:critic]] You are the Critic. You receive a proposal, its cited ids, the list of ids that actually exist in the dataset, and its claims.
 RULES:
@@ -334,6 +368,7 @@ RULES:
 2. Any claim about a person that has no source, or whose source is not about that person, is unsupported: verdict "reject".
 3. A claim that is true but irrelevant to the pairing is not a reason to reject; note it.
 4. Do not accept a proposal because it is well written. Check the evidence.
+Keep the note under 60 words.
 ${JSON_ONLY}
 Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": string, "sources": string[]}]}`,
 
@@ -372,7 +407,7 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
     if (!proposal) return;
 
     // Defence in depth: resolve every id in code before believing the model.
-    const unknown = proposal.citations.filter((id) => !state.sourceIds.has(id));
+    const { unknown } = checkCitations(proposal.citations, state.sourceIds);
     const modelVerdict = result?.verdict === "approve" ? "approve" : "reject";
     const verdict: "approve" | "reject" = unknown.length > 0 ? "reject" : modelVerdict;
 
@@ -387,7 +422,7 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
     for (const claim of claims) {
       const row = claimRows.find((candidate) => String(candidate.text ?? "") === claim.text);
       const sources = Array.isArray(row?.sources) ? row.sources.map(String) : claim.sources;
-      const valid = sources.filter((id) => state.sourceIds.has(id));
+      const valid = checkCitations(sources, state.sourceIds).valid;
       claim.sources = valid;
       claim.note = valid.length === sources.length ? "all sources resolve" : "some sources dropped";
       claim.status = verdict === "approve" && valid.length > 0 ? "verified" : "rejected";
@@ -443,6 +478,13 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
     });
     wake(state.queues["critic"].length, "critic", context.worker);
   },
+};
+
+/** Accept 0–1 or 0–100 and always store 0–1. */
+export const clampFit = (value: number): number => {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  const normalised = value > 1 ? value / 100 : value;
+  return Math.min(1, Number(normalised.toFixed(3)));
 };
 
 export const ROLE_SPECS = { profiler, analyst, matchmaker, writer, critic } as const;

@@ -70,8 +70,9 @@ export const portfolioMarkdown = (state: EurekaState, entries: PortfolioEntry[])
   const lines = [
     "# EUREKA — portfolio",
     "",
-    `${entries.length} collaborations proposed from ${state.analyses.size} company challenges, ` +
-      `after ${state.counters.rejections} critic rejection(s).`,
+    `${entries.length} collaboration${entries.length === 1 ? "" : "s"} proposed from ${state.analyses.size} ` +
+      `company challenge${state.analyses.size === 1 ? "" : "s"}, after ${state.counters.rejections} critic rejection` +
+      `${state.counters.rejections === 1 ? "" : "s"}.`,
     "",
   ];
 

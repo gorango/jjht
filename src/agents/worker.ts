@@ -38,6 +38,8 @@ export interface WorkerSpec {
   role: Role;
   instruction: string;
   model: string;
+  /** Per-role output ceiling. Proposals are one page; 5k tokens is waste and latency. */
+  maxOutputTokens: number;
   /** Build the JSON payload the model sees. Throwing is a task failure. */
   buildInput(state: EurekaState, item: string, attempt: number): Record<string, unknown>;
   /** Turn the model's JSON into domain effects. The worker does not interpret it. */
@@ -156,6 +158,7 @@ export const createWorker = (state: EurekaState, spec: WorkerSpec, index: number
 
               const input: InferenceInput = {
                 model: spec.model,
+                maxOutputTokens: spec.maxOutputTokens,
                 context: turn(spec.instruction, envelope),
                 tools: [],
               };
