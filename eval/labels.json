@@ -1,0 +1,26 @@
+{
+  "method": "Hand-labelled on 2026-10-30 by reading the retrieval top-5 for each challenge (eval/sheet.md) and marking every researcher whose stated fields, keywords or open-to statements credibly address the challenge's specific need. Labels are ours, not ground truth; the sheet and this file are committed so a reviewer can disagree and recompute. Gold sets are capped at the retrieved top-5, so this measures ranking quality, not recall over 1,047 researchers.",
+  "labelledBy": "Goran",
+  "challenges": [
+    { "challengeId": "C001-CH1", "gold": ["R1008", "R0071"], "note": "Unsupervised anomaly detection on ICS traffic; R1008 is a direct fit, R0071 has the method but on sensor data." },
+    { "challengeId": "C008-CH1", "gold": ["R0811"], "note": "LoRaWAN link budget and gateway placement; only R0811 is a domain fit, and retrieval put it 4th." },
+    { "challengeId": "C015-CH1", "gold": ["R0799", "R0824", "R0224"], "note": "Ion-exchange resin odour: microbiology of sulphide, MIC, and water-treatment process engineering." },
+    { "challengeId": "C022-CH1", "gold": ["R0971", "R0150"], "note": "Cadastral positional error is a geodesy problem; both geodesists in the set are the right people, and retrieval missed both." },
+    { "challengeId": "C029-CH1", "gold": ["R0821", "R0089"], "note": "Hygrothermal behaviour of hemp insulation; building physics is the second angle." },
+    { "challengeId": "C036-CH1", "gold": ["R0976", "R0172"], "note": "Berry shelf life + barrier film; either could lead, together they cover the failure mode." },
+    { "challengeId": "C043-CH1", "gold": ["R0512", "R0481"], "note": "Road-geometry database: map formats versus remote-sensing change detection." },
+    { "challengeId": "C050-CH1", "gold": ["R0780"], "note": "Demand forecasting for staffing is operations research; R0780 is the only fit." },
+    { "challengeId": "C057-CH1", "gold": ["R0068", "R0680"], "note": "Parcel-level yield prediction from NDVI; remote sensing leads, precision ag supports." },
+    { "challengeId": "C064-CH1", "gold": ["R0318"], "note": "Deadlock in a workflow engine is exactly Petri-net reachability and model checking." },
+    { "challengeId": "C071-CH1", "gold": ["R0826", "R0905"], "note": "Coin-cell lifetime prediction plus ultra-low-power design." },
+    { "challengeId": "C078-CH1", "gold": ["R0391"], "note": "Emulsion stability and oxidative ageing in cosmetics; only R0391." },
+    { "challengeId": "C085-CH1", "gold": ["R0595"], "note": "Threshold optimisation for reflex review in lab software; the rest are wrong domains." },
+    { "challengeId": "C092-CH1", "gold": ["R0206", "R0057", "R0822", "R0737"], "note": "Vibration compression at the edge; four of the top five are credible." },
+    { "challengeId": "C099-CH1", "gold": ["R0228", "R0559"], "note": "Churn prediction is the domain, class imbalance is the method." },
+    { "challengeId": "C106-CH1", "gold": ["R0071", "R0030", "R0634"], "note": "False-positive reduction on high-rate time-series; three plausible methods." },
+    { "challengeId": "C113-CH1", "gold": [], "note": "SAP connector maintenance — no researcher in the top five works on ERP integration or schema mapping. The correct answer is 'no match'." },
+    { "challengeId": "C120-CH1", "gold": ["R0019"], "note": "Time-series storage and query cost; R0019 is the only direct fit." },
+    { "challengeId": "C127-CH1", "gold": ["R0837", "R1004"], "note": "Evidence that game mechanics build mathematical reasoning: learning science and maths cognition." },
+    { "challengeId": "C134-CH1", "gold": ["R0685", "R0873", "R0687", "R0016"], "note": "Retrofit ranking: building physics, M&V for EPCs, building energy control, energy audits." }
+  ]
+}

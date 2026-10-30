@@ -44,6 +44,40 @@ tokens, its cost and its duration.
 
 ---
 
+## Does the matching actually work?
+
+The trace proves sources resolve. It does not prove the *pairs are right*, so here is a measurement.
+
+Twenty challenges were sampled across sectors, their retrieval top-5 printed (`eval/sheet.md`), and
+every researcher whose stated fields, keywords or open-to statements credibly address the challenge's
+specific need was labelled by hand (`eval/labels.json`). `npm run eval` recomputes the numbers from
+those labels; `eval/results.json` is the output.
+
+| Metric | Result | What it means |
+| --- | --- | --- |
+| **hit@3** | **84.2%** (16/19) | The shortlist handed to the Matchmaker contains a qualified researcher for 16 of 19 challenges |
+| **precision@1** | **47.4%** (9/19) | Lexical retrieval alone picks the *right* one first about half the time |
+| **precision@3** | **43.9%** | On average under half of the top three are genuine fits |
+| **MRR** | **0.69** | When it is right, it is usually first or second |
+| no qualified researcher in the top 10 | 1 of 20 | C113 (SAP connector maintenance) has no fit in the dataset — "no match" is correct |
+
+Two honest readings:
+
+1. **Retrieval is a shortlist generator, not a decision.** 84% hit@3 versus 47% precision@1 is
+   exactly why the Matchmaker exists: it sees six candidates and a reason per candidate, and the
+   25-point criterion is judged on *its* pick, not on the lexical order. Retrieval's job is to not
+   lose the right person; it mostly succeeds and occasionally fails (C022: both geodesists who
+   could fix a 2–4 m cadastral offset were ranked 4th and 5th; C008: the one LoRaWAN specialist was
+   ranked 4th behind three manufacturing engineers).
+2. **The labels are ours.** They are committed, with the sheet they were made from, so a reviewer can
+   disagree with a label and recompute. That is the point — the alternative is an unverifiable claim
+   of quality.
+
+At the full scale in `examples/run-full/`: 12 challenges, **2 left unmatched on purpose**, 10
+proposals, 7 approved after **7 Critic rejections**, portfolio of 5, 82 model calls, $0.16, 97 s.
+
+---
+
 ## Why this is not a pipeline in disguise
 
 A pipeline is a script that calls A, then B, then C. Here, **nobody calls anybody**:

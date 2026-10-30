@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-10-30T07:36:52.432Z",
+  "labelledChallenges": 20,
+  "scored": 19,
+  "noGold": [
+    "C113-CH1"
+  ],
+  "metrics": {
+    "precisionAt1": 0.47368421052631576,
+    "precisionAt3": 0.4385964912280702,
+    "hitAt3": 0.8421052631578947,
+    "mrr": 0.6859649122807018
+  },
+  "misses": []
+}
