@@ -402,6 +402,14 @@ rank or rate people by worth. Retrieval ranks *overlap with a stated problem*, a
 - **Portfolio is greedy.** No global optimisation (e.g. max-coverage with mutual exclusivity);
   with 153 companies that is a real, if small, quality gap.
 - **No persistence between runs.** State lives in memory; `runs/` is the durable artefact.
+- **CORDIS institutional provenance was probed and dropped.** A live probe found 84 EU-funded
+  projects with a University of Novi Sad participant (Sciences 35, Agriculture 17, Technical
+  Sciences 14, Technology 11), which is real and verifiable. But ranking those projects against the
+  20 labelled challenges produced **0 matches at a two-term relevance floor**, and the best-scoring
+  pairs were generic-word coincidences — a Modbus anomaly-detection challenge "matched" a
+  multilingual-dialogue project on `data`, `build`, `loop`. CORDIS supports an institutional
+  footnote ("this faculty has run 35 EU projects"), not a pair-level citation, and a footnote is
+  not worth a section. The finding is recorded here rather than shipped as decoration.
 - **Open-call matching was prototyped and removed.** A Funding Scout attached live Horizon Europe
   calls to each pair. The portal's search API returns only the topic *title* — the `topicDetails`
   JSON endpoint that used to carry descriptions now 404s — so ranking ~314 open topics on keywords
