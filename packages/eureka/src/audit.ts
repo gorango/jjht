@@ -103,7 +103,12 @@ export const auditRun = (run: string): number => {
   console.log(`  ${"claim".padEnd(width)}  ${"sources".padEnd(24)}  status`);
   console.log(`  ${"-".repeat(width)}  ${"-".repeat(24)}  ------`);
   for (const row of result.rows) {
-    const status = row.unresolved.length > 0 ? `UNRESOLVED ${row.unresolved.join(", ")}` : "resolved";
+    const status =
+      row.unresolved.length > 0
+        ? `UNRESOLVED ${row.unresolved.join(", ")}`
+        : row.sources.length === 0
+          ? "no source"
+          : "resolved";
     const sources = row.sources.length > 0 ? row.sources.join(", ") : "(none)";
     const claim = row.claim.length > width ? `${row.claim.slice(0, width - 1)}…` : row.claim;
     console.log(`  ${claim.padEnd(width)}  ${sources.padEnd(24)}  ${status}`);

@@ -13,7 +13,7 @@ bun run trace -- --port=4173     # leave running in a second terminal
 ```
 
 Open `http://localhost:4173/` in a browser tab and leave it there. Open
-`examples/run-full/portfolio.md` in a second tab. Have a terminal at 18pt font, dark background.
+`examples/run-proposals/portfolio.md` in a second tab. Have a terminal at 18pt font, dark background.
 
 ## The script
 
@@ -32,7 +32,7 @@ Point at the final lines, not the trace:
 
 - 12 challenges → 12 proposals → 12 Critic rejections → **12 approved after revision**
 - **14 model turns in flight at once** — every worker in the pool busy
-- about a second, `$0.00`
+- 103 model calls, about a third of a second, `$0.00`
 
 > "The mock fabricates one citation on purpose, so you always see the Critic catch it and the Writer
 > fix it. Everything else — the runtime, the leases, the claims, the trace — is real." 
@@ -56,12 +56,12 @@ Point at the final lines, not the trace:
 > **before** the model's opinion counts. If an id doesn't exist, the verdict is reject — the model
 > never gets a vote on existence, only on relevance."
 
-**1:30 — the real run.** Switch to `examples/run-full/portfolio.md`.
+**1:30 — the real run.** Switch to `examples/run-proposals/portfolio.md`.
 
-> "Same six companies and twelve challenges, real models: 10 proposals, 7 approved, 3 abandoned
-> after failing twice, and 2 challenges left unmatched on purpose. Seventeen cents, 127 seconds.
-> Read the section headings: problem, first-year plan split by side, what could make it fail,
-> unverified evidence."
+> "Four companies and four challenges, real models: 4 proposals, all 4 approved after 4 real Critic
+> rejections. Nineteen cents, 131 seconds. Read the section headings: supervisors and candidate,
+> research questions, a three-year plan, what each side brings, why this pair, the IP and
+> publication clause, what could make it fail, and unverified evidence."
 
 Read one sentence of the **unverified evidence** section aloud. That paragraph is the whole pitch:
 the system is telling you what it could not prove.
@@ -83,8 +83,8 @@ the system is telling you what it could not prove.
 | Failure | Do this |
 |---|---|
 | Model calls hang | Use the mock. It is a complete run, not a demo mode. |
-| Viewer won't load | `bun run trace -- --run=<id>` from `runs/`; or show `examples/run-full/trace.jsonl` raw. |
-| No projector / no laptop | `examples/run-full/portfolio.md` and `docs/trace-viewer.png` render on GitHub. |
+| Viewer won't load | `bun run trace -- --run=<id>` from `runs/`; or show `examples/run-openrouter/trace.jsonl` raw. |
+| No projector / no laptop | `examples/run-proposals/portfolio.md` and `docs/trace-viewer.png` render on GitHub. |
 | "Is it real?" | `bun run eval` — 47%/84% in two seconds, and `git log` shows the rejected designs. |
 
 ## 60-second cut
@@ -111,8 +111,8 @@ Critic can reject.
 > and the Critic checks every citation against the dataset in code before any model judgement is
 > considered. Proposals that survive carry sourced claims, a named failure mode, and an explicit
 > list of what could not be verified. The system is allowed to conclude that a challenge has no
-> defensible pair, and does so for roughly one in six. A full run of twelve challenges costs about
-> $0.17 and produces a JSONL trace with time and cost per task.
+> defensible pair. In the committed real run, four proposals were approved after four real Critic
+> rejections and cost $0.1934; the JSONL trace records time and cost per task.
 
 **How the agents run concurrently (≈150 words):**
 
@@ -122,8 +122,8 @@ Critic can reject.
 > carries a monotonic generation, so a worker that stalled and lost its lease has its write
 > discarded instead of overwriting the worker that replaced it. Each worker runs one turn at a time,
 > which keeps `model.answer` unambiguous and bounds cost — parallelism comes from the pool, not
-> from fan-out inside one agent. Measured on a 12-challenge run: 86 model turns, up to 9 in flight
-> at once, 127 seconds. The trace proves it: `inference.started` minus `inference.completed` over
-> time is the concurrency curve.
+> from fan-out inside one agent. Measured on a 6-challenge workload at 1 / 3 / 5 workers per role:
+> 1,133 / 640 / 607 ms and 5 / 9 / 11 turns in flight. The default mock run reaches 14 in flight;
+> the trace proves it: `inference.started` minus `inference.completed` over time is the curve.
 
 **Track:** EINSTEIN: Science-to-Business Matchmaker

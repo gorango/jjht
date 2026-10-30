@@ -49,7 +49,7 @@ bottleneck a "coordinator agent" usually becomes, and it costs nothing.
 | `pairs.ranked` | `{ challengeId, scores[], generation }` | Candidate pairs with fit and reasons. |
 | `proposal.drafted` / `proposal.revised` | `{ proposal, generation }` | First draft / post-critique revision. |
 | `proposal.reviewed` | `{ proposalId, verdict, note, claims[], generation }` | Approve or reject, with the claim ledger. |
-| `proposal.abandoned` | `{ proposalId, reason }` | Failed twice; not shipped. |
+| `proposal.abandoned` | `{ proposalId, reason }` | Failed after three attempts; not shipped. |
 | `portfolio.ready` | `{ entries[] }` | Final selection. |
 | `run.completed` | `{ summary }` | Counters, cost, elapsed. |
 
@@ -72,7 +72,14 @@ Mozaik's own loop events (`message_received.*`, `inference.*`, `model.answer`,
    the watchdog fired.)
 
 TTL defaults to 120s. An expired lease is reclaimable, which is how a crashed or wedged worker
-recovers without a supervisor.
+recovers without a supervisor. Expiry and takeover are on the record: the chaos path emits
+`lease.expired`, `task.reclaimed`, and, when the late answer finally arrives, `task.discarded`
+(`src/agents/worker.ts`). `tests/runtime.test.ts` asserts the item is finished exactly once while
+the duplicate spend stays visible in the trace.
+
+The Scheduler can be removed after boot (`--scheduler=off-after-boot`). A non-participant Watchdog
+polls `settled()` and closes the run; the same test asserts the Scheduler left before
+`portfolio.ready`.
 
 ## Why one task in flight per worker
 
@@ -138,8 +145,9 @@ new document.
 - every challenge has been analysed,
 - every analysed challenge has a proposal that is `approved` or `rejected`, or is in `unmatched`.
 
-The Scheduler evaluates this on every decision event. In the mock run it fires about a second in, on the
-same event that approves the last proposal. A watchdog (`20s` mock, `15min` real) force-closes the
+The Scheduler evaluates this on every event, because a slow pool can finish a profiler after the
+last proposal is reviewed. In the default mock run it fires in about a third of a second, on the
+event that approves the last proposal. A watchdog (`20s` mock, `15min` real) force-closes the
 run and prints a diagnosis (queues, leases, undecided challenges) so a stall is debuggable instead
 of silent.
 
@@ -150,8 +158,9 @@ of silent.
 answer "which role spends the money" — usually the Writer, because Matchmaker and Writer use the
 strong model while Profiler, Analyst and Critic use the fast one.
 
-The mock run above: 53 model calls, 61k in / 17k out, ~$0.16 estimated, 0.9s wall clock. In real
-mode expect minutes rather than milliseconds, and a few dollars for the default scale.
+The committed default mock run: 103 model calls, 189k in / 56k out, $0.00 and 0.3s wall clock.
+The committed real run: 36 calls, $0.1934, 131s. `examples/run-full/` is a 24-challenge offline run
+(201 calls, $0.00); it measures scale, not model quality.
 
 ## Failure modes and what happens
 

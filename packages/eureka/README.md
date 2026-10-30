@@ -11,11 +11,28 @@ through a lease market instead of following a scripted pipeline.
 Built for the **EINSTEIN: Science-to-Business Matchmaker** track of the NTP Novi Sad Hackathon
 (30–31 October 2026).
 
+## 60 seconds
+
+EUREKA reads a company challenge, retrieves the researchers whose published work overlaps with it,
+and writes a one-page industrial-PhD proposal where **every factual sentence is a claim whose source
+ids code resolves before any model verdict counts**. Five agent pools share one Mozaik runtime and
+claim work through a lease market, not a script.
+
 ![The trace viewer after a full run](docs/trace-viewer.png)
 
-*A real run in the trace viewer: 12 challenges, 103 model calls, **14 turns in flight at once**,
-12 Critic rejections and 12 approvals. `bun run mock` reproduces it in about a second with no keys and no
-network, then `bun run trace` opens this page.*
+```bash
+bun install
+bun run mock                       # offline, 12 challenges, 103 model calls, 12 rejections, 14 in flight, $0.00
+bun run check:examples             # every README number is re-read from the committed artefacts
+bun run audit run-mock             # re-resolve every claim in a committed trace; non-zero on drift
+```
+
+**Measured, not asserted:** the real OpenRouter run has **4 proposals, 4 Critic rejections (all
+real), 7 turns in flight, $0.1934, 131s** (`examples/run-openrouter/`). The offline full-scale run has
+**24 challenges, 201 model calls, 14 turns in flight, $0.00** (`examples/run-full/`). The
+pool-scaling curve is **1 / 3 / 5 workers per role → 1,133 / 640 / 607 ms wall clock and 5 / 9 / 11
+max in flight** (`eval/concurrency.md`). Retrieval: **84.2% hit@3**, **47.4% precision@1**
+(`bun run eval`).
 
 ---
 
@@ -31,11 +48,12 @@ challenge → capability needs → retrieval (no model) → ranked pairs → pro
    153 companies × 1,047 researchers is 160k pairs, and no budget survives throwing a model at that.
 3. **Research Profiler** enriches the strongest candidates with a sourced profile.
 4. **Matchmaker** ranks the pairs for that challenge and explains each ranking.
-5. **Proposal Writer** drafts a one-page proposal — problem, first-year plan, what each side brings,
-   industrial-PhD option, risks.
+5. **Proposal Writer** drafts the organisers' reference shape — supervisors and candidate, problem,
+   research questions, a three-year plan, what each side brings, why this pair, an agreed
+   publication/IP clause, named risks and an explicit unverified-evidence section.
 6. **Critic** checks every citation against the dataset, in code first and with a model second.
-   A fabricated paper does not survive: the proposal goes back to the Writer, and if it fails
-   twice it is abandoned rather than shipped.
+   A fabricated paper does not survive: the proposal goes back to the Writer for up to three
+   attempts, then it is abandoned rather than shipped.
 7. **Portfolio** picks at most one collaboration per company, never double-books a researcher,
    and is allowed to leave a challenge unmatched — saying "no defensible pair" is a result.
 
@@ -73,9 +91,11 @@ Two honest readings:
    disagree with a label and recompute. That is the point — the alternative is an unverifiable claim
    of quality.
 
-At the full scale in `examples/run-full/`: 12 challenges, **2 left unmatched on purpose**, 10
-proposals, 7 approved after **9 Critic rejections** (3 abandoned after failing twice), portfolio of
-5, 86 model calls, $0.17, 127 s.
+The real run in `examples/run-openrouter/`: 4 companies, 4 challenges, **4 proposals, all 4
+approved after 4 real Critic rejections**, portfolio 4, 36 model calls, **$0.1934**, 131 s, 7 turns
+in flight. Nothing in that trace was forced. The full-scale offline run in `examples/run-full/` is
+12 companies / 24 challenges / 201 model calls / $0.00: it proves scale and concurrency, not
+proposal quality, because its text generation is the deterministic mock.
 
 ---
 
@@ -91,12 +111,27 @@ A pipeline is a script that calls A, then B, then C. Here, **nobody calls anybod
 - Workers of the same role compete for the same queue. Adding a worker adds throughput; it does
   not change the code.
 - The only coordinating participant, the **Scheduler**, owns no work. It publishes the initial
-  work and closes the run when the market and the queues are empty. Remove it after boot and the
-  run still drains — it just would not know when to stop.
+  work and closes the run when the market and the queues are empty. `--scheduler=off-after-boot`
+  removes it immediately after boot; a non-participant Watchdog still closes the run.
+  `tests/runtime.test.ts` asserts the Scheduler left before `portfolio.ready` and the run drained.
+- A **lease expiry** is not silent. `--chaos=slow-worker --lease-ttl=80` holds one Writer past its
+  TTL, emits `lease.expired` and `task.reclaimed`, lets another Writer finish the item, and records
+  the late answer as `task.discarded`. The test asserts exactly one portfolio entry and the
+  duplicate spend in the trace.
 
-Measured on the mock run in this repository: **14 model turns in flight at once** (the whole pool), across five
-roles, with a max pool of 3. The trace proves it — `inference.started` minus `inference.completed`
-over time is the concurrency curve.
+The claim is measured, not asserted. `bun run concurrency` runs the same 6-challenge workload at 1,
+3 and 5 workers per role with a deterministic 50 ms mock latency, and writes
+`eval/concurrency.json` + `eval/concurrency.md`:
+
+| Pools (workers/role) | Wall clock | Max in flight | Model calls | Cost |
+| --- | --- | --- | --- | --- |
+| 1 | 1,133 ms | 5 | 52 | $0.0000 |
+| 3 | 640 ms | 9 | 53 | $0.0000 |
+| 5 | 607 ms | 11 | 52 | $0.0000 |
+
+Max in-flight is derived from `inference.started` minus `inference.completed` in each trace. The
+default-scale mock run reaches **14 turns in flight at once** across five roles (103 calls, $0.00).
+The real run reaches 7; its lower figure is a provider-latency effect, not a pool limit.
 
 ---
 
@@ -106,9 +141,13 @@ Requires [Bun](https://bun.sh) 1.4+. From the repository root:
 
 ```bash
 bun install
-bun run mock                       # offline, deterministic, no API key, ~1s
+bun run mock                       # offline, deterministic, no API key, ~0.3s
 bun start                          # real models (needs a provider key)
 bun run trace                      # serve the trace viewer at http://localhost:4173
+bun run audit run-mock             # re-resolve every claim; exits non-zero on an unknown source
+bun run check:examples             # README numbers vs committed run.json/trace.jsonl
+bun run concurrency                # pool-scaling curve -> eval/concurrency.md
+bun run serve                      # POST /challenges, GET /events (SSE), GET /portfolio/:runId
 bun run openalex                   # optional: verify the OpenAlex key, pull UNS context
 ```
 
@@ -157,15 +196,16 @@ Any OpenAI-compatible endpoint (DeepSeek direct, vLLM, Ollama) works through `OP
 
 ### Measured
 
-| | mock (offline) | OpenRouter, 2 companies / 2 challenges |
+| | mock (offline, 6 companies / 12 challenges) | OpenRouter (4 companies / 4 challenges) |
 | --- | --- | --- |
-| wall clock | 1.2s | ~30–60s |
-| model calls | 103 | 12 |
-| cost | $0.00 | ~$0.01 |
-| concurrency | 14 turns in flight (full pool) | 3–5 turns in flight |
+| wall clock | 0.3s | 131.0s |
+| model calls | 103 | 36 |
+| cost | $0.00 | $0.1934 |
+| Critic rejections / approvals | 12 / 12 | 4 / 4 |
+| concurrency | 14 turns in flight | 7 turns in flight |
 
-A full run at the default scale (6 companies, 12 challenges) is a few minutes and well under $0.25
-on these models.
+The real run used `deepseek/deepseek-v4-pro` for every role, including the Critic. The paid budget
+was spent on that run; the larger `examples/run-full/` artefact is deliberately offline.
 
 ### Scale knobs
 
@@ -184,6 +224,10 @@ bun start -- --companies=10 --challenges=2 --candidates=6 --profile=3 --portfoli
 | `--portfolio` | 5 | Collaborations carried into the portfolio |
 | `--pools` | 3/3/3/3/2 | Worker-pool size per role |
 | `--lease-ttl` | 120000 | Lease lifetime in ms |
+| `--mock-latency` | 0 | Deterministic per-call sleep in mock mode (concurrency measurement) |
+| `--chaos` | off | `slow-worker` holds one Writer past the TTL and exercises recovery |
+| `--scheduler` | on | `off-after-boot` removes the Scheduler; the Watchdog closes the run |
+| `--allow-real-people` | off | Permit ORCID/OpenAlex identities to reach a model (refused by default) |
 
 ---
 
@@ -235,7 +279,9 @@ src/
   runtime/      runtime state, event catalogue, session, trace observer
   agents/       generic reactive worker, the five role prompts, pools, scheduler, portfolio
   inference/    mock runner, price table
-  index.ts      CLI (run / trace)
+  index.ts      CLI (run / trace / audit / serve)
+  serve.ts      POST /challenges, SSE /events, GET /portfolio/:runId
+  audit.ts      offline re-resolution of every claim in a committed trace
   trace-server.ts  zero-dependency viewer server
 public/viewer.html   the trace UI
 data/data/           vendored synthetic dataset (see provenance below)
@@ -277,11 +323,22 @@ Required extras from the brief:
 
 - **Architecture diagram** — §Architecture and `docs/architecture.md`.
 - **Trace of one full run, showing where the Critic stepped in** —
-  `examples/run-openrouter/trace.jsonl` (real OpenRouter run, 3 proposals, 1 challenge left
-  unmatched). Every `proposal.reviewed` entry carries the verdict, the Critic's note and the claim
-  ledger (`data.claims`). `examples/run-mock/` is the same system with the rejection loop forced,
-  for a zero-cost look. See [`examples/README.md`](examples/README.md).
-- **At least three proposals** — `examples/run-openrouter/portfolio.md`.
+  `examples/run-openrouter/trace.jsonl`: a real OpenRouter run with **4 real `reject` verdicts and
+  4 approvals**. Every `proposal.reviewed` entry carries the verdict, the Critic's note,
+  machine-readable `hardRejects` and the claim ledger (`data.claims`). Nothing was forced.
+  `examples/run-mock/` is the same system with the rejection loop forced, for a zero-cost look. See
+  [`examples/README.md`](examples/README.md).
+- **At least three proposals** — `examples/run-openrouter/portfolio.md` (4 proposals; the three
+  best are ArmaturaSec × Krisztina Kiss, Zrenjanin Game Works × Danilo Mitrović and AutomVoj × Bojan
+  Erić), mirrored in `examples/run-proposals/`.
+
+### Read the proposal shape
+
+The top of `examples/run-proposals/portfolio.md` is the 25-point criterion: each proposal names the
+academic and industrial supervisors and the candidate, asks 2–3 research questions, gives a
+year-by-year plan with a quantified year-one milestone, says what each side brings, explains why
+this pair (naming a real publication title), states the publication-review window and IP ownership,
+names a failure mode, and lists what could not be verified.
 
 ---
 
@@ -317,6 +374,20 @@ sequenceDiagram
 A host integrates by posting a challenge and reading `proposal.reviewed`; it never imports our
 agents. The reverse also works: our runtime can join a network's event bus as one more participant,
 because `RuntimeState` and `SemanticEvent` are the framework's public vocabulary, not ours.
+
+The seam is executable, not a diagram:
+
+```bash
+MOCK=1 bun run serve -- --port=4300
+curl -X POST localhost:4300/challenges -H 'content-type: application/json' \
+     -d '{"challengeId":"C001-CH1"}'
+curl -N localhost:4300/events                    # SSE stream of every semantic event
+curl localhost:4300/portfolio/<runId>            # markdown after run.completed
+```
+
+`POST /challenges` also accepts `{"text":"...","companyId":"C001"}` for a challenge that is not in
+the dataset; the posted text becomes a citable source. `examples/host.ts` joins the same bus as a
+participant in-process and posts a challenge without importing the agents.
 
 ### 2. EINSTEIN Stars: evidence cards, not a leaderboard
 
@@ -389,15 +460,24 @@ sends real people to a model: enrichment is limited to resolving public identifi
 rank or rate people by worth. Retrieval ranks *overlap with a stated problem*, and the
 `unmatched` list exists so a weak pair is reported as weak rather than dressed up.
 
+The runtime has a hard guard before every model call: if the payload contains an ORCID or OpenAlex
+identifier (or an `orcid`/`openalex` field), the turn is refused with an `inference.refused` event
+unless the operator passes `--allow-real-people`. The synthetic dataset has no such ids, so the
+default run never sends a real person to a model. `tests/guard.test.ts` covers it.
+
 ---
 
 ## Honest limitations
 
 - **Mock mode is deterministic fiction.** It proves the machinery, not the proposal quality.
   Real-mode output quality depends on the provider and the prompt; the Critic guards facts, not taste.
-- **Retrieval is lexical.** Serbian Cyrillic and Latin records are not transliterated yet, so a
-  Cyrillic-only profile can be under-retrieved. The dataset has 82 such records. Fix: a
-  transliteration pass in `tokenize` (`src/domain/dataset.ts`), ~20 lines.
+- **The paid evidence is one run.** `examples/run-openrouter/` is a real run; `examples/run-full/`
+  is the same runtime at larger scale with mock text generation. The budget was spent before a
+  second paid full-scale run, so the README says which artefact is which rather than blurring them.
+- **Retrieval is lexical.** Serbian Cyrillic and Latin records are not transliterated, so a
+  Cyrillic-only profile can be under-retrieved (82 records). We implemented a Serbian
+  transliteration pass and re-ran `bun run eval`: hit@3 stayed at 84.2% and MRR at 0.69, so the
+  change was reverted rather than kept as unmeasured complexity.
 - **Profiles are per-challenge.** The same researcher may be profiled several times for different
   challenges. A cross-run profile cache is the obvious next step.
 - **Embeddings would beat keyword overlap** for cross-disciplinary pairs ("formal verification" ×
@@ -436,6 +516,9 @@ rank or rate people by worth. Retrieval ranks *overlap with a stated problem*, a
 
 `bun run trace` serves the viewer (`public/viewer.html`): a timeline with filters, expandable
 payloads, live cost/token counters, red rejections and green approvals, plus the portfolio beside it.
+`bun run audit <runId>` re-resolves every claim in a committed trace against the dataset and exits
+non-zero on any source that does not exist; `bun run check:examples` does the same for every number
+quoted about the example runs.
 
 ---
 
