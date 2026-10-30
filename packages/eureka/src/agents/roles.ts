@@ -400,6 +400,28 @@ Schema: {"title": string, "supervisors": {"academic": string, "industrial": stri
       state.claims.set(id, record);
     }
 
+    // A citation without a claim is floating evidence: the Critic cannot see
+    // that the id supports anything. Materialise one claim per citation before
+    // review, so the ledger the model sees matches the citation list.
+    const currentClaims = [...state.claims.values()].filter(
+      (claim) => claim.proposalId === proposal.id && claim.revision === proposal.revision,
+    );
+    const cited = new Set(currentClaims.flatMap((claim) => claim.sources));
+    for (const sourceId of citations) {
+      if (!state.sourceIds.has(sourceId) || cited.has(sourceId)) continue;
+      const id = `${proposal.id}#auto-${proposal.revision}-${sourceId}`;
+      state.claims.set(id, {
+        id,
+        proposalId: proposal.id,
+        text: `Source ${sourceId} supports the proposal.`,
+        sources: [sourceId],
+        status: "proposed",
+        note: "citation without a supporting claim",
+        revision: proposal.revision,
+      });
+      cited.add(sourceId);
+    }
+
     emit(proposal.revision > 0 ? "proposal.revised" : "proposal.drafted", context.worker, {
       proposal,
       generation: context.generation,
@@ -560,7 +582,9 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
   buildInput(state, item) {
     const proposal = state.proposals.get(item);
     if (!proposal) throw new Error(`unknown proposal ${item}`);
-    const claims = [...state.claims.values()].filter((claim) => claim.proposalId === item);
+    const claims = [...state.claims.values()].filter(
+      (claim) => claim.proposalId === item && claim.revision === proposal.revision,
+    );
     const researcher = state.dataset.byResearcherId.get(proposal.researcherId);
     const entry = state.dataset.byChallengeId.get(proposal.challengeId);
 
@@ -647,7 +671,9 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
     const note = reasons.length > 0 ? reasons.join(" ") : String(result?.note ?? "");
 
     const claimRows: Array<{ text?: unknown; sources?: unknown }> = Array.isArray(result?.claims) ? result.claims : [];
-    const claims = [...state.claims.values()].filter((claim) => claim.proposalId === item);
+    const claims = [...state.claims.values()].filter(
+      (claim) => claim.proposalId === item && claim.revision === proposal.revision,
+    );
 
     for (const claim of claims) {
       const row = claimRows.find((candidate) => String(candidate.text ?? "") === claim.text);
@@ -664,7 +690,7 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
       if (!state.sourceIds.has(id)) continue;
       if (!cited.has(id)) {
         const claim: Claim = {
-          id: `${proposal.id}#auto-${id}`,
+          id: `${proposal.id}#auto-${proposal.revision}-${id}`,
           proposalId: proposal.id,
           text: `Source ${id} supports the proposal.`,
           sources: [id],
