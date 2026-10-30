@@ -2,3 +2,4 @@ outbox/
 evidence/
 runs/
 dist/
+trace.jsonl

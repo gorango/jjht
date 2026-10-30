@@ -7,7 +7,15 @@
  */
 import { RuntimeState } from "@mozaik-ai/core";
 
-import type { Decision, EvidenceLock, Intent, TelemetryEvent, Topology } from "../domain/types.js";
+import type {
+  ActionName,
+  Decision,
+  EvidenceLock,
+  Intent,
+  Target,
+  TelemetryEvent,
+  Topology,
+} from "../domain/types.js";
 
 export type Phase = "watch" | "triage" | "act" | "recover" | "closed";
 
@@ -29,6 +37,16 @@ export interface Incident {
   decisionIds: string[];
 }
 
+/** One effect a simulated adapter actually applied, and which path allowed it. */
+export interface ExecutedAction {
+  intentId: string;
+  agent: string;
+  action: ActionName;
+  target: Target;
+  params: Record<string, string | number>;
+  path: "loop" | "airlock-retry";
+}
+
 export class CustodyState extends RuntimeState {
   topology?: Topology;
 
@@ -37,6 +55,7 @@ export class CustodyState extends RuntimeState {
   readonly decisions = new Map<string, Decision>();
   readonly locks = new Map<string, EvidenceLock>();
   readonly incidents = new Map<string, Incident>();
+  readonly executed: ExecutedAction[] = [];
 
   capabilities: Record<string, string[]> = {};
   readonly secondKey = new Set<string>();

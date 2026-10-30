@@ -1,55 +1,58 @@
 #!/usr/bin/env bun
 /**
- * CUSTODY — scaffold CLI.
+ * CUSTODY - the live run.
  *
- * Today this replays the money scenario through the real airlock and the real
- * invariants. No model is called and no infrastructure is touched: the point of
- * this slice is to prove the decision core is deterministic and testable before
- * any agent is wired to it.
+ * Every decision below came from the airlock's window over suspended Mozaik
+ * loops. Inference is scripted (`runner: mock`, `costUsd: 0`); the bus, the
+ * participants, the interception and the state mutations are real.
  */
-import { reconcile, summarize } from "./agents/airlock.js";
-import type { InvariantContext } from "./domain/invariants.js";
-import { failures } from "./domain/invariants.js";
-import { moneyScenario } from "./scenarios/money.js";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 
-const args = process.argv.slice(2);
-const command = args[0] ?? "demo";
-const verbose = args.includes("--verbose");
+import type { ScenarioReport } from "./agents/scheduler.js";
+import type { Decision } from "./domain/types.js";
+import { run } from "./run.js";
+
+const DEFAULT_WINDOW_MS = 1_500;
 
 const pad = (value: string, width: number): string =>
   value.length > width ? `${value.slice(0, width - 1)}…` : value.padEnd(width);
 
 const help = (): void => {
-  console.log(`custody — scaffold
+  console.log(`custody - live incident response, offline
 
-  bun run demo            replay the money scenario through the airlock
-  bun run demo --verbose  include every invariant check, not just failures
-  bun test                unit + scenario tests
-  bun run typecheck       tsc --noEmit
+  bun src/index.ts                  run the money scenario through the real runtime
+  bun src/index.ts --scenario <id>  run a named scenario
+  bun src/index.ts --verbose        print every invariant finding and veto
+  bun src/index.ts help             this text
+
+  CUSTODY_WINDOW_MS  decision window in milliseconds (default ${DEFAULT_WINDOW_MS})
+  CUSTODY_TRACE      trace path (default ./trace.jsonl)
+
+  exit 0 requires the expected decisions, INFLIGHT >= 2 with distinct loop ids,
+  and the trace file. The offline runner is labelled mock with costUsd 0.
 `);
 };
 
-const demo = (): number => {
-  const scenario = moneyScenario;
+const windowMs = (): number | undefined => {
+  const raw = process.env.CUSTODY_WINDOW_MS;
+  if (!raw) return DEFAULT_WINDOW_MS;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    console.error(`custody: CUSTODY_WINDOW_MS must be a positive number, got "${raw}"`);
+    return undefined;
+  }
+  return parsed;
+};
 
-  const ctx: InvariantContext = {
-    topology: scenario.topology,
-    locks: scenario.locks,
-    blastBudget: scenario.blastBudget,
-    knownEventIds: new Set(scenario.telemetry.map((event) => event.id)),
-    capabilities: scenario.capabilities,
-    secondKey: new Set(),
-    now: 2_000,
-  };
+const tracePath = (): string => {
+  const raw = process.env.CUSTODY_TRACE;
+  return resolve(raw && raw.trim().length > 0 ? raw : "trace.jsonl");
+};
 
-  const result = reconcile(scenario.intents, ctx);
-
-  console.log(`\nCUSTODY — airlock replay`);
-  console.log(`scenario: ${scenario.title}`);
-  console.log(`${scenario.story}\n`);
-
+const printTable = (decisions: readonly Decision[]): void => {
   const header = ["intent", "agent", "action", "target", "decision", "reason"];
-  const rows = result.decisions.map((decision) => [
+  const rows = decisions.map((decision) => [
     decision.intentId,
     decision.agent,
     decision.action,
@@ -63,55 +66,161 @@ const demo = (): number => {
   );
 
   console.log(header.map((title, column) => pad(title, widths[column] ?? title.length)).join("  "));
-  console.log(widths.map((width) => "─".repeat(width)).join("  "));
+  console.log(widths.map((width) => "-".repeat(width)).join("  "));
   for (const row of rows) {
     console.log(row.map((cell, column) => pad(cell, widths[column] ?? cell.length)).join("  "));
   }
-
-  console.log(`\nairlock: ${summarize(result)}`);
-
-  const breachCount = result.findings.filter((finding) => !finding.ok).length;
-  console.log(`invariant breaches intercepted: ${breachCount}`);
-
-  for (const decision of result.decisions) {
-    if (decision.kind === "rewrite" && decision.final) {
-      console.log(
-        `rewrite ${decision.intentId}: ${String(scenario.intents.find((i) => i.id === decision.intentId)?.params.cidr ?? "?")} ` +
-          `→ ${String(decision.final.params.cidr ?? decision.final.target.id)}`,
-      );
-    }
-  }
-
-  if (verbose) {
-    console.log("\nall invariant failures:");
-    for (const decision of result.decisions) {
-      const intent = scenario.intents.find((candidate) => candidate.id === decision.intentId);
-      if (!intent) continue;
-      const bad = failures(result.findings.filter((finding) => finding.intentId === intent.id));
-      for (const finding of bad) console.log(`  ${intent.id}  ${finding.code.padEnd(14)} ${finding.detail}`);
-    }
-  }
-
-  const expected = scenario.expected;
-  const mismatches = result.decisions.filter((decision) => expected[decision.intentId] !== decision.kind);
-  if (mismatches.length === 0) {
-    console.log(`\nexpected outcomes: ${result.decisions.length}/${result.decisions.length} match\n`);
-    return 0;
-  }
-
-  console.log(`\nexpected outcomes: ${result.decisions.length - mismatches.length}/${result.decisions.length} match`);
-  for (const decision of mismatches) {
-    console.log(`  ${decision.intentId}: expected ${expected[decision.intentId]}, got ${decision.kind}`);
-  }
-  return 1;
 };
 
-if (command === "help" || command === "--help" || command === "-h") {
-  help();
-} else if (command === "demo") {
-  process.exitCode = demo();
-} else {
-  console.error(`unknown command: ${command}`);
+const printVerbose = (report: ScenarioReport): void => {
+  console.log("\nfindings:");
+  if (report.findings.length === 0) console.log("  (none)");
+  for (const finding of report.findings) {
+    console.log(
+      `  ${finding.intentId.padEnd(14)} ${finding.code.padEnd(15)} ` +
+        `${finding.ok ? "ok  " : "FAIL"} ${finding.detail}`,
+    );
+  }
+
+  console.log("votes:");
+  let votes = 0;
+  for (const decision of report.decisions) {
+    for (const vote of decision.votes) {
+      votes += 1;
+      console.log(`  ${decision.intentId}  ${vote.voter}: ${vote.verdict} - ${vote.reason}`);
+    }
+  }
+  if (votes === 0) console.log("  (none)");
+};
+
+const printMoney = (report: ScenarioReport, verbose: boolean): number => {
+  console.log(`\nCUSTODY - live run`);
+  console.log(`scenario: ${report.scenario.id} - ${report.scenario.title}`);
+  console.log(`${report.scenario.story}\n`);
+
+  printTable(report.decisions);
+
+  console.log(`\nrunner: ${report.runner}  costUsd: ${report.costUsd}`);
+  for (const window of report.windows) {
+    console.log(
+      `window ${window.windowId} INFLIGHT ${window.inflight} ` +
+        `loops ${window.loopIds.join(", ") || "(none)"}`,
+    );
+  }
+  console.log(
+    report.scenario.id === "money"
+      ? `INFLIGHT ${report.inflightMax} (>= 2 required)`
+      : `INFLIGHT ${report.inflightMax}`,
+  );
+  console.log(`expected outcomes: ${report.expectedMatches}/${report.expectedTotal} match`);
+  console.log(`trace: ${report.tracePath}`);
+
+  if (verbose) printVerbose(report);
+
+  const reasons: string[] = [];
+  if (report.expectedMatches !== report.expectedTotal) {
+    reasons.push(`expected ${report.expectedTotal} matching decisions, got ${report.expectedMatches}`);
+  }
+  if (report.scenario.id === "money") {
+    if (report.inflightMax < 2) reasons.push(`INFLIGHT ${report.inflightMax} is below 2`);
+    const loops = new Set(report.windows.flatMap((window) => window.loopIds));
+    if (loops.size < 2) reasons.push(`only ${loops.size} distinct loop ids were held together`);
+  }
+  if (!report.closed) reasons.push("the incident did not close");
+  if (!existsSync(report.tracePath)) reasons.push(`trace missing at ${report.tracePath}`);
+
+  if (reasons.length > 0) {
+    for (const reason of reasons) console.error(`custody: FAIL: ${reason}`);
+    return 1;
+  }
+  return 0;
+};
+
+const printNoAction = (report: ScenarioReport, verbose: boolean): number => {
+  const reason =
+    report.scenario.noActionReason ?? report.noActionOutcome ?? "(no reason recorded)";
+  console.log(`\nCUSTODY - live run`);
+  console.log(`scenario: ${report.scenario.id} - ${report.scenario.title}`);
+  console.log(`${report.scenario.story}\n`);
+  console.log(`NO ACTION: ${reason}`);
+  console.log(`effects executed: ${report.executed.length}`);
+  console.log(`runner: ${report.runner}  costUsd: ${report.costUsd}`);
+  console.log(`trace: ${report.tracePath}`);
+
+  if (verbose) printVerbose(report);
+
+  const reasons: string[] = [];
+  if (!report.closed) reasons.push("the incident did not close with a reason");
+  if (report.executed.length > 0) reasons.push(`${report.executed.length} effects executed`);
+  if (!existsSync(report.tracePath)) reasons.push(`trace missing at ${report.tracePath}`);
+
+  if (reasons.length > 0) {
+    for (const reason of reasons) console.error(`custody: FAIL: ${reason}`);
+    return 1;
+  }
+  return 0;
+};
+
+const argv = process.argv.slice(2);
+let command = "demo";
+let scenarioId = "money";
+let verbose = false;
+let bad = false;
+
+for (let index = 0; index < argv.length; index += 1) {
+  const arg = argv[index];
+  if (arg === undefined) continue;
+
+  if (arg === "--verbose") {
+    verbose = true;
+    continue;
+  }
+  if (arg === "--scenario") {
+    const value = argv[index + 1];
+    if (!value) {
+      console.error("custody: --scenario needs an id");
+      bad = true;
+      break;
+    }
+    scenarioId = value;
+    index += 1;
+    continue;
+  }
+  if (arg.startsWith("--scenario=")) {
+    scenarioId = arg.slice("--scenario=".length);
+    continue;
+  }
+  if (arg === "help" || arg === "-h" || arg === "--help") {
+    command = "help";
+    continue;
+  }
+  if (arg === "demo" || arg === "run") {
+    command = "demo";
+    continue;
+  }
+  console.error(`custody: unknown argument "${arg}"`);
+  bad = true;
+  break;
+}
+
+if (bad) {
   help();
   process.exitCode = 2;
+} else if (command === "help") {
+  help();
+} else {
+  const ms = windowMs();
+  if (ms === undefined) {
+    process.exitCode = 2;
+  } else {
+    run({ scenarioId, windowMs: ms, tracePath: tracePath(), verbose })
+      .then((report) => {
+        const noAction = report.expectedTotal === 0;
+        process.exitCode = noAction ? printNoAction(report, verbose) : printMoney(report, verbose);
+      })
+      .catch((error: unknown) => {
+        console.error(`custody: ${error instanceof Error ? error.message : String(error)}`);
+        process.exitCode = 1;
+      });
+  }
 }
