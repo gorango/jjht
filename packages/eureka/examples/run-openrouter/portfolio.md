@@ -1,39 +1,51 @@
 # EUREKA — portfolio
 
-3 collaborations proposed from 4 company challenges, after 0 critic rejections.
+4 collaborations proposed from 4 company challenges, after 4 critic rejections.
 
 ## 1. ArmaturaSec d.o.o. × Krisztina Kiss
 
 - **Challenge:** C001-CH1
 - **Fit:** 95%
-- **Why:** Krisztina Kiss's direct expertise in unsupervised anomaly detection for Modbus/ICS traffic perfectly addresses the core need: learning 'normal' from terabytes of benign data without attack labels.
+- **Why:** Her core research is unsupervised anomaly detection for ICS protocols like Modbus, perfectly matching the challenge's need for site-specific baseline learning without attack examples.
 - **Proposal:** `P-C001-CH1-R1008`
 
-## 1. The Problem: Silent Failures in Zero-Attack-Data Environments
+## The problem
+ArmaturaSec needs to detect unusual behaviour on Modbus and BACnet networks without labelled attack data; their clients have zero confirmed compromises, so supervised classifiers produce unacceptable false positives on real OT traffic (C001-CH1).
 
-ArmaturaSec's ProtoSense module monitors Modbus TCP and BACnet/IP traffic, but its supervised classifier, trained on public datasets, generates unacceptably high false positive rates in production. Clients disable alerts. The core issue is the complete absence of labelled attack data from client sites (C001-CH1). A detection approach that requires malicious examples is fundamentally broken here. Instead, the operational need is for a model that learns the statistical profile of normal traffic at a specific site and flags deviations without ever seeing an attack.
+## Research questions
+1. How can a one-class baseline model of normal Modbus/BACnet behaviour be built per site to achieve a false positive rate below 1% on real OT traffic?
+2. What feature representation of ICS protocol traffic allows a plant operator to understand why a deviation from the baseline was flagged?
+3. How can such a model be updated incrementally on an industrial appliance without full retraining, to track slow legitimate network changes?
 
-## 2. Proposed First-Year Collaboration: Engineering a Deployable Baseline Model
+## Plan
+| Year | Work | Result |
+|------|------|--------|
+| 1 | Instrument the ProtoSense parsing path to extract protocol field-value time series from ArmaturaSec's traffic archives. Train a one-class SVM and an Isolation Forest on real, unlabelled Modbus captures. Build a lab testbed at the university for controlled experiments. | Baseline model suite with an AUC of at least 0.95 on held-out normal traffic from three sites and a quantified false positive rate on 30 days of continuous capture from one site. |
+| 2 | Design an explainability layer: map anomalous features back to Modbus function codes and BACnet object identifiers. Implement an on-device inference prototype in C on ArmaturaSec's hardware bench. Design an update protocol for incremental retraining. | A firmware module that runs inference on NetGuard-OT hardware, reports root-cause alerts, and updates its baseline without cloud connectivity. |
+| 3 | Conduct a live pilot deployment at one energy utility site in Serbia. Integrate detector output into the ArmaturaSec Managed Support dashboard. Evaluate drift detection under scheduled configuration changes. Write and defend the PhD thesis. | Pilot report confirming the target false positive rate is maintained during 90 days of live operation, including one documented legitimate baseline shift event. |
 
-This 12-month project will transition Prof. Krisztina Kiss's research on unsupervised anomaly detection for industrial protocols from her testbed directly into an evaluative deployment on ArmaturaSec's NetGuard-OT appliance. The goal is not a theoretical paper but a field-ready detector component.
+## What each side brings
+- **Company:** Access to terabytes of unlabelled Modbus and BACnet captures from consenting clients (C001-CH1). ProtoSense firmware source and a hardware bench for on-device testing (C001). One to two engineers part-time guided by Radovan Čičić (C001).
+- **Faculty:** Expertise in one-class classifiers and statistical baseline modelling for ICS protocols (R1008, SYN-PUB-10472, SYN-PUB-10473, SYN-PUB-10475). A dedicated ICS network testbed for long-term controlled experiments (R1008). PhD supervision and rigorous evaluation methodology (R1008).
 
-**Phase 1 (Months 1-4): Method Selection and Offline Profiling.** The university group will apply one-class classification methods, specifically the Isolation Forest and one-class SVM models (SYN-PUB-10475, SYN-PUB-10473), to a sanitized, representative sample of ArmaturaSec's terabytes of benign Modbus traffic (C001-CH1). The objective is to perform a sensitivity analysis of algorithm parameters—contamination fraction, window length (SYN-PUB-10475)—against this specific dataset to select the most stable algorithm. ArmaturaSec will provide the traffic archives and engineering context on packet structure and normal operational rhythms (C001).
+## Why this pair
+Prof. Kiss' publication "Statistical Baseline Modelling of Modbus/TCP Traffic in a Substation Automation Network" (SYN-PUB-10472) provides a direct methodology for the exact problem ArmaturaSec faces: building a normal-behaviour profile of Modbus traffic without attack labels. The company contributes real traffic volume that no public dataset matches, while the faculty provides detection algorithms, a controlled testbed, and a long-term measurement study background (SYN-PUB-10474) essential for moving from a paper to an appliance.
 
-**Phase 2 (Months 5-9): Feature Engineering and Explainability.** The core technical challenge is translating statistical deviations into plain-language alarms for a plant manager. We will engineer features based on Prof. Kiss's statistical baseline modelling work (SYN-PUB-10472), focusing on periods, function code sequences, and register poll frequencies. The university will develop a traceability layer that maps an anomaly score back to a specific, human-readable deviation (e.g., "Unusual burst of write commands to programmable logic controller register 40001"). ArmaturaSec engineers will co-design this explanation schema and integrate a proof-of-concept model into the NetGuard-OT firmware stack for offline testing on actual hardware (C001).
+## Agreed up front
+Publication review window: 30 days. IP: ArmaturaSec owns the ProtoSense firmware and traffic archives; unpatented methods and evaluation scripts are jointly owned; the University may publish methodology and results after the review window.
 
-**Phase 3 (Months 10-12): Validation on Live Hardware and Deployment Roadmap.** The final phase involves deploying the model as a passive, non-alerting observer on one consented, live client network through the NetGuard-OT appliance (C001). This will validate hardware performance and detect any drift-induced false positives before offering it as a feature. The deliverable is a technical report on model performance, a list of false positives from the live observation period, and a detailed integration specification for the ArmaturaSec Managed Support firmware update.
+## Risks
+- The unlabelled archives may contain misconfiguration or maintenance periods that operators never flagged as abnormal, polluting the baseline and increasing the false negative rate.
+- Running a one-class model on the NetGuard-OT Mini's embedded CPU may exceed the available compute or memory budget, forcing a reduced feature set that lowers detection accuracy.
 
-## 3. What Each Side Contributes
+## Unverified evidence
+- Whether client consent covers using traffic captures as ML training data, beyond existing diagnostics.
+- The exact headcount of the university group and the ICS testbed hardware specifications.
+- The total volume of the traffic archives in terabytes.
+- The candidate's years of experience and specific degree background.
 
-*   **ArmaturaSec d.o.o.** provides the critical real-world validation opportunity that is normally absent in academic work. This includes: terabytes of curated, benign Modbus/BACnet traffic archives from consenting clients (C001-CH1); the NetGuard-OT hardware bench for resource-constrained inference testing; one to two part-time embedded engineers with access to the existing firmware codebase for integration support (C001); and the production deployment channel for a live pilot.
-
-*   **Prof. Krisztina Kiss's Research Group** contributes the specific algorithmic expertise that avoids the supervised classifier pitfall. This includes: deep knowledge of one-class classification (Isolation Forest, one-class SVM) for industrial protocols (SYN-PUB-10473, SYN-PUB-10475); a proven methodology for statistical baseline modelling of Modbus traffic (SYN-PUB-10472); and prior experience validating research on an ICS testbed with real traffic generators (SYN-PUB-10474). A graduate student can be funded for focused work on feature engineering and evaluation.
-
-## 4. Why This Collaboration Could Fail
-
-*   **Unexplained False Positives Erode Trust.** If the explanation module does not provide a root cause that a plant manager understands, the new detector will be silenced just like the old one, regardless of its statistical accuracy.
-*   **Hardware Constraints Prevent Deployment.** The chosen algorithm may not run efficiently enough on the NetGuard-OT appliance's embedded processor, even after optimization, making it an interesting research result with no product path.
-*   **Traffic Homogeneity.** If the real client traffic is extremely simplistic and invariant, the model will learn a threshold that is too tight, generating a flood of nuisance alarms for the slightest legitimate operational change, such as a manual override by an engineer.
+## Supervisors and candidate
+Academic supervisor: Prof. Dr. Krisztina Kiss, Full Professor, Department of Computing and Control Engineering, Faculty of Technical Sciences (R1008). Industrial supervisor: Radovan Čičić, Head of Engineering, ArmaturaSec d.o.o. (C001-CH1). Candidate: An engineer employed by ArmaturaSec with network protocol analysis and Python scripting experience, enrolled in the industrial PhD programme, splitting time between Zrenjanin and the university lab.
 
 ---
 
@@ -41,26 +53,48 @@ This 12-month project will transition Prof. Krisztina Kiss's research on unsuper
 
 - **Challenge:** C002-CH1
 - **Fit:** 95%
-- **Why:** Mitrović's core expertise is clickstream analysis for student modelling, directly matching the company's task of distinguishing guessing from learning using their existing log data. His work with hidden Markov models is ideal for this sequential behaviour pattern problem.
+- **Why:** Directly specializes in educational data mining and clickstream analysis; his work on sequence mining and competency prediction can distinguish random guessing from genuine learning patterns.
 - **Proposal:** `P-C002-CH1-R1006`
 
-**Problem.** Teachers using Zrenjanin Game Works' math games report a critical gap: a high in-game score does not reflect a child's actual understanding. A documented case showed a student with a 91% score failed equivalent paper tests, indicating rapid, random clicking that the system could not flag (C002-CH1). The company possesses rich clickstream data (timestamp, question ID, answer, response time, attempts) for 4,200 students, but lacks the analytical method to distinguish systematic guessing from genuine competency (C002-CH1).
+## The problem
+Teachers using Zrenjanin Game Works' primary-school math games cannot distinguish a child who is learning from one who is clicking fast and guessing, despite having detailed timestamped clickstream logs for roughly 4,200 students over two school years (C002-CH1). Simple accuracy thresholds fail; a teacher confirmed a 91%-score student understood nothing when tested on paper.
 
-**Proposed Solution & First-Year Plan.**
-We propose a joint 12-month project to develop and validate a statistical model that flags likely guessers. The core hypothesis is that guessing manifests as a distinct, identifiable latent state in a student's clickstream sequence. The work will progress in three phases:
+## Research questions
+1. Which features derived from timestamped click sequences best discriminate random guessing from deliberate, knowledge-based responding?
+2. Can a Hidden Markov Model be reliably trained to identify latent 'learning states' from in-game clickstreams without requiring paper-test ground truth for every student?
+3. What is the minimum interaction length required to flag a likely-guessing student with a false-positive rate acceptable to classroom teachers?
 
-1.  **Data Preparation & Exploratory Analysis (Months 1-3).** Mitrović's team will receive anonymized CSV log exports. They will engineer time-series features like response time entropy, answer-switching frequency, and performance stability. Zrenjanin staff (Miroslav Kovačević) will provide critical domain context on game mechanics and question difficulty to inform feature selection.
-2.  **Model Development & Internal Validation (Months 4-8).** Mitrović will apply Hidden Markov Models (HMMs) to model student learning as a sequence of latent states (e.g., "mastered," "confused," "guessing"), a technique he has previously validated for detecting shifts in learning states from clickstream data (SYN-PUB-10456). The model will output a probability of a student being in a "guessing" state for each session. A baseline logistic regression model using engineered features will also be built for comparison (SYN-PUB-10454).
-3.  **External Validation & Tool Prototyping (Months 9-12).** Zrenjanin's pedagogy expert (Tatjana) will coordinate with a small subset of partner teachers to collect contemporaneous paper-based or observational assessment data. This ground truth will be used to externally validate the model's predictions. The deliverable is a working prototype script that ingests new log files and outputs a simple teacher-facing dashboard mock-up flagging at-risk students, calibrated for the 2025–26 school year (C002-CH1).
+## Plan
+| Year | Work | Result |
+|------|------|--------|
+| 1 | Ingest and explore the full 4,200-student CSV data; co-create a teacher-annotated ground-truth subset; engineer behavioural features from response times, attempt trails, and correctness sequences; train baseline classifiers with a target recall ≥ 0.75 on held-out data. | A descriptive report on guessing behaviours, a novel feature set, a validated baseline classifier, and a small annotated dataset. |
+| 2 | Design and train an HMM to model latent learning/guessing states over question-attempt sequences; compare HMM states to the ground truth and baseline classifiers; iteratively refine the model structure; build a prototype script that translates model output into interpretable teacher-facing flags. | A validated, comparative HMM for clickstream-state detection and a prototype flag-generation script. |
+| 3 | Integrate the model into an offline, testable diagnostic tool; conduct a structured field trial in 3–5 classrooms in the first half of the 2025–26 school year; measure teacher agreement, tune alert thresholds, and prepare the methods and tool documentation for two journal publications. | A polished, teacher-tested diagnostic tool and two submitted journal papers. |
 
-**What Each Side Brings.**
-*   **Researcher (Mitrović):** Core expertise in educational data mining, specifically clickstream analysis, HMMs for state detection (SYN-PUB-10456), and time-to-mastery modeling (SYN-PUB-06872). Provides the statistical methodology and model development capacity.
-*   **Company (Zrenjanin Game Works):** Proprietary, real-world clickstream dataset for 4,200 students (C002-CH1), direct access to teacher feedback for validation, and essential domain knowledge of the game design and curriculum alignment (C002). Miroslav Kovačević will provide one day per week of dedicated development and liaison support (C002).
+## What each side brings
+- **Company:** Real-world, timestamped clickstream logs for ~4,200 students (C002-CH1); direct access to Vojvodina teachers and classrooms for annotation and field trials (C002-CH1); game-design and pedagogy expertise from Tatjana Kovačević; one day per week of Miroslav Kovačević's time for research collaboration (C002).
+- **Faculty:** Supervisory and research expertise in HMM-based learning-state detection (SYN-PUB-10456), educational sequence clustering (SYN-PUB-10455), and competency prediction modelling (SYN-PUB-06872, SYN-PUB-10454); infrastructure for high-dimensional data analysis; access to MSc-level student interns for data engineering support (R1006).
 
-**Key Risks & Mitigation.**
-*   **Insufficient Signal:** The log data may lack the temporal resolution or features to cleanly separate guessing from confusion. *Mitigation:* Phase 1 will explicitly test this; if the signal is absent, we pivot to a minimum viable product based on simpler thresholds validated against the ground truth.
-*   **Ground Truth Validity:** External paper tests may not perfectly correlate with in-game learning. *Mitigation:* The validation protocol will use teacher judgment triangulated with short, game-like diagnostic tasks, not just formal tests.
-*   **Researcher Availability:** Mitrović's portfolio lists corporate HR analytics as a primary interest (R1006). *Mitigation:* This risk must be addressed in the initial contracting to confirm a minimum 0.25 FTE commitment to this K-12 focused project.
+## Why this pair
+Zrenjanin Game Works holds a unique, large-scale primary-school clickstream dataset with a validated guessing problem but lacks internal analytics capacity. Prof. Mitrović has published precisely on the required methods, including "Applying Hidden Markov Models to Detect Shifts in Student Learning States from Clickstream Data" (SYN-PUB-10456), providing a direct academic foundation for a practical teacher tool that can be tested before the 2025–26 school year.
+
+## Agreed up front
+- Publication review window: 30 days.
+- IP: The company owns the game platform, raw data, and the integrated diagnostic tool built on it. The Faculty retains ownership of generalisable models, methods, and open-source reference implementations.
+
+## Risks
+- Sufficient sequence density: if students play too infrequently, resulting click sequences may be too short or sparse for reliable HMM training and state discrimination.
+- Ground-truth bottleneck: teachers may be unable or unwilling to conduct the paper-test verification required to annotate a high-quality training set, limiting supervised model calibration and HMM validation.
+
+## Unverified evidence
+- The exact volume, temporal resolution, and structure (unique vs. repeat students) of the full CSV export (C002-CH1).
+- Teacher availability timeline for ground-truth annotation in Year 1 and field-trial participation in Year 3.
+- Whether the game backend currently records item-level identifiers necessary for modelling question difficulty.
+
+## Supervisors and candidate
+- Academic supervisor: Prof. Dr. Danilo Mitrović, Assistant Professor, Department of Mathematics and Informatics, Faculty of Sciences, University of Novi Sad.
+- Industrial supervisor: Miroslav Kovačević, Co-founder and Lead Developer, Zrenjanin Game Works d.o.o.
+- Candidate profile: MSc in computer science, statistics, or data science with strong Python or R skills and coursework in machine learning and probabilistic models; experience with educational data or log-file analysis is a plus.
 
 ---
 
@@ -68,39 +102,90 @@ We propose a joint 12-month project to develop and validate a statistical model 
 
 - **Challenge:** C003-CH1
 - **Fit:** 95%
-- **Why:** Direct expertise in low-temperature fatigue, fracture mechanics of welded steel joints, and thermal cycling—exactly matching the core failure hypothesis and need for root-cause analysis.
+- **Why:** Directly aligns on low-temperature fatigue and fracture of welded steel joints, with explicit willingness to test under combined loading — precisely the failure mode analysis needed.
 - **Proposal:** `P-C003-CH1-R0365`
 
-**Problem**
-AutomVoj a.d. is experiencing systematic weld cracking at crossmember-to-stringer connections on conveyor frames operating in customer cold stores (2–6 °C). Fourteen complete frame assemblies have been replaced under warranty this year. The failure surfaces and timing (~18 months) strongly suggest a fatigue mechanism promoted by low-temperature service conditions, but the failure cannot be reproduced in AutomVoj’s workshop under ambient-temperature load tests (C003-CH1). Without understanding the root cause, changes to welding procedure, filler material, or joint design remain guesswork, and warranty costs continue.
+## The problem
+AutomVoj a.d. has been replacing welded mild-steel conveyor frames under warranty because crossmember-to-stringer fillet welds crack after approximately 18 months in cold stores operating between 2 °C and 6 °C. Fourteen complete assemblies have been replaced this year alone C003-CH1. The company cannot reproduce the failure in its workshop because all load tests are conducted at room temperature, and it suspects that thermal cycling, condensation and belt vibration act together to drive a damage mechanism that ambient testing misses C003-CH1.
 
-**Proposed First-Year Work**
-The project combines targeted experiments with simulation to identify the driving mechanism and recommend immediate design or process changes.
+## Research questions
+1. What is the dominant damage mechanism that drives crack initiation in the mild-steel crossmember-to-stringer fillet welds when subjected to the combined effect of sustained vibration, condensation-driven corrosion, and thermal cycling between 2 °C and ambient?
+2. Which combination of weld geometry, filler material or post-weld treatment can reliably extend the crack-initiation life beyond a five-year continuous cold-store duty, verified by a low-temperature block-loading fatigue test?
 
-1. **Failure characterisation.** The two cracked frame sections held in storage will be sectioned and examined by the university team. Fractography (stereo and scanning electron microscopy) will identify crack initiation sites and distinguish between monotonic overload or progressive fatigue crack growth. Hardness traverses and microstructural analysis will check for heat-affected-zone anomalies (R0365; SYN-PUB-04475).
+## Plan
+| Year | Work | Result |
+|------|------|--------|
+| 1 | Characterise as-built welds (macro-sections, residual stress via XRD), run 5 constant-amplitude fatigue tests at +2 °C with condensing humidity, build and calibrate a full-frame Abaqus FE model with DIC. | Validated FE model (strain within 15 %); quantified residual stress map; S–N data point from ≥ 5 valid specimens. |
+| 2 | Capture vibration service logs, design a block-loading spectrum, test three improved joint variants inside the climate chamber at +2 °C under condensing conditions, parametrise NASGRO crack-growth model. | Ranked countermeasure variants; one variant selected that shows ≥ 3× fatigue life extension in the block-spectrum test. |
+| 3 | Build two full conveyor-frame modules with the winning joint, perform a six-month accelerated durability test (−5 °C to +25 °C daily cycles), draft a revised welding procedure specification. | Validated inspection interval; approved WPS; thesis submitted. |
 
-2. **Controlled environment fatigue testing.** Small-scale fillet-welded cruciform specimens, representative of the crossmember-to-stringer detail, will be manufactured from identical mild steel hollow section (supplied by AutomVoj). Tests will be run on the university’s servo-hydraulic fatigue machine inside a climate chamber capable of −60 °C (R0365). Two loading blocks will be applied at +20 °C and at +2 °C, using cyclic loads derived from belt tension and product mass estimates provided by AutomVoj. Digital Image Correlation will map surface strain fields around the weld toe, detecting early crack formation and thermal-strain interactions (SYN-PUB-04474; SYN-PUB-04475).
+## What each side brings
+- **Company:** Access to the Zrenjanin fabrication shop, two failed frame assemblies in storage, field vibration measurements, and the practical commissioning experience of 212 staff C003. Direct funding for a three-year PhD candidate, consumables, and test-frame fabrication.
+- **Faculty:** A servo-hydraulic fatigue machine with a climate chamber to −60 °C, a 3D DIC system (Aramis), Abaqus FE licences, and protocols for low-temperature fatigue testing on welded structural steel R0365.
 
-3. **Thermal cycling interaction.** Additional specimens will be subjected to periodic temperature swings between 2 °C and ambient shop-floor conditions to mimic infrequent defrost or maintenance events. This tests the hypothesis that condensation-driven corrosion fatigue or transient thermal stresses accelerate damage (SYN-PUB-04475).
+## Why this pair
+AutomVoj needs to stop a recurring weld-cracking failure that only appears in cold, vibrating service — a failure they cannot replicate in their workshop. Bojan Erić’s group has just published **“Low-Cycle Fatigue Behaviour of Cruciform Welded Joints at −40 °C: An Experimental Study”** SYN-PUB-04474 and “Interaction of Mechanical Cyclic Loading and Thermal Cycling on Fatigue Life of Butt-Welded Structural Steel Plates” SYN-PUB-04475, which together demonstrate that his lab already runs precisely the low-temperature cyclic tests with DIC instrumentation that the company lacks. No other regional faculty combines a climate chamber to −60 °C, a servo-hydraulic rig, and a decade of fracture-mechanics modelling on welded steel grades. For the company, this is the fastest path to a weld procedure that survives a cold-store warranty period; for the researcher, it is a direct industrial validation of laboratory methods on a real, high-consequence structure.
 
-4. **Finite element simulation.** A 3D elastic–plastic FE model of the joint, incorporating weld geometry scanned from actual frames, will compute local notch stress and stress intensity factor ranges. The model will be validated against the DIC measurements and then used to explore sensitivity to weld toe radius, leg length, and residual stress level (SYN-PRJ-0388; SYN-PUB-04472). By month 9, a concise engineering report will rank contributing factors and deliver specific recommendations—weld profile changes, a low-temperature-suitable filler metal, or post-weld dressing—that AutomVoj can trial on a pilot frame.
+## Agreed up front
+- Publication review window: 60 days (company may request an additional 90 days for patent filing).
+- IP: Methods (FE protocols, DIC procedures, fatigue-life scripts) owned by the Faculty; physical test rigs, jigs and the final WPS owned by AutomVoj a.d.
 
-**What Each Side Brings**
+## Risks
+- The dominant crack driver may be pure corrosion fatigue from condensation freeze-thaw cycles, not mechanical vibration; the weld-geometry changes studied could therefore show no life improvement, delaying a fix by 18 months.
 
-*AutomVoj a.d.* provides in-service failure history, two failed frame assemblies, material (mild steel hollow section), estimated service load spectra, access to an operating cold-store line for validation measurements if needed, and the commercial urgency that keeps the investigation focused. The company’s chief engineer and senior automation team will guide practical constraints such as weld access and fabrication cost (C003).
+## Unverified evidence
+- The claim that the researcher has an active collaboration with a Vojvodina-based metalworking company during crane girder monitoring could not be verified against a named dataset and is omitted from the evidence chain.
+- Exact make, capacity and load-cell configuration of the servo-hydraulic machine, and the internal volume of the climate chamber, are not stated in the provided source; suitability for a full-frame test must be confirmed.
 
-*University of Novi Sad (Bojan Erić)* contributes a working group with direct experimental and numerical expertise in low-temperature fatigue of welded structural steel. Available equipment includes a servo-hydraulic fatigue frame, a climate chamber validated down to −60 °C, and a DIC system for full-field strain measurement (R0365). Previous projects have examined fatigue crack propagation in fillet-welded S355 steel under variable-amplitude loading (SYN-PUB-04472) and low-cycle fatigue of cruciform joints at −40 °C (SYN-PUB-04474). The group’s experience in residual-stress measurement and FE stress analysis (SYN-PUB-04473; SYN-PRJ-0389) ensures the simulation work is grounded in experimental validation.
-
-**What Would Make It Fail**
-
-- **Insufficient load definition.** If AutomVoj cannot provide credible estimates of belt tension ranges, product-induced live loads, and start–stop transients, the laboratory loading will be unrepresentative and the findings irrelevant.
-- **Unanticipated corrosion mechanism.** If the crack surfaces retrieved from the field show the primary driver is a specific condensate chemistry (e.g., chlorine-based cleaning agents) rather than pure mechanical fatigue, the proposed mechanical-thermal test matrix may miss the key variable. The fractography in Work Package 1 is designed to catch this early, but a switch to an electro-chemical investigation would require re-scoping.
-- **Excessive residual stress scatter.** If the as-welded residual stress state in the production frames varies dramatically and dominates the fatigue life, a small laboratory specimen program may fail to capture the statistical worst case, leading to recommendations that do not prevent future field failures.
+## Supervisors and candidate
+- **Academic supervisor:** Assoc. Prof. Bojan Erić, Faculty of Technical Sciences, University of Novi Sad.
+- **Industrial supervisor:** Chief Engineer (to be confirmed), AutomVoj a.d.
+- **Candidate profile:** A mechanical or materials engineer with a strong MSc in solid mechanics or welding technology. Must be confident in operating servo-hydraulic test rigs and running Abaqus FE simulations. A candidate who can spend 70 % of their time in the AutomVoj workshop and test floor, and 30 % in the university climate-chamber and DIC lab will succeed. Hands-on experience with arc welding of structural steel is highly desirable.
 
 ---
 
-## Challenges left unmatched (on purpose)
+## 4. OsiguroMi d.o.o. × Žarko Pejić
 
-The system is allowed to conclude that a challenge has no defensible pair. Proposing a weak collaboration is worse than saying so.
+- **Challenge:** C004-CH1
+- **Fit:** 95%
+- **Why:** Expert in geostatistical interpolation and satellite precipitation downscaling for index insurance, directly addressing parcel-level rainfall estimation with multi-source data.
+- **Proposal:** `P-C004-CH1-R0364`
 
-- C004-CH1: Our weather-triggered crop parametric product pays out when measured rainfall at the nearest official station drops below a threshold, but farmers tell us the station is sometimes 30 km away and their field got rain while the station recorded drought — we're paying out when we shouldn't and refusing when we should.
+## The problem
+OsiguroMi’s parametric crop product triggers payouts when the nearest official meteorological station records rainfall below a contractual threshold, but the station can be up to 30 km away, leading to unjustified payouts or missed claims (C004-CH1). A spatial rainfall estimate that works at the field scale is needed without replacing the regulatory framework.
+
+## Research questions
+1. How can satellite precipitation estimates, dense private gauge networks, and official station data be fused to produce a daily 1 km rainfall grid that reduces basis risk relative to the nearest-station threshold alone?
+2. What is the spatial transferability of bias-correction factors derived from a 140-point network to operational index insurance triggers across Vojvodina parcels?
+
+## Plan
+| Year | Work | Result |
+|------|------|--------|
+| 1 | Harmonise RHMZS, private network, and IMERG data. Cross-validate kriging variants and random forest against held-out stations. | Benchmark model with root-mean-square error for monthly rainfall below 15 mm at 10 held-back locations. |
+| 2 | Build a 1 km multi-source grid and a parcel-level rainfall-deficit index. Retrospective testing on historical partner claims. | Candidate index ready for identical-twin testing against the operational trigger over two growing seasons of partner data. |
+| 3 | Execute pre-agreed performance protocol; shadow-trigger integration in the API; regulatory documentation. | Production-ready API endpoint returning parcel-scale drought status, with measured false-payout improvement over the baseline. |
+
+## What each side brings
+- **Company:** OsiguroMi d.o.o.: access to the white-label API and B2B partner claims data for historical verification; knowledge of the regulatory constraints for parametric triggers; requirement for a result applicable within six to nine months (C004).
+- **Faculty:** Spatial statistics and satellite downscaling expertise; access to the group’s dense gauge network for short deployment campaigns (R0364); existing validated IMERG-based kriging-with-external-drift workflow (SYN-PUB-04461).
+
+## Why this pair
+Žarko Pejić has directly addressed the core problem: his publication “Kriging with External Drift Using IMERG Precipitation as a Covariate for Sub-Monthly Rainfall Mapping at 1 km Resolution in Northern Serbia” (SYN-PUB-04461) demonstrates a working method for the region. Combined with his index-insurance design study (SYN-PUB-04462) and OsiguroMi’s need to move beyond the 30 km station gap (C004-CH1), the pair aligns a proven geostatistical toolkit with a live parametric product.
+
+## Agreed up front
+Publication review window: 45 days. IP: Company owns the final rain-fused grid product and the tuned trigger model; Faculty retains ownership of the underlying interpolation methodology and may publish it after review.
+
+## Risks
+- The private network’s 140 point locations may not be well distributed across the active underwriting area, preventing a robust bias correction.
+- Partner claims data may be too sparse or noisy to confidently measure a reduction in basis risk within the project timeline.
+
+## Unverified evidence
+- The number and spatial density of the three private agrometeorological networks totalling 140 measurement points.
+- The exact locations and availability timelines of the partner claims dataset for retrospective testing.
+
+## Supervisors and candidate
+Academic supervisor: Prof. dr Branislav Jovanović
+Industrial supervisor: Milena Čabarkapa
+Candidate profile: MSc or PhD candidate with a background in geostatistics, remote sensing, or hydrometeorology, ideally familiar with agricultural index insurance and the Pannonian climate.
+
+---

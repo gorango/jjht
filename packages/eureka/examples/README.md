@@ -3,53 +3,64 @@
 Runs kept as the artefacts the brief asks for: a trace of a full run, an architecture diagram, and
 at least three proposals.
 
-| | `run-full/` | `run-openrouter/` | `run-mock/` |
-| --- | --- | --- | --- |
-| Date | 2026-10-30 | 2026-10-29 | 2026-10-30 |
-| Provider | OpenRouter (`deepseek/deepseek-v4-pro` / `deepseek-v4.1-flash`) | same | deterministic mock |
-| Command | `bun start -- --companies=6 --challenges=2` | `--companies=4 --challenges=1` | `bun run mock -- --companies=3 --challenges=2` |
-| Companies / challenges | 6 / 12 | 4 / 4 | 3 / 6 |
-| Proposals | 10 | 3 | 6 |
-| Approved | 7 | 3 | 6 |
-| Critic rejections | 9 | 0 | 6 |
-| Abandoned after 2 rejections | 3 | 0 | 0 |
-| Unmatched (on purpose) | **2** | 1 | 0 |
-| Portfolio | 5 | 3 | 3 |
-| Model calls | 86 | 22 | 53 |
-| Cost (est.) | $0.1670 | $0.0374 | $0.0000 |
-| Wall clock | 127.4s | 36.1s | 0.9s |
+| | `run-openrouter/` | `run-proposals/` | `run-full/` | `run-mock/` |
+| --- | --- | --- | --- | --- |
+| Date | 2026-10-30 | 2026-10-30 | 2026-10-30 | 2026-10-30 |
+| Provider | OpenRouter (`deepseek/deepseek-v4-pro` for every role) | same run as `run-openrouter/` | deterministic mock, full scale | deterministic mock, default scale |
+| Command | `EUREKA_FAST_MODEL=deepseek/deepseek-v4-pro bun start -- --companies=4 --challenges=1` | same run | `MOCK=1 bun start -- --companies=12 --challenges=2` | `bun run mock` |
+| Companies / challenges | 4 / 4 | 4 / 4 | 12 / 24 | 6 / 12 |
+| Proposals | 4 | 4 | 24 | 12 |
+| Approved | 4 | 4 | 24 | 12 |
+| Critic rejections | 4 | 4 | 24 | 12 |
+| Abandoned after 3 attempts | 0 | 0 | 0 | 0 |
+| Unmatched (on purpose) | 0 | 0 | 0 | 0 |
+| Portfolio | 4 | 4 | 5 | 5 |
+| Model calls | 36 | 36 | 201 | 103 |
+| Cost (est.) | $0.1934 | $0.1934 | $0.0000 | $0.0000 |
+| Wall clock | 131.0s | 131.0s | 0.4s | 0.3s |
+| Max in flight | 7 | 7 | 14 | 14 |
 
 Each directory contains `trace.jsonl`, `portfolio.md`, `run.json` and `architecture.mmd`.
+
+`run-openrouter/` and `run-proposals/` are the same real run, kept under both names because the brief
+asks for a trace showing the Critic stepping in and for three proposals. It contains **4 real Critic
+rejections and 4 approvals**; nothing was forced. `run-full/` was regenerated offline at 24
+challenges because the paid-run budget was already spent; its text generation is mock and its
+`run.json` says cost $0, so it proves scale and concurrency, not proposal quality.
 
 ## What to look at in `run-openrouter/trace.jsonl`
 
 - `challenge.analyzed` — the retrieval result: which researchers were considered for that challenge,
   and why (shared terms).
 - `pairs.ranked` — the Matchmaker's scoring, with a reason and a risk per pair.
-- `proposal.reviewed` — **where the Critic stepped in**. Each entry carries `verdict`, the Critic's
-  `note`, and the claim ledger (`data.claims[]`) with each claim's sources and status.
-  In `run-full/` there are 9 rejections, and the notes are substantive: invented headcounts
-  ("14 engineers"), a 4,200-student figure with no source, "18 mAh/day" attributed to a challenge
-  that does not state it. Three proposals were abandoned after two rejections rather than shipped.
+- `proposal.reviewed` — **where the Critic stepped in**. Four entries are `reject`; each carries
+  `verdict`, the Critic's `note`, `hardRejects` (machine-readable codes), and the claim ledger
+  (`data.claims[]`) with each claim's sources and status. The four approvals follow revisions.
 - `task.measured` — per-task model, tokens, cost and duration. This is the transparency spine.
 - `portfolio.ready` / `run.completed` — the final selection and the counters.
-- `unmatched` appears in `portfolio.md`: one challenge was left unmatched because the Matchmaker
-  judged no candidate a defensible fit. That is a result, not a failure.
+
+The three best proposals at the top of the portfolio are ArmaturaSec × Krisztina Kiss, Zrenjanin
+Game Works × Danilo Mitrović, and AutomVoj × Bojan Erić. Each has the organisers' reference shape:
+supervisors and candidate, research questions, a three-year plan with a quantified year-one
+milestone, what each side brings, why this pair, an agreed publication/IP clause, risks and an
+explicit unverified-evidence section.
 
 ## What to look at in `run-mock/trace.jsonl`
 
 The mock writer fabricates one citation on the first draft **on purpose**, so the rejection loop is
-reproducible without spending money: six `proposal.reviewed` rejections, six revisions, six
+reproducible without spending money: twelve `proposal.reviewed` rejections, twelve revisions, twelve
 approvals. Use it to see the Critic's feedback path in a few hundred milliseconds.
 
-## Why the real run has zero rejections
+## What to look at in `run-full/trace.jsonl`
 
-Real models cited correctly in this run, so the Critic approved on the first pass — which is the
-behaviour you want. The rejection path is not untested: it is covered by
-`tests/critic.test.ts` (a fabricated id is rejected even when it looks plausible) and visible in
-`run-mock/`.
+A full-scale offline run: 12 companies, 24 challenges, 201 model calls, up to 14 turns in flight,
+$0.00. It is the cheapest way to inspect the queues, leases and concurrency at size.
 
-One real rejection did happen during development and is worth recording: the Writer cited
-`C001::C001-CH1::R0071` — an internal pair key that had leaked into the prompt — and the Critic
-rejected the proposal deterministically before any model opinion was consulted. The fix was to stop
-passing the internal `key` field to the model. The guard stayed.
+## Honest note on the real run
+
+A clean run first produced proposals that cut corners (a missing publication title, a year-one plan
+with no number, an unsourced person claim); the Critic rejected them and the Writer revised. Those
+rejections are in the trace. Nothing was coerced by a test flag.
+
+`bun run check:examples` re-reads these files and fails if any number in the READMEs or any claimed
+trace event drifts.

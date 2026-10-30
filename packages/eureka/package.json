@@ -20,7 +20,8 @@
     "test": "bun test tests",
     "refresh:calls": "bun scripts/refresh-calls.ts",
     "eval": "bun scripts/eval.ts",
-    "concurrency": "bun scripts/concurrency.ts"
+    "concurrency": "bun scripts/concurrency.ts",
+    "check:examples": "bun scripts/check-examples.ts"
   },
   "dependencies": {
     "@mozaik-ai/core": "workspace:*",
