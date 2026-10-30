@@ -1,6 +1,7 @@
 # 05 — The scenario suite
 
-Ten incidents. The first is implemented; the rest are the ticket backlog for the judge.
+Ten incidents, all implemented as fixtures in `src/scenarios/` with committed expected decisions.
+The pure airlock and the live run agree on every one.
 
 | # | Scenario | Conflict | Expected airlock behaviour |
 | --- | --- | --- | --- |
@@ -39,11 +40,12 @@ The narrative the table tells:
   capability is necessary, not sufficient.
 - Availability gets its capacity, because the joint budget after the rewrite is 3%.
 
-Reproduce with `bun run custody` (or `bun run custody -- --verbose` for every finding).
+Reproduce with `bun run custody` for the live money run, `bun run custody --scenario <id>` for any
+other incident, and `bun run custody:ablate` for all ten through three arms.
 
 ## What a failure looks like
 
-If the airlock regresses, the replay fails loudly:
+If the airlock regresses, the live run and the test suite fail loudly:
 
 ```
 expected outcomes: 4/5 match

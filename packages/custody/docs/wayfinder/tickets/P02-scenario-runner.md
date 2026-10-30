@@ -56,8 +56,9 @@ validate the seam; the final harness is execution.
 
 ## Resolution
 
-**Resolved 2026-10-30.** Prototype: [`packages/custody/scripts/compare-arms.ts`](../../../scripts/compare-arms.ts).
-Run: `cd packages/custody && bun scripts/compare-arms.ts`.
+**Resolved 2026-10-30.** The prototype was folded into the real ablation:
+[`packages/custody/scripts/ablate.ts`](../../../scripts/ablate.ts).
+Run: `bun run custody:ablate`. The prototype file was removed once the ablation superseded it.
 
 Observed output on the money scenario:
 

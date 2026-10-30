@@ -15,9 +15,9 @@
     "eureka:typecheck": "bun run --filter eureka typecheck",
     "eureka:build": "bun run --filter eureka build",
     "eureka:test": "bun run --filter eureka test",
-    "custody": "bun run --filter custody custody",
-    "custody:ablate": "bun run --filter custody ablate",
-    "custody:test": "bun run --filter custody test",
-    "custody:typecheck": "bun run --filter custody typecheck"
+    "custody": "bun --cwd packages/custody src/index.ts demo",
+    "custody:ablate": "bun --cwd packages/custody scripts/ablate.ts",
+    "custody:test": "bun --cwd packages/custody test",
+    "custody:typecheck": "bun --cwd packages/custody run typecheck"
   }
 }

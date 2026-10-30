@@ -30,6 +30,12 @@ interface Scenario {
   blastBudget: number;
   capabilities: Record<string, string[]>;
   expected: Record<string, "accept" | "rewrite" | "reject" | "defer">;
+  secondKeyIntentIds: string[];
+  taintedIntentIds: string[];
+  allowedEffects: AllowedEffect[];
+  evidenceTargets: string[];
+  executable?: boolean;
+  noActionReason?: string;
 }
 ```
 
@@ -69,8 +75,8 @@ that was not needed. This is the one measurement that turns "we contained it" in
 proved it". It requires the scenario runner to target both builds (ticket 13), which is why that
 ticket exists before the ablation is finalised.
 
-**No numbers are claimed yet.** The table above is the experiment design, not a result. Until the
-ablation runs, the claim is unverified and the README must say so.
+**The experiment has run.** `bun run custody:ablate` writes `eval/results.json`; the README quotes
+only numbers in that file. The patched arm is labelled not run because no second build exists.
 
 ## Adversarial generation (stretch)
 

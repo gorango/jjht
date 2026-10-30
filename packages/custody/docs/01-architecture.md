@@ -99,36 +99,43 @@ src/
     invariants.ts   capability/provenance/taint/compensation/blast/evidence     [implemented]
   agents/
     airlock.ts      joint reconciliation + precedence rules                    [implemented, tested]
-    airlock-handler.ts  Mozaik InterceptionHandler adapter                     [typed, not wired]
-    roles.ts        role prompts                                               [text only]
-    worker.ts       generic reactive worker                                    [TODO]
-    pool.ts         role pools                                                 [TODO]
-    scheduler.ts    boot + quiescence                                          [TODO]
+    airlock-handler.ts  per-loop InterceptionHandler: propose, await, apply     [implemented]
+    airlock-coordinator.ts  the pending set, window clock, deferrals, retries   [implemented]
+    scheduler.ts    boot, participants, one loop per intent                    [implemented]
+    roles.ts        role prompts                                               [implemented]
   runtime/
     state.ts        CustodyState                                               [implemented]
     events.ts       event catalogue                                            [implemented]
     session.ts      defineRuntime                                              [implemented]
-    trace.ts        JSONL observer                                             [TODO — lift from EUREKA]
+    trace.ts        JSONL observer participant                                 [implemented]
+    clock.ts        injected time and timers                                   [implemented]
+    ingest.ts       taint before any participant sees telemetry                [implemented]
   infra/
-    adapter.ts      InfraAdapter interface                                     [TODO]
-    sim.ts          digital twin                                               [TODO]
-    docker.ts       real adapter                                               [TODO]
+    adapter.ts      InfraAdapter + deterministic SimAdapter                     [implemented]
+    docker.ts       real adapter                                               [not built]
+  inference/
+    mock-runner.ts  scripted InferenceRunner, labelled mock, costUsd 0          [implemented]
   scenarios/
-    money.ts        the five-intent scenario                                   [implemented]
-    *.ts            the rest of the suite                                      [TODO]
-  index.ts          `bun run custody` replay                                  [implemented]
+    *.ts            ten fixtures with expected decisions and harm labels        [implemented]
+  eval/
+    ablate.ts       naive / checks-only / custody over all ten                 [implemented]
+  index.ts          `bun run custody` live CLI                                 [implemented]
 ```
 
 ## What exists today, precisely
 
-- 18 passing tests across three files: invariants, airlock, registry.
-- `bun run custody` replays five concurrent intents and prints the decisions; exits non-zero if any
-  outcome differs from the scenario's expectation.
-- `tsc --noEmit` clean against the workspace Mozaik build.
-- The Mozaik interception adapter compiles against v4.1.0 but has not been exercised in a live loop.
+- 50 passing tests: invariants, airlock, registry, taint, all ten scenarios, the live CLI, and the
+  ablation.
+- `bun run custody` boots the real Mozaik runtime, joins ten participants, starts one loop per
+  proposed action, holds every `act` call in the interception handler, and prints the decisions,
+  `INFLIGHT 5`, and five distinct loop ids. It exits non-zero unless the five decisions match and at
+  least two loops were held together.
+- `bun run custody --scenario benign` closes with no action and executes nothing.
+- `bun run custody:ablate` writes `eval/results.json`; `custody` is 0 harmful and 0 obeyed, `naive`
+  is 15 harmful and 2 obeyed in 9 of 10 scenarios.
+- `tsc --noEmit` is clean against the workspace Mozaik build.
 
 ## What does not exist yet
 
-The worker/pool that runs role prompts, the digital twin, the real adapter, the trace observer, the
-viewer, the scenario suite beyond the money case, the ablation harness, and the baro handoff. Those
-are the tickets in [10-wayfinder-seed](10-wayfinder-seed.md).
+The Docker adapter, the observer viewer, live inference, the baro handoff, and the evidence hash
+bundle. Those are cut or later work, and the README says so.

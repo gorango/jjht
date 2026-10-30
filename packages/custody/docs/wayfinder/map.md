@@ -72,7 +72,7 @@ the [Vertical slice contract](tickets/C15-vertical-slice-contract.md).
 - [Claim discipline and README contract](tickets/C17-claim-discipline.md) — claim table, numbers only from `eval/results.json`, honest limitations, judge Q&A; no fake PR/Docker.
 - [GitHub test repo and token for filing issues](tickets/T01-github-test-repo.md) — public `gorango/custody-scratch`, real issue #1, failing fixture, push rights; outbox fallback.
 - [Prototype: the live run's trace table](tickets/P01-trace-table.md) — columns, proposal order, load-bearing `window.closed`/`INFLIGHT` row; the CLI table is enough.
-- [Prototype: scenario runner, one scenario two build states](tickets/P02-scenario-runner.md) — `scripts/compare-arms.ts`; money scenario naive 3 harmful vs custody 0; keep `run(arm)`, add a patched worktree.
+- [Prototype: scenario runner, one scenario two build states](tickets/P02-scenario-runner.md) — folded into `scripts/ablate.ts`; ten scenarios, three arms, `eval/results.json`.
 - [Prototype: airlock/lease timeline in the viewer](tickets/P03-lease-timeline.md) — lanes, `par` block, window shading, decision arrows; viewer is an observer; lightweight generation for stale writes.
 
 ## Not yet specified
