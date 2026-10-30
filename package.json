@@ -6,14 +6,17 @@
   "scripts": {
     "postinstall": "bun run --filter @mozaik-ai/core build",
     "build:mozaik": "bun run --filter @mozaik-ai/core build",
-    "start": "bun run --filter eureka start",
-    "run": "bun run --filter eureka run",
-    "mock": "bun run --filter eureka mock",
-    "trace": "bun run --filter eureka trace",
-    "openalex": "bun run --filter eureka openalex",
-    "eval": "bun run --filter eureka eval",
-    "typecheck": "bun run --filter eureka typecheck",
-    "build": "bun run --filter eureka build",
-    "test": "bun run --filter eureka test"
+    "eureka:start": "bun run --filter eureka start",
+    "eureka:run": "bun run --filter eureka run",
+    "eureka:mock": "bun run --filter eureka mock",
+    "eureka:trace": "bun run --filter eureka trace",
+    "eureka:openalex": "bun run --filter eureka openalex",
+    "eureka:eval": "bun run --filter eureka eval",
+    "eureka:typecheck": "bun run --filter eureka typecheck",
+    "eureka:build": "bun run --filter eureka build",
+    "eureka:test": "bun run --filter eureka test",
+    "custody": "bun run --filter custody demo",
+    "custody:test": "bun run --filter custody test",
+    "custody:typecheck": "bun run --filter custody typecheck"
   }
 }

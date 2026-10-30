@@ -1,0 +1,24 @@
+{
+  "name": "custody",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CUSTODY — an incident-response runtime where no agent can act alone",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "demo": "bun src/index.ts demo",
+    "start": "bun src/index.ts demo",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@mozaik-ai/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}

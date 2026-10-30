@@ -31,6 +31,17 @@
         "typescript-eslint": "^8.61.0",
       },
     },
+    "packages/custody": {
+      "name": "custody",
+      "version": "0.1.0",
+      "dependencies": {
+        "@mozaik-ai/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^24.10.1",
+        "typescript": "^5.9.3",
+      },
+    },
     "packages/eureka": {
       "name": "eureka",
       "version": "0.1.0",
@@ -370,6 +381,8 @@
     "cors": ["cors@2.8.6", "", { "dependencies": { "object-assign": "^4", "vary": "^1" } }, "sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw=="],
 
     "cross-spawn": ["cross-spawn@7.0.6", "", { "dependencies": { "path-key": "^3.1.0", "shebang-command": "^2.0.0", "which": "^2.0.1" } }, "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA=="],
+
+    "custody": ["custody@workspace:packages/custody"],
 
     "data-uri-to-buffer": ["data-uri-to-buffer@4.0.1", "", {}, "sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A=="],
 
