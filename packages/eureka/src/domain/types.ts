@@ -158,6 +158,30 @@ export interface PairScore {
 
 export type ProposalStatus = "drafting" | "review" | "rejected" | "approved";
 
+/**
+ * The proposal is a document a company and a researcher would actually sign,
+ * so the structured half mirrors the sections of the organisers' reference
+ * industrial-PhD topic. The Critic checks these fields in code; the markdown is
+ * what a human reads.
+ */
+export interface ProposalSupervisors {
+  academic: string;
+  industrial: string;
+}
+
+export interface PlanYear {
+  year: number;
+  work: string;
+  result: string;
+}
+
+export interface ProposalTerms {
+  /** Days the company may review a manuscript before it is submitted. */
+  publicationReviewDays: number;
+  /** Who owns the rig/models and who keeps the methods. */
+  ip: string;
+}
+
 export interface Proposal {
   id: string;
   companyId: string;
@@ -169,6 +193,16 @@ export interface Proposal {
   status: ProposalStatus;
   revision: number;
   criticNote: string;
+
+  supervisors: ProposalSupervisors;
+  candidate: string;
+  researchQuestions: string[];
+  plan: PlanYear[];
+  whatEachSideBrings: { company: string[]; faculty: string[] };
+  whyThisPair: string;
+  agreedUpFront: ProposalTerms;
+  risks: string[];
+  unverified: string[];
 }
 
 export interface PortfolioEntry {

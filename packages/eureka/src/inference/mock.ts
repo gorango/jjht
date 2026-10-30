@@ -70,7 +70,7 @@ const respond = (task: TaskEnvelope): unknown => {
     }
 
     case "writer": {
-      const { researcher, company, challenge, score } = input;
+      const { researcher, company, challenge, score, industrialContact } = input;
       const real = [
         challenge.id,
         researcher.id,
@@ -81,25 +81,54 @@ const respond = (task: TaskEnvelope): unknown => {
       // catch. This is the failure mode the EINSTEIN brief is built around.
       const fabricated = task.attempt === 0 ? ["SYN-PUB-99999"] : [];
       const citations = [...real, ...fabricated];
+      const publication = (researcher.publicationsDetailed as Array<{ id: string; title: string }>)[0];
+      const titleLine = publication
+        ? `${researcher.name}'s paper "${publication.title}" (${publication.id}) is the closest published work.`
+        : `${researcher.name}'s published record is the closest work.`;
+      const industrial = industrialContact
+        ? `${industrialContact.name} (${industrialContact.role}, ${company.name})`
+        : `the Head of Engineering at ${company.name}`;
       const markdown = [
         `# ${company.name} × ${researcher.name}`,
         "",
         `**Challenge:** ${challenge.text}`,
         "",
+        `## The problem`,
+        `${challenge.text.replace(/^We need to /i, "").replace(/\.$/, "")}.`,
+        "",
+        `## Research questions`,
+        "1. Which part of the stated problem can be solved with the methods the faculty already uses?",
+        "2. What measurement would convince the company that the result works on its own line?",
+        "3. What would make the approach fail badly enough to stop after year one?",
+        "",
+        `## Plan`,
+        "| Year | Work | Result |",
+        "| --- | --- | --- |",
+        "| 1 | A baseline built on 2,000 labelled samples from the company's existing process | A working baseline and a dataset paper |",
+        "| 2 | Extend the method to the second operating condition and measure it on site | A journal paper and a prototype |",
+        "| 3 | A full trial through one operating cycle, compared with the current process | The thesis and a rollout decision |",
+        "",
+        `## What each side brings`,
+        `- **Company:** ${company.rd_capacity} and access to the operating data.`,
+        `- **Faculty:** supervision by ${researcher.name}, laboratory time, and ${researcher.keywords.slice(0, 3).join(", ")}.`,
+        "",
         `## Why this pair`,
-        `${score.why} ${researcher.name} works on ${researcher.fields.slice(0, 2).join(" and ")}, and the company's ` +
-          `${company.sector.toLowerCase()} roadmap needs exactly that.`,
+        `${score.why} ${titleLine}`,
         "",
-        `## What we would do together`,
-        `A 12-month joint project: ${challenge.text.replace(/^We need to /i, "").replace(/\.$/, "")}. ` +
-          `The company brings ${company.rd_capacity.toLowerCase()} The faculty brings ${researcher.keywords.slice(0, 3).join(", ")}.`,
-        "",
-        `## Industrial PhD option`,
-        `If the results hold, the work becomes an industrial PhD topic supervised by ${researcher.name} ` +
-          `(${researcher.department}) and an engineer from ${company.name}.`,
+        `## Agreed up front`,
+        "- Results may be published after a 60-day review by the company.",
+        "- The company owns the rig and the trained models; the faculty keeps the methods.",
         "",
         `## Risks`,
-        `The pairing depends on data access the company has not yet committed. ${score.risks.join("; ") || "No structural risk identified."}`,
+        `The pair fails if the company cannot commit timely access to its operating data. ${score.risks.join("; ") || ""}`.trim(),
+        "",
+        `## Unverified evidence`,
+        "- Budget, data-access terms and the candidate's availability are not in the dataset and remain to be confirmed.",
+        "",
+        `## Supervisors and candidate`,
+        `- **Academic supervisor:** ${researcher.name} (${researcher.title}, ${researcher.department}).`,
+        `- **Industrial supervisor:** ${industrial}.`,
+        `- **Candidate:** a master's graduate in ${researcher.fields[0] ?? company.sector}, employed by ${company.name} for the three years.`,
         "",
         `## References`,
         ...citations.map((id) => `- ${id}`),
@@ -107,6 +136,32 @@ const respond = (task: TaskEnvelope): unknown => {
 
       return {
         title: `${company.name} × ${researcher.name}: ${researcher.fields[0] ?? company.sector}`,
+        supervisors: {
+          academic: `${researcher.name} (${researcher.title}, ${researcher.department})`,
+          industrial,
+        },
+        candidate: `a master's graduate in ${researcher.fields[0] ?? company.sector}, employed by ${company.name} for the three years`,
+        researchQuestions: [
+          "Which part of the stated problem can be solved with the methods the faculty already uses?",
+          "What measurement would convince the company that the result works on its own line?",
+          "What would make the approach fail badly enough to stop after year one?",
+        ],
+        plan: [
+          { year: 1, work: "A baseline built on 2,000 labelled samples from the company's existing process", result: "A working baseline and a dataset paper" },
+          { year: 2, work: "Extend the method to the second operating condition and measure it on site", result: "A journal paper and a prototype" },
+          { year: 3, work: "A full trial through one operating cycle, compared with the current process", result: "The thesis and a rollout decision" },
+        ],
+        whatEachSideBrings: {
+          company: [`${company.rd_capacity} and access to the operating data.`],
+          faculty: [`Supervision by ${researcher.name}, laboratory time, and ${researcher.keywords.slice(0, 3).join(", ")}.`],
+        },
+        whyThisPair: `${score.why} ${titleLine}`,
+        agreedUpFront: {
+          publicationReviewDays: 60,
+          ip: "The company owns the rig and the trained models; the faculty keeps the methods.",
+        },
+        risks: [`The pair fails if the company cannot commit timely access to its operating data.`],
+        unverified: ["Budget, data-access terms and the candidate's availability are not in the dataset and remain to be confirmed."],
         markdown,
         citations,
         claims: [

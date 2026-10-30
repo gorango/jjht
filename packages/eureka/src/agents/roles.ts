@@ -18,6 +18,7 @@ import type {
   Candidate,
   ChallengeAnalysis,
   Claim,
+  Dataset,
   PairScore,
   Proposal,
   ResearcherProfile,
@@ -228,6 +229,15 @@ Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "shar
       status: "drafting",
       revision: 0,
       criticNote: "",
+      supervisors: { academic: "", industrial: "" },
+      candidate: "",
+      researchQuestions: [],
+      plan: [],
+      whatEachSideBrings: { company: [], faculty: [] },
+      whyThisPair: "",
+      agreedUpFront: { publicationReviewDays: 0, ip: "" },
+      risks: [],
+      unverified: [],
     };
     // Create the proposal *before* announcing the ranking: the Funding Scout looks
     // it up when deciding whether to hand work to the Writer.
@@ -245,19 +255,42 @@ Schema: {"ranked": [{"researcherId": string, "fit": number, "why": string, "shar
 /* Proposal Writer                                                             */
 /* -------------------------------------------------------------------------- */
 
+/** A named industrial contact, when the company record states one. */
+export const industrialContact = (about: string): { role: string; name: string } | undefined => {
+  const match =
+    /\b(head of [a-z ]+|chief executive|chief technology officer|cto|director|founder|managing director)[, ]+([A-ZČĆŠŽĐ][a-zčćšžđ]+ [A-ZČĆŠŽĐ][a-zčćšžđ]+)/i.exec(
+      about,
+    );
+  const role = match?.[1];
+  const name = match?.[2];
+  if (!role || !name) return undefined;
+  return { role: role.replace(/\b\w/g, (letter) => letter.toUpperCase()), name };
+};
+
 export const writer: WorkerSpec = {
   role: "writer",
-  maxOutputTokens: 1800,
+  maxOutputTokens: 2600,
   model: "strong",
-  instruction: `[[role:writer]] You are the Proposal Writer. Write a one-page proposal that a company manager and a professor would actually sit down over: the concrete problem, what the two sides would do in the first year, what each side brings, and what would make it fail.
-Every factual claim about the researcher or the company must cite a dataset id. Never invent a publication, project, patent or capability. If you lack a source for a sentence, drop the sentence.
+  instruction: `[[role:writer]] You are the Proposal Writer. Write a one-page industrial-PhD or joint-project proposal that a company manager and a professor would actually sit down over. Follow the shape of a real industrial PhD topic, not a marketing page.
+Required markdown sections, with these exact headings and in this order:
+## The problem
+## Research questions
+## Plan
+## What each side brings
+## Why this pair
+## Agreed up front
+## Risks
+## Unverified evidence
+## Supervisors and candidate
+Under "Research questions" give 2-3 numbered questions. Under "Plan" give a markdown table with one row per year for exactly three years and columns Year | Work | Result; year 1 must contain at least one quantified milestone (a number with a unit). Under "What each side brings" use two bullets, **Company:** and **Faculty:**. Under "Agreed up front" state a publication review window in days and who owns the rig/models versus the methods. Under "Risks" name at least one concrete failure mode. Under "Unverified evidence" list what you could not verify. Under "Supervisors and candidate" name the academic supervisor, the industrial supervisor, and describe the candidate profile.
+Every factual claim about the researcher or the company must cite a dataset id. Never invent a publication, project, patent or capability. If you lack a source for a sentence, drop the sentence or put it under "Unverified evidence".
+Name at least one publication title that belongs to this researcher, exactly as provided, in "Why this pair".
 Citations must be bare ids exactly as given: "R1008", "C001-CH1", "SYN-PUB-10472". Never a phrase, a description, or a field name such as "company products".
-Budget: at most 550 words of markdown. One page, not a report.
+Budget: at most 650 words of markdown. One page, not a report.
 Do not quote the challenge back; summarise it in one sentence.
 Every number you write about the company, the researcher or their data (headcount, distances, volumes, durations, years, costs) must appear verbatim in a provided source. If the number is not there, write "to be confirmed" — never invent a number to make the proposal concrete.
-Include one line naming the evidence you could not verify and what would make this pair fail.
 ${JSON_ONLY}
-Schema: {"title": string, "markdown": string, "citations": string[], "claims": [{"text": string, "sources": string[]}]}`,
+Schema: {"title": string, "supervisors": {"academic": string, "industrial": string}, "candidate": string, "researchQuestions": string[], "plan": [{"year": number, "work": string, "result": string}], "whatEachSideBrings": {"company": string[], "faculty": string[]}, "whyThisPair": string, "agreedUpFront": {"publicationReviewDays": number, "ip": string}, "risks": string[], "unverified": string[], "markdown": string, "citations": string[], "claims": [{"text": string, "sources": string[]}]}`,
 
   buildInput(state, item) {
     const proposal = state.proposals.get(item);
@@ -268,7 +301,16 @@ Schema: {"title": string, "markdown": string, "citations": string[], "claims": [
     if (!entry || !researcher) throw new Error(`incomplete pair for ${item}`);
 
     return {
-      company: { id: entry.company.id, name: entry.company.name, sector: entry.company.sector, rd_capacity: entry.company.rd_capacity, products: entry.company.products },
+      company: {
+        id: entry.company.id,
+        name: entry.company.name,
+        sector: entry.company.sector,
+        location: entry.company.location,
+        employees: entry.company.employees,
+        rd_capacity: entry.company.rd_capacity,
+        products: entry.company.products,
+        about: entry.company.about,
+      },
       challenge: entry.challenge,
       researcher: {
         id: researcher.id,
@@ -280,13 +322,14 @@ Schema: {"title": string, "markdown": string, "citations": string[], "claims": [
         keywords: researcher.keywords,
         open_to: researcher.open_to,
         publications: researcher.publications.slice(0, 4),
-        publicationTitles: researcher.publications
+        publicationsDetailed: researcher.publications
           .slice(0, 4)
-          .map((id) => state.dataset.publications.get(id)?.title)
-          .filter(Boolean),
+          .map((id) => ({ id, title: state.dataset.publications.get(id)?.title }))
+          .filter((row): row is { id: string; title: string } => Boolean(row.title)),
         projects: researcher.projects.slice(0, 2),
         patents: researcher.patents.slice(0, 2),
       },
+      industrialContact: industrialContact(entry.company.about),
       profile: state.profiles.get(researcher.id),
       // Deliberately no `key`: the internal pair key ("C001::C001-CH1::R0071")
       // looks like a citation id and models copy it into the references.
@@ -305,12 +348,39 @@ Schema: {"title": string, "markdown": string, "citations": string[], "claims": [
 
     const citations: string[] = Array.isArray(result?.citations) ? result.citations.map(String) : [];
     const rawClaims: Array<{ text?: unknown; sources?: unknown }> = Array.isArray(result?.claims) ? result.claims : [];
+    const strings = (value: unknown): string[] =>
+      Array.isArray(value) ? value.map(String).map((text) => text.trim()).filter(Boolean) : [];
+    const supervisors = result?.supervisors ?? {};
 
     proposal.title = String(result?.title ?? proposal.id);
     proposal.markdown = String(result?.markdown ?? "");
     proposal.citations = citations;
     proposal.status = "review";
     proposal.revision = context.attempt;
+    proposal.supervisors = {
+      academic: String(supervisors.academic ?? "").trim(),
+      industrial: String(supervisors.industrial ?? "").trim(),
+    };
+    proposal.candidate = String(result?.candidate ?? "").trim();
+    proposal.researchQuestions = strings(result?.researchQuestions);
+    proposal.plan = Array.isArray(result?.plan)
+      ? result.plan.map((row: { year?: unknown; work?: unknown; result?: unknown }) => ({
+          year: Number(row?.year ?? 0),
+          work: String(row?.work ?? "").trim(),
+          result: String(row?.result ?? "").trim(),
+        }))
+      : [];
+    proposal.whatEachSideBrings = {
+      company: strings(result?.whatEachSideBrings?.company),
+      faculty: strings(result?.whatEachSideBrings?.faculty),
+    };
+    proposal.whyThisPair = String(result?.whyThisPair ?? "").trim();
+    proposal.agreedUpFront = {
+      publicationReviewDays: Number(result?.agreedUpFront?.publicationReviewDays ?? 0),
+      ip: String(result?.agreedUpFront?.ip ?? "").trim(),
+    };
+    proposal.risks = strings(result?.risks);
+    proposal.unverified = strings(result?.unverified);
 
     for (const claim of rawClaims) {
       if (!claim.text) continue;
@@ -368,6 +438,96 @@ export const checkCitations = (
   };
 };
 
+export interface HardReject {
+  code: string;
+  detail: string;
+}
+
+/** The sections a proposal must contain, in the order the reference topic uses. */
+export const REQUIRED_SECTIONS = [
+  "The problem",
+  "Research questions",
+  "Plan",
+  "What each side brings",
+  "Why this pair",
+  "Agreed up front",
+  "Risks",
+  "Unverified evidence",
+  "Supervisors and candidate",
+] as const;
+
+const normalizeText = (text: string): string =>
+  text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+/**
+ * Structural gates. These are deliberately in code, not in the prompt: a model
+ * that forgets the IP clause or a year-one milestone cannot be talked into
+ * having written one. Returning codes rather than prose keeps the trace
+ * machine-readable.
+ */
+export const structuralRejects = (proposal: Proposal, dataset: Dataset): HardReject[] => {
+  const rejects: HardReject[] = [];
+  const markdown = proposal.markdown ?? "";
+  const normalizedMarkdown = normalizeText(markdown);
+
+  for (const section of REQUIRED_SECTIONS) {
+    const heading = new RegExp(`^##\\s+${section.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "im");
+    if (!heading.test(markdown)) {
+      rejects.push({ code: "missing-section", detail: `missing required section: ${section}` });
+    }
+  }
+
+  const researcher = dataset.byResearcherId.get(proposal.researcherId);
+  const titles = (researcher?.publications ?? [])
+    .map((id) => dataset.publications.get(id)?.title)
+    .filter((title): title is string => typeof title === "string" && title.length >= 12);
+  if (titles.length === 0 || !titles.some((title) => normalizedMarkdown.includes(normalizeText(title)))) {
+    rejects.push({
+      code: "no-publication-title",
+      detail: "the proposal names no publication title that belongs to this researcher",
+    });
+  }
+
+  const firstYear = (proposal.plan ?? []).find((row) => Number(row.year) === 1);
+  if (!firstYear || !/\d/.test(`${firstYear.work} ${firstYear.result}`)) {
+    rejects.push({
+      code: "no-quantified-milestone",
+      detail: "the year-one plan has no quantified milestone",
+    });
+  }
+
+  if (!(proposal.risks ?? []).some((risk) => risk.trim().length >= 8)) {
+    rejects.push({ code: "no-failure-mode", detail: "no concrete failure mode is named" });
+  }
+
+  if (
+    !proposal.supervisors?.academic?.trim() ||
+    !proposal.supervisors?.industrial?.trim() ||
+    !proposal.candidate?.trim()
+  ) {
+    rejects.push({
+      code: "no-supervisors",
+      detail: "academic supervisor, industrial supervisor and candidate profile are all required",
+    });
+  }
+
+  const reviewDays = Number(proposal.agreedUpFront?.publicationReviewDays);
+  const ip = proposal.agreedUpFront?.ip ?? "";
+  if (!(Number.isFinite(reviewDays) && reviewDays > 0) || !/(own|retain|licen[cs]e|intellectual property|\bip\b)/i.test(ip)) {
+    rejects.push({
+      code: "no-ip-publication-clause",
+      detail: "the proposal must state a publication review window and who owns the IP",
+    });
+  }
+
+  return rejects;
+};
+
 export const critic: WorkerSpec = {
   role: "critic",
   maxOutputTokens: 900,
@@ -379,7 +539,8 @@ RULES:
 3. A claim that is true but irrelevant to the pairing is not a reason to reject; note it.
 4. Any number about the company, the researcher or their data that does not appear in a cited source is a fabrication: verdict "reject".
 5. A proposal longer than 650 words is padded: verdict "reject", and say so.
-6. Do not accept a proposal because it is well written. Check the evidence.
+6. The proposal must contain every required section, a named publication title belonging to the researcher, a quantified year-one milestone, a named failure mode, supervisors and candidate, and a publication/IP clause; missing any of them is a reject. Code checks these before you see the proposal and its verdict overrides yours.
+7. Do not accept a proposal because it is well written. Check the evidence.
 Keep the note under 60 words.
 ${JSON_ONLY}
 Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": string, "sources": string[]}]}`,
@@ -420,13 +581,20 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
 
     // Defence in depth: resolve every id in code before believing the model.
     const { unknown } = checkCitations(proposal.citations, state.sourceIds);
+    // Structural gates run before the model's opinion, for the same reason the
+    // citation check does: existence and completeness are not opinions.
+    const hardRejects = structuralRejects(proposal, state.dataset);
     const modelVerdict = result?.verdict === "approve" ? "approve" : "reject";
-    const verdict: "approve" | "reject" = unknown.length > 0 ? "reject" : modelVerdict;
+    const verdict: "approve" | "reject" =
+      unknown.length > 0 || hardRejects.length > 0 ? "reject" : modelVerdict;
 
-    const note =
-      unknown.length > 0
-        ? `Unsupported source(s): ${unknown.join(", ")}.`
-        : String(result?.note ?? "");
+    const reasons = [
+      unknown.length > 0 ? `Unsupported source(s): ${unknown.join(", ")}.` : "",
+      hardRejects.length > 0
+        ? `Structural rejects: ${hardRejects.map((reject) => `${reject.code} (${reject.detail})`).join("; ")}.`
+        : "",
+    ].filter(Boolean);
+    const note = reasons.length > 0 ? reasons.join(" ") : String(result?.note ?? "");
 
     const claimRows: Array<{ text?: unknown; sources?: unknown }> = Array.isArray(result?.claims) ? result.claims : [];
     const claims = [...state.claims.values()].filter((claim) => claim.proposalId === item);
@@ -486,6 +654,8 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
       verdict,
       note,
       claims,
+      hardRejects,
+      unknownCitations: unknown,
       generation: context.generation,
     });
     wake(state.queues["critic"].length, "critic", context.worker);

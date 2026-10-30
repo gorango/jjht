@@ -89,7 +89,13 @@ const dataFor = (type: string, payload: any): unknown => {
     case "proposal.revised":
       return { ...payload.proposal, markdown: truncate(payload.proposal.markdown) };
     case "proposal.reviewed":
-      return { note: payload.note, verdict: payload.verdict, claims: payload.claims };
+      return {
+        note: payload.note,
+        verdict: payload.verdict,
+        hardRejects: payload.hardRejects ?? [],
+        unknownCitations: payload.unknownCitations ?? [],
+        claims: payload.claims,
+      };
     case "portfolio.ready":
       return payload.entries;
     case "run.completed":

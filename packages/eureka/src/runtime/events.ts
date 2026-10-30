@@ -47,6 +47,9 @@ export interface EventMap {
     verdict: "approve" | "reject";
     note: string;
     claims: Claim[];
+    /** Machine-readable structural gates that fired before the model verdict. */
+    hardRejects: Array<{ code: string; detail: string }>;
+    unknownCitations: string[];
     generation: number;
   };
   "proposal.revised": { proposal: Proposal; generation: number };
