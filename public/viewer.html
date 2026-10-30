@@ -120,8 +120,10 @@ async function load(id) {
   const text = await res.text();
   lines = text.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l));
   const types = [...new Set(lines.map((l) => l.type))];
-  active = new Set(types);
-  chips.innerHTML = types.map((t) => `<span class="chip on" data-type="${esc(t)}">${esc(t)}</span>`).join('');
+  // Joined/available events are plumbing: keep them available, off by default.
+  const noisy = new Set(['participant.joined', 'work.available', 'message_received.started', 'message_received.completed']);
+  active = new Set(types.filter((t) => !noisy.has(t)));
+  chips.innerHTML = types.map((t) => `<span class="chip${active.has(t) ? ' on' : ''}" data-type="${esc(t)}">${esc(t)}</span>`).join('');
   chips.querySelectorAll('.chip').forEach((chip) => {
     chip.onclick = () => {
       const t = chip.dataset.type;

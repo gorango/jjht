@@ -11,6 +11,12 @@ through a lease market instead of following a scripted pipeline.
 Built for the **EINSTEIN: Science-to-Business Matchmaker** track of the NTP Novi Sad Hackathon
 (30–31 October 2026).
 
+![The trace viewer after a full run](docs/trace-viewer.png)
+
+*A real run in the trace viewer: 12 challenges, 103 model calls, **9 turns in flight at once**,
+12 Critic rejections and 12 approvals. `npm run mock` reproduces it in 0.6s with no keys and no
+network, then `npm run trace` opens this page.*
+
 ---
 
 ## What it does
@@ -242,21 +248,89 @@ Required extras from the brief:
 
 ## How this plugs into the EINSTEIN network and EINSTEIN Stars
 
-*Our reading of the brief; the integration points are concrete, the surrounding platform details are assumptions.*
+*Our reading of the brief. The seams below are implemented; the surrounding platform details are assumptions, marked as such.*
 
-- **Identity and profiles.** A researcher profile is a set of sourced claims, not a score.
-  EINSTEIN Stars can consume the same `Claim` records to show *why* someone is a candidate —
-  `{ assertion, sourceId, verifiedBy }` — which is exactly the shape a review board needs and
-  the shape a leaderboard must not be.
-- **Matching as a service.** The runtime exposes a clean seam: `challenge.analyzed` in,
-  `proposal.reviewed` out. The network can post real challenges and receive proposals without
-  adopting our agents — the deliverable is the event contract, not the CLI.
-- **Human approval stays human.** The brief suggests a step where a person approves pairs before
-  proposal writing. That is one extra participant subscribing to `pairs.ranked`; the market
-  already supports holding work (a lease with no release).
-- **Provenance for the network.** Every proposal carries citations into ORCID/OpenAlex-shaped ids.
-  Swapping the synthetic index for a live OpenAlex index is a data adapter change
-  (`src/domain/dataset.ts`), not an architecture change.
+The unit of exchange is **not a score and not a chatbot**. It is a *claim-backed proposal*: a pair,
+a problem, a plan, and every factual sentence tied to an id that resolves. That is what makes this
+composable with a network rather than another silo.
+
+### 1. The event seam (implemented)
+
+Everything a host needs is on the bus, and nothing is hidden in a CLI:
+
+```mermaid
+sequenceDiagram
+  participant N as EINSTEIN network
+  participant R as runtime
+  participant C as Critic
+  participant P as portfolio
+
+  N->>R: challenge.analyzed {challengeId, analysis, candidates}
+  R->>R: pairs.ranked {challengeId, scores[]}
+  Note over R: a human may approve/reject here —<br/>the lease is simply not released
+  R->>R: proposal.drafted {proposal}
+  R->>C: (claim ledger)
+  C-->>R: proposal.reviewed {verdict, note, claims[]}
+  R->>P: portfolio.ready {entries[]}
+  P-->>N: portfolio.md + trace.jsonl
+```
+
+A host integrates by posting a challenge and reading `proposal.reviewed`; it never imports our
+agents. The reverse also works: our runtime can join a network's event bus as one more participant,
+because `RuntimeState` and `SemanticEvent` are the framework's public vocabulary, not ours.
+
+### 2. EINSTEIN Stars: evidence cards, not a leaderboard
+
+A researcher profile in EUREKA is a set of claims — `{ text, sources[], status }` — not a rank.
+That maps directly onto a "why is this person a candidate?" card in Stars:
+
+| Stars needs | EUREKA already produces |
+| --- | --- |
+| Who is this researcher? | `researcher.profiled` with sourced expertise and open-to statements |
+| Why are they being suggested? | `pairs.ranked` with a reason and a named risk per pair |
+| Can I check it? | every claim carries dataset/ORCID/OpenAlex-shaped ids |
+| What is *not* claimed? | unmatched challenges and abandoned proposals are in the trace |
+
+The last row matters most. A network that only shows matches learns nothing from the ones that
+should not exist.
+
+### 3. Human approval is a lease, not a meeting
+
+The brief suggests a person approves pairs before writing. In this runtime that is one participant
+that reacts to `pairs.ranked` and calls `market.claim(...)` without releasing it until a human
+answers — the same mechanism that already stops a second Critic from taking a proposal. No new
+workflow engine, no polling, and the wait is visible in the trace as an open lease.
+
+### 4. Provenance: where CORDIS and OpenAlex fit
+
+Real public data cannot make a synthetic claim true, so we do not let it. Its honest job is
+**context and checking**:
+
+- **CORDIS (historical record).** For a pair, look up prior EU-funded projects in the same field and
+  report them as *real-world context*: "this research area has N funded Horizon projects, e.g.
+  ACRONYM". That supports a reviewer's judgement about whether the area is fundable — it does not
+  verify anything about the fictional researcher, and the claim type would say so.
+- **OpenAlex (present record).** Resolve a real UNS author into a proposal's "why this pair" only
+  after matching their ORCID/OpenAlex id, with the id printed next to the sentence.
+- **The rule stays.** A `sourceType: "cordis" | "openalex"` claim is checked against those APIs at
+  review time the same way a `SYN-PUB-…` claim is checked against the dataset. If the id does not
+  resolve, the proposal is rejected — the Critic does not care where the evidence came from.
+
+We prototyped live *open-call* matching and removed it: the portal exposes titles only, and wrong
+calls in proposals cost more than no calls. Prior-project provenance is the version of that idea
+that cannot lie about the pair.
+
+### 5. Deployment sketch
+
+| Mode | What runs | Why it fits |
+| --- | --- | --- |
+| Local CLI (today) | `npm run mock` / `npm start` | A jury can reproduce a full run offline in one second |
+| Service behind the portal | one long-lived runtime, challenges posted as events | The network keeps its UI; EUREKA is a matching backend |
+| Batch/offline | `--companies=153` over a nightly corpus | Portfolios per faculty/sector, no live model calls during review |
+
+The trade-off we would defend: **stateless agents per turn, stateful runtime per session.** Any
+participant can be restarted or replaced without losing the run, because nothing important lives in
+a model's context window — it lives in `RuntimeState` and the trace.
 
 ---
 

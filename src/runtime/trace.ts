@@ -92,6 +92,8 @@ const dataFor = (type: string, payload: any): unknown => {
       return { note: payload.note, verdict: payload.verdict, claims: payload.claims };
     case "portfolio.ready":
       return payload.entries;
+    case "run.completed":
+      return payload.summary;
     default:
       return undefined;
   }

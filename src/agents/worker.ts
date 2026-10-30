@@ -191,7 +191,8 @@ export const createWorker = (state: EurekaState, spec: WorkerSpec, index: number
             const usage = lastUsage ?? { input: Math.ceil(text.length / 8), output: Math.ceil(text.length / 4) };
             lastUsage = undefined;
 
-            const costUsd = estimateCost(spec.model, usage.input, usage.output);
+            // A mock run costs nothing; reporting a price for it would be a lie in the trace.
+            const costUsd = state.config.mock ? 0 : estimateCost(spec.model, usage.input, usage.output);
             state.counters.modelCalls += 1;
             state.counters.inputTokens += usage.input;
             state.counters.outputTokens += usage.output;

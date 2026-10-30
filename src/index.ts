@@ -66,9 +66,13 @@ const buildConfig = (): RunConfig => ({
   // With OpenRouter configured, model ids are OpenRouter ids (vendor/model), not
   // the bundled names — so the defaults change with the provider.
   strongModel:
-    process.env.EUREKA_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.strong : "gpt-5.5"),
+    process.env.MOCK === "1" || process.env.MOCK === "true"
+      ? "mock"
+      : process.env.EUREKA_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.strong : "gpt-5.5"),
   fastModel:
-    process.env.EUREKA_FAST_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.fast : "gpt-5.4-mini"),
+    process.env.MOCK === "1" || process.env.MOCK === "true"
+      ? "mock"
+      : process.env.EUREKA_FAST_MODEL ?? (hasOpenRouter() ? OPENROUTER_DEFAULTS.fast : "gpt-5.4-mini"),
   mock: process.env.MOCK === "1" || process.env.MOCK === "true",
 });
 
