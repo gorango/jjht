@@ -12,6 +12,7 @@ import type { EurekaState } from "../runtime/state.js";
 import {
   describeChallenge,
   describeResearcher,
+  lookupSource,
   tokenize,
 } from "../domain/dataset.js";
 import type {
@@ -537,7 +538,8 @@ RULES:
 1. Any citation that does not exist in knownIds is a fabricated source: verdict "reject".
 2. Any claim about a person that has no source, or whose source is not about that person, is unsupported: verdict "reject".
 3. A claim that is true but irrelevant to the pairing is not a reason to reject; note it.
-4. Any number about the company, the researcher or their data that does not appear in a cited source is a fabrication: verdict "reject".
+4. Any number about the company, the researcher or their data that does not appear in a cited source is a fabrication: verdict "reject". Exception: a number in the Plan table that is explicitly a project target (for example, "label 2,000 samples") is a plan, not a claim about the dataset, and must not be rejected for that reason.
+4b. sourceFacts gives the label/title for each allowed source. Use it to check names, titles and numbers instead of guessing what an id contains.
 5. A proposal longer than 650 words is padded: verdict "reject", and say so.
 6. The proposal must contain every required section, a named publication title belonging to the researcher, a quantified year-one milestone, a named failure mode, supervisors and candidate, and a publication/IP clause; missing any of them is a reject. Code checks these before you see the proposal and its verdict overrides yours.
 7. Do not accept a proposal because it is well written. Check the evidence.
@@ -564,11 +566,18 @@ Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": st
       ...(researcher?.patents ?? []),
     ];
 
+    const sourceFacts = allowedSources
+      .map((id) => lookupSource(state.dataset, id))
+      .filter((record): record is NonNullable<typeof record> => Boolean(record))
+      .slice(0, 24)
+      .map((record) => ({ id: record.id, type: record.type, label: record.label }));
+
     return {
       proposalId: proposal.id,
       markdown: proposal.markdown,
       citations: proposal.citations,
       allowedSources,
+      sourceFacts,
       knownSourceCount: state.sourceIds.size,
       researcherId: proposal.researcherId,
       claims: claims.map((claim) => ({ text: claim.text, sources: claim.sources })),
