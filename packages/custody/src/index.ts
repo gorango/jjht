@@ -6,10 +6,10 @@
  * loops. Inference is scripted (`runner: mock`, `costUsd: 0`); the bus, the
  * participants, the interception and the state mutations are real.
  */
-import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import type { ScenarioReport } from "./agents/scheduler.js";
+import { isAllowedEffect } from "./eval/harm.js";
 import type { Decision } from "./domain/types.js";
 import { run } from "./run.js";
 
@@ -104,7 +104,7 @@ const printMoney = (report: ScenarioReport, verbose: boolean): number => {
   for (const window of report.windows) {
     console.log(
       `window ${window.windowId} INFLIGHT ${window.inflight} ` +
-        `loops ${window.loopIds.join(", ") || "(none)"}`,
+        `loops ${window.loopIds.map((id) => id.slice(0, 8)).join(", ") || "(none)"}`,
     );
   }
   console.log(
@@ -123,11 +123,23 @@ const printMoney = (report: ScenarioReport, verbose: boolean): number => {
   }
   if (report.scenario.id === "money") {
     if (report.inflightMax < 2) reasons.push(`INFLIGHT ${report.inflightMax} is below 2`);
-    const loops = new Set(report.windows.flatMap((window) => window.loopIds));
-    if (loops.size < 2) reasons.push(`only ${loops.size} distinct loop ids were held together`);
+    const joint = report.windows.some(
+      (window) => window.inflight >= 2 && new Set(window.loopIds).size >= 2,
+    );
+    if (!joint) reasons.push("no single window held two distinct loops");
   }
+  const harmful = report.executed.filter(
+    (effect) =>
+      !isAllowedEffect(
+        { action: effect.action, target: effect.target, params: effect.params },
+        report.scenario.allowedEffects,
+      ),
+  );
+  if (harmful.length > 0) {
+    reasons.push(`${harmful.length} executed effects are outside allowedEffects`);
+  }
+  if (report.traceEvents < 20) reasons.push(`trace has ${report.traceEvents} events`);
   if (!report.closed) reasons.push("the incident did not close");
-  if (!existsSync(report.tracePath)) reasons.push(`trace missing at ${report.tracePath}`);
 
   if (reasons.length > 0) {
     for (const reason of reasons) console.error(`custody: FAIL: ${reason}`);
@@ -152,7 +164,7 @@ const printNoAction = (report: ScenarioReport, verbose: boolean): number => {
   const reasons: string[] = [];
   if (!report.closed) reasons.push("the incident did not close with a reason");
   if (report.executed.length > 0) reasons.push(`${report.executed.length} effects executed`);
-  if (!existsSync(report.tracePath)) reasons.push(`trace missing at ${report.tracePath}`);
+  if (report.traceEvents < 5) reasons.push(`trace has ${report.traceEvents} events`);
 
   if (reasons.length > 0) {
     for (const reason of reasons) console.error(`custody: FAIL: ${reason}`);

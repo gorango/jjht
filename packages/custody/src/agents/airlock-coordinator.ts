@@ -107,12 +107,30 @@ export class AirlockCoordinator {
 
   /** Called by a suspended handler after it publishes `intent.proposed`. */
   decide(intent: Intent, loopId: string): Promise<Decision> {
-    const decided = this.decided.get(intent.id);
-    if (decided) return Promise.resolve(decided);
+    // First proposal wins. Serving a cached decision to a second handler would
+    // execute the second proposal's body under the first proposal's verdict.
+    const prior = this.decided.get(intent.id);
+    const existing = prior ? undefined : this.pending.get(intent.id);
+    if (prior || existing) {
+      const firstAgent = prior?.agent ?? existing?.intent.agent ?? "another agent";
+      publish("intent.duplicate", this.producerId, {
+        intentId: intent.id,
+        loopId,
+        agent: intent.agent,
+        firstAgent,
+      });
+      return Promise.resolve({
+        intentId: intent.id,
+        agent: intent.agent,
+        action: intent.action,
+        target: intent.target.id,
+        kind: "reject",
+        reason: `duplicate_intent: ${intent.id} was already proposed by ${firstAgent}`,
+        votes: [{ voter: "airlock", verdict: "veto", reason: "duplicate intent id" }],
+      });
+    }
 
-    const existing = this.pending.get(intent.id);
-    if (existing) return existing.deferred.promise;
-
+    this.options.state.propose(intent);
     const current = this.open.get(this.incidentId());
     const agentPending = [...this.pending.values()].filter(
       (entry) => !entry.settled && entry.intent.agent === intent.agent,

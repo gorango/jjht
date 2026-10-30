@@ -41,6 +41,7 @@ export class SimAdapter implements InfraAdapter {
 
     const executed: ExecutedAction = {
       intentId: intent.id,
+      sourceIntentId: intent.id.split("#")[0] ?? intent.id,
       agent: intent.agent,
       action: intent.action,
       target: { ...intent.target },

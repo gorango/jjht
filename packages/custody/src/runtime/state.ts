@@ -40,6 +40,8 @@ export interface Incident {
 /** One effect a simulated adapter actually applied, and which path allowed it. */
 export interface ExecutedAction {
   intentId: string;
+  /** The proposal the effect came from; a rewritten effect keeps its source id. */
+  sourceIntentId: string;
   agent: string;
   action: ActionName;
   target: Target;
@@ -53,6 +55,8 @@ export class CustodyState extends RuntimeState {
   readonly telemetry = new Map<string, TelemetryEvent>();
   readonly intents = new Map<string, Intent>();
   readonly decisions = new Map<string, Decision>();
+  /** The first verdict per intent. Retries may supersede `decisions`, not this. */
+  readonly firstDecisions = new Map<string, Decision>();
   readonly locks = new Map<string, EvidenceLock>();
   readonly incidents = new Map<string, Incident>();
   readonly executed: ExecutedAction[] = [];
@@ -75,6 +79,9 @@ export class CustodyState extends RuntimeState {
   }
 
   decide(decision: Decision): void {
+    if (!this.firstDecisions.has(decision.intentId)) {
+      this.firstDecisions.set(decision.intentId, decision);
+    }
     this.decisions.set(decision.intentId, decision);
   }
 

@@ -51,6 +51,7 @@ export interface ScenarioReport {
   expectedMatches: number;
   expectedTotal: number;
   tracePath: string;
+  traceEvents: number;
   closed: boolean;
   noActionOutcome?: string;
   runner: "mock";
@@ -90,11 +91,9 @@ const instructionFor = (agentId: string): string => {
   );
 };
 
-const modelFor = (agentId: string): string => {
-  const role = roleFor(agentId);
-  if (role === "contain") return "deepseek-v4-pro";
-  return "deepseek-v4-flash";
-};
+// The offline runner is the only runner. Naming a provider model here would put
+// a call that never happened into every inference span in the trace.
+const modelFor = (_agentId: string): string => "mock";
 
 const text = (value: unknown): string | undefined =>
   typeof value === "string" && value.length > 0 ? value : undefined;
@@ -237,7 +236,7 @@ const reportIncidentTool = (agentId: string, state: CustodyState, clock: Clock):
   },
 });
 
-const lockEvidenceTool = (agentId: string, adapter: SimAdapter): Tool => ({
+const lockEvidenceTool = (agentId: string, state: CustodyState, adapter: SimAdapter): Tool => ({
   type: "function",
   name: "lock_evidence",
   description: "Hold a target while evidence is captured. Destructive actions must wait.",
@@ -254,6 +253,9 @@ const lockEvidenceTool = (agentId: string, adapter: SimAdapter): Tool => ({
   strict: false,
   async invoke(raw) {
     const args = (raw ?? {}) as Record<string, unknown>;
+    if (!(state.capabilities[agentId] ?? []).includes("snapshot")) {
+      return { locked: false, reason: `capability: ${agentId} does not hold snapshot` };
+    }
     const lock = adapter.lockEvidence({
       targetId: text(args.targetId) ?? "",
       holder: agentId,
@@ -312,6 +314,13 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
 
   join(makeHuman("airlock", "Airlock", []));
   join(makeHuman("human-1", "Human", []));
+  publish("run.started", "airlock", {
+    scenario: scenario.id,
+    runner: "mock",
+    costUsd: 0,
+    mock: true,
+    windowMs: options.windowMs,
+  });
 
   const toolsByAgent = new Map<string, Tool[]>();
   const proposerIds = [...new Set(scenario.intents.map((intent) => intent.agent))];
@@ -322,7 +331,7 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
   for (const agentId of proposerIds) {
     const tools: Tool[] = [actTool(agentId, state, clock, adapter), refuseActionTool()];
     if (needsLock.has(agentId) || roleFor(agentId) === "preserve") {
-      tools.push(lockEvidenceTool(agentId, adapter));
+      tools.push(lockEvidenceTool(agentId, state, adapter));
     }
     toolsByAgent.set(agentId, tools);
     join(makeAgent(agentId, scenario.capabilities[agentId] ?? [], tools));
@@ -476,7 +485,7 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
 
   const expected = Object.entries(scenario.expected);
   const expectedMatches = expected.filter(
-    ([intentId, kind]) => state.decisions.get(intentId)?.kind === kind,
+    ([intentId, kind]) => state.firstDecisions.get(intentId)?.kind === kind,
   ).length;
 
   const loopIds = [
@@ -485,7 +494,7 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
 
   return {
     scenario,
-    decisions: [...state.decisions.values()],
+    decisions: [...state.firstDecisions.values()],
     windows: coordinator.windows,
     inflightMax: coordinator.inflightMax,
     loopIds,
@@ -493,6 +502,7 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
     expectedMatches,
     expectedTotal: expected.length,
     tracePath: trace.file,
+    traceEvents: trace.rows.length,
     closed: closedOutcome !== undefined,
     ...(scenario.intents.length === 0 && closedOutcome
       ? { noActionOutcome: closedOutcome }

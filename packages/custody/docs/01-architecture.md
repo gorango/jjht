@@ -124,7 +124,7 @@ src/
 
 ## What exists today, precisely
 
-- 50 passing tests: invariants, airlock, registry, taint, all ten scenarios, the live CLI, and the
+- 51 passing tests: invariants, airlock, registry, taint, all ten scenarios, the live CLI, and the
   ablation.
 - `bun run custody` boots the real Mozaik runtime, joins ten participants, starts one loop per
   proposed action, holds every `act` call in the interception handler, and prints the decisions,

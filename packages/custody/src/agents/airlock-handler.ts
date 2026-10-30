@@ -19,6 +19,7 @@ import { rationaleFrom } from "../domain/taint.js";
 import type { ActionName, Decision, Intent, Rationale, Target, TargetKind } from "../domain/types.js";
 import type { Clock, Timer } from "../runtime/clock.js";
 import { publish } from "../runtime/ingest.js";
+import { currentLoop } from "../runtime/loops.js";
 import type { CustodyState } from "../runtime/state.js";
 import type { AirlockCoordinator } from "./airlock-coordinator.js";
 
@@ -185,14 +186,14 @@ const errorDecision = (intent: Intent): Decision => ({
 export const createLoopAirlockHandler = (options: LoopHandlerOptions): InterceptionHandler => {
   const toolName = options.toolName ?? "act";
 
-  const awaitDecision = async (intent: Intent): Promise<Decision> => {
+  const awaitDecision = async (intent: Intent, loopId: string): Promise<Decision> => {
     let timer: Timer | undefined;
     const timedOut = new Promise<Decision>((resolve) => {
       timer = options.clock.setTimer(options.timeoutMs, () => {
         options.coordinator.abandon(intent.id);
         publish("airlock.timeout", options.agentId, {
           agentId: options.agentId,
-          loopId: options.loopId,
+          loopId,
           intentId: intent.id,
         });
         resolve(timeoutDecision(intent));
@@ -201,7 +202,7 @@ export const createLoopAirlockHandler = (options: LoopHandlerOptions): Intercept
 
     try {
       return await Promise.race([
-        options.coordinator.decide(intent, options.loopId),
+        options.coordinator.decide(intent, loopId),
         timedOut,
       ]);
     } catch (error) {
@@ -223,12 +224,7 @@ export const createLoopAirlockHandler = (options: LoopHandlerOptions): Intercept
       if (transition.nextStateId !== "function_call") return transition;
       const functionCall = transition as FunctionCallTransition;
       const call = functionCall.input.call;
-
-      publish("interception.started", options.agentId, {
-        agentId: options.agentId,
-        loopId: options.loopId,
-        tool: call.name,
-      });
+      const loopId = currentLoop() ?? options.loopId;
 
       const parsed = intentFromArgs(
         options.agentId,
@@ -238,26 +234,13 @@ export const createLoopAirlockHandler = (options: LoopHandlerOptions): Intercept
         call.callId,
       );
       if (!parsed.ok) {
-        publish("interception.finished", options.agentId, {
-          agentId: options.agentId,
-          loopId: options.loopId,
-          denied: parsed.reason,
-        });
         return refuse(functionCall, parsed.reason, "reject", parsed.intentId);
       }
 
       const intent = parsed.intent;
-      options.state.propose(intent);
-      publish("intent.proposed", options.agentId, { intent, loopId: options.loopId });
+      publish("intent.proposed", options.agentId, { intent, loopId });
 
-      const decision = await awaitDecision(intent);
-
-      publish("interception.finished", options.agentId, {
-        agentId: options.agentId,
-        loopId: options.loopId,
-        intentId: intent.id,
-        decision: decision.kind,
-      });
+      const decision = await awaitDecision(intent, loopId);
 
       if (decision.kind === "accept") return transition;
 

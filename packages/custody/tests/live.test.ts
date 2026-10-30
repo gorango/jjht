@@ -79,11 +79,12 @@ describe("the live run", () => {
         expect(types.has(type), type).toBe(true);
       }
 
-      const decisions = new Map(
-        rows
-          .filter((row) => row.type === "decision.made")
-          .map((row) => [row.payload.decision.intentId, row.payload.decision.kind]),
-      );
+      const decisions = new Map<string, string>();
+      for (const row of rows.filter((row) => row.type === "decision.made")) {
+        if (!decisions.has(row.payload.decision.intentId)) {
+          decisions.set(row.payload.decision.intentId, row.payload.decision.kind);
+        }
+      }
       expect(Object.fromEntries(decisions)).toEqual(moneyScenario.expected);
 
       expect(rows.some((row) => row.type === "evidence.locked" && row.producerId === "preserve-1")).toBe(true);

@@ -33,14 +33,15 @@ i-injected  edge-bot        block_egress  edge      REJECT    taint: rationale d
 i-scale     availability-1  scale         checkout  ACCEPT    all invariants hold
 
 runner: mock  costUsd: 0
-window inc-1#1 INFLIGHT 5 loops loop-2, loop-3, loop-4, loop-5, loop-6
+window inc-1#1 INFLIGHT 5 loops cf2ceeac, 95c2010b, 5217ca61, bc4e8787, 0cedb94a
 INFLIGHT 5 (>= 2 required)
 expected outcomes: 5/5 match
 ```
 
 `INFLIGHT 5` is asserted by the run, not read from prose. Five handlers from five distinct loops
-were suspended in the airlock at the same deadline. The loop order varies between runs, which is
-what real concurrency looks like.
+were suspended in the airlock at the same deadline. The loop ids are the ids Mozaik minted, not
+synthetic labels, and they change on every run. The trace carries the same ids on the core's
+`interception.started` spans, so the window and the loops join.
 
 ## Status
 
@@ -74,9 +75,10 @@ What is real:
   evidence lock, the Airlock records the joint decision. `CustodyState` holds telemetry, intents,
   decisions, locks, incidents, and executed effects.
 - **A real trace.** `trace.jsonl` is written by a participant subscribed to every event. The money
-  run produces 138 events: `inference.started/completed`, `interception.started/finished`,
-  `intent.proposed`, `window.opened/closed`, `decision.made`, `evidence.locked`,
-  `action.executed`, `incident.closed`.
+  run produces 103 events, including 5 `intent.proposed`, 5 `decision.made`, 5
+  `interception.started`, 3 `action.executed`, 1 `intent.deferred`, and 1 `window.closed`.
+  `run.started` carries `runner: "mock"` and `costUsd: 0`. Every inference span names the literal
+  model `mock`, because no provider was called.
 
 The conflict is visible in the table. Contain's `/24` block is **rewritten** to the suspect `/32`
 before it runs. Contain's isolate is **deferred** because Preserve holds the host and it carries 40%
@@ -93,6 +95,14 @@ effects executed: 0
 
 The Scribe closes the incident from the trace with a reason. A defender that always acts is a
 liability.
+
+The decision window is 1500 ms by default. `INFLIGHT` is a property of that window: set
+`CUSTODY_WINDOW_MS=1` and the intents split across four windows, so the maximum drops and the
+single-window assertion fails. The demo runs the default window.
+
+The evidence lock belongs to Preserve. The tool is given only to agents holding `snapshot`, and the
+tool checks that capability again before it writes a lock. The airlock then treats the lock as
+evidence that outranks containment.
 
 ## The ten scenarios
 
@@ -148,6 +158,10 @@ The model is canned in every arm and every live run. The trace labels `runner: "
 - **Not evidence hashing.** "Evidence intact" means no destructive effect ran against a live lock.
   The SHA-256 bundle and `sha256sum -c` verifier from the design are not built.
 - **Not a statistical result.** Ten hand-written scenarios are not a sample. No p-value is quoted.
+- **Deferral is not awaited by the demo.** A deferred intent carries `retryAt` and the retry path
+  runs to the three-attempt cap and `intent.exhausted` in `tests/coordinator.test.ts`. The CLI exits
+  after the first window and prints that window's verdicts, so the table shows `DEFER`, not the
+  later exhausted decision.
 - **Not a viewer.** The CLI table and `trace.jsonl` are the interface.
 - **Not a fix.** The runtime contains and defers. The baro handoff that turns an incident into a
   patch is not built.

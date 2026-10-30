@@ -8,6 +8,7 @@ import { dirname, resolve } from "node:path";
 
 import { Human, SituationSpecification, type SemanticEvent } from "@mozaik-ai/core";
 
+import { noteLoop } from "./loops.js";
 import { join } from "./session.js";
 
 export interface TraceRow {
@@ -38,6 +39,7 @@ export class Trace {
   record(event: SemanticEvent): void {
     const payload = event.payload as { loopId?: unknown } | undefined;
     const loopId = typeof payload?.loopId === "string" ? payload.loopId : undefined;
+    if (event.type === "interception.started" && loopId) noteLoop(loopId);
     const row: TraceRow = {
       at: event.occurredAt.toISOString(),
       producerId: event.producerId,

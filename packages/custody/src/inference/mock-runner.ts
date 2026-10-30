@@ -2,9 +2,9 @@
  * The offline inference runner. The model is the only canned part of the live
  * run: real Mozaik loops, bus events and interception happen around it.
  *
- * The runLoop message carries `{stepId, agentId}` as JSON. `agentId` is used as
- * the event producer because `sendEvent` rejects participants that were never
- * joined, and the runner must never crash a loop over a trace concern.
+ * The runLoop message carries `{stepId, agentId}` as JSON. The configured model
+ * is the literal `mock`, so the core's inference spans never name a provider
+ * that was not called.
  */
 import {
   FunctionCallItem,
@@ -16,7 +16,6 @@ import {
 } from "@mozaik-ai/core";
 
 import type { Clock } from "../runtime/clock.js";
-import { publish } from "../runtime/ingest.js";
 
 export interface ScriptedCall {
   name: string;
@@ -77,8 +76,6 @@ export class MockInferenceRunner implements InferenceRunner {
 
   private readonly finished = new Set<string>();
 
-  private warned = false;
-
   constructor(
     scripts: readonly StepScript[],
     private readonly clock: Clock,
@@ -105,16 +102,6 @@ export class MockInferenceRunner implements InferenceRunner {
     this.waits.get(stepId)?.resolve();
   }
 
-  private trace(agentId: string, type: string, payload: unknown): void {
-    try {
-      publish(type, agentId, payload);
-    } catch (error) {
-      if (this.warned) return;
-      this.warned = true;
-      console.error(`custody: inference event rejected (${type} from ${agentId}): ${String(error)}`);
-    }
-  }
-
   async run(request: InferenceInput): Promise<InferenceOutput> {
     const envelope = readEnvelope(request);
     if (!envelope) return { items: [done()], tokenUsage: undefined, rowResponse: undefined };
@@ -122,20 +109,11 @@ export class MockInferenceRunner implements InferenceRunner {
     const script = this.scripts.get(envelope.stepId);
     if (!script) return { items: [done()], tokenUsage: undefined, rowResponse: undefined };
 
-    const agentId = envelope.agentId ?? script.agentId;
     const index = completedCalls(request);
-    const startedAt = this.clock.now();
-    const base = { stepId: script.stepId, agentId, runner: "mock", costUsd: 0 };
-
-    this.trace(agentId, "inference.started", { ...base, callIndex: index });
-
     await this.clock.sleep(script.latencyMs);
 
     const call = script.calls[index];
-    const durationMs = this.clock.now() - startedAt;
-
     if (!call) {
-      this.trace(agentId, "inference.completed", { ...base, durationMs, callIndex: index, terminal: true });
       this.finish(script.stepId);
       return { items: [done()], tokenUsage: undefined, rowResponse: undefined };
     }
@@ -144,14 +122,6 @@ export class MockInferenceRunner implements InferenceRunner {
       callId: `${script.stepId}-${index + 1}`,
       name: call.name,
       args: JSON.stringify(call.args),
-    });
-
-    this.trace(agentId, "inference.completed", {
-      ...base,
-      durationMs,
-      callIndex: index,
-      terminal: false,
-      tool: call.name,
     });
 
     return { items: [item], tokenUsage: undefined, rowResponse: undefined };
