@@ -1,0 +1,6 @@
+[submodule "modules/mozaik"]
+	path = modules/mozaik
+	url = https://github.com/jigjoy-ai/mozaik
+[submodule "modules/baro"]
+	path = modules/baro
+	url = https://github.com/jigjoy-ai/baro

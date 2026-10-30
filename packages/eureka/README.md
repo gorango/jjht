@@ -113,6 +113,8 @@ bun run openalex                   # optional: verify the OpenAlex key, pull UNS
 ```
 
 The same scripts work from this package directory (`cd packages/eureka && bun run mock`).
+`@mozaik-ai/core` resolves to the pinned `modules/mozaik` git submodule, which the root
+`bun install` builds with `tsup`.
 
 `bun run mock` is the honest demo: the runtime, the concurrency, the leases, the Critic and the
 trace are all real. Only text generation is replaced by `src/inference/mock.ts`, which is labelled

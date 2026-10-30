@@ -2,8 +2,10 @@
   "name": "jigjoy",
   "private": true,
   "type": "module",
-  "workspaces": ["packages/*"],
+  "workspaces": ["packages/*", "modules/mozaik"],
   "scripts": {
+    "postinstall": "bun run --filter @mozaik-ai/core build",
+    "build:mozaik": "bun run --filter @mozaik-ai/core build",
     "start": "bun run --filter eureka start",
     "run": "bun run --filter eureka run",
     "mock": "bun run --filter eureka mock",

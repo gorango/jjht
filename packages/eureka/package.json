@@ -20,7 +20,7 @@
     "eval": "tsx scripts/eval.ts"
   },
   "dependencies": {
-    "@mozaik-ai/core": "^4.1.0",
+    "@mozaik-ai/core": "workspace:*",
     "dotenv": "^17.2.3"
   },
   "devDependencies": {
