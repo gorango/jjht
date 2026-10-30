@@ -33,6 +33,8 @@ export interface Target {
 export interface Rationale {
   eventId: string;
   tainted: boolean;
+  /** Fields of the cited event the intent relies on. Taint is computed from these. */
+  citedFields?: string[];
   note?: string;
 }
 
@@ -105,5 +107,7 @@ export interface TelemetryEvent {
   kind: string;
   /** Text the attacker can influence. Never treated as instruction. */
   text: string;
+  /** Computed at ingestion by `ingestTelemetry`; a fixture may set it explicitly. */
+  taintedFields?: string[];
   tainted: boolean;
 }

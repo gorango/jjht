@@ -14,7 +14,8 @@ export type InvariantCode =
   | "compensation"
   | "blast"
   | "evidence"
-  | "protected_cidr";
+  | "protected_cidr"
+  | "control_plane";
 
 export interface Finding {
   code: InvariantCode;
@@ -33,6 +34,8 @@ export interface InvariantContext {
   capabilities: Readonly<Record<string, readonly string[]>>;
   /** Intent ids a human has approved with a second key. */
   secondKey: ReadonlySet<string>;
+  /** False when the control plane is unreachable: every intent defers, fail closed. */
+  executable?: boolean;
   now: number;
 }
 
@@ -54,11 +57,14 @@ export const checkIntent = (intent: Intent, ctx: InvariantContext): Finding[] =>
   const secondKey = ctx.secondKey.has(intent.id);
   const findings: Finding[] = [];
 
+  // A capability is scoped to the action, and may be scoped to the target kind
+  // (`isolate@host`). A token for a secret does not authorize a service.
+  const scoped = `${definition.capability}@${intent.target.kind}`;
   findings.push({
     code: "capability",
     intentId: intent.id,
-    ok: caps.includes("*") || caps.includes(definition.capability),
-    detail: `${intent.agent} holds [${caps.join(", ") || "nothing"}], needs ${definition.capability}`,
+    ok: caps.includes("*") || caps.includes(scoped) || caps.includes(definition.capability),
+    detail: `${intent.agent} holds [${caps.join(", ") || "nothing"}], needs ${definition.capability} on ${intent.target.kind}`,
   });
 
   findings.push({
@@ -113,6 +119,15 @@ export const checkIntent = (intent: Intent, ctx: InvariantContext): Finding[] =>
       detail: (ctx.topology.protectedCidrs ?? []).includes(cidr)
         ? `${cidr} is internal traffic; blocking it is a self-inflicted outage`
         : `${cidr} is not a protected range`,
+    });
+  }
+
+  if (ctx.executable === false) {
+    findings.push({
+      code: "control_plane",
+      intentId: intent.id,
+      ok: false,
+      detail: "control plane unreachable: the action cannot be executed, so it is deferred",
     });
   }
 

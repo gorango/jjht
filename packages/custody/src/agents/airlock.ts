@@ -32,6 +32,7 @@ const VOTER: Record<string, string> = {
   blast: "availability",
   evidence: "preserve",
   protected_cidr: "availability",
+  control_plane: "availability",
 };
 
 const voteFor = (finding: Finding): Vote => ({
@@ -82,6 +83,12 @@ export const reconcile = (intents: readonly Intent[], ctx: InvariantContext): Ai
     const bad = failures(checks);
     const votes = bad.map(voteFor);
     const definition = definitionOf(intent.action);
+
+    // 0. Fail closed. If the control plane is unreachable, nothing executes.
+    if (ctx.executable === false) {
+      record(intent, "defer", "control plane unreachable; deferred, not executed", votes);
+      continue;
+    }
 
     // 1. Evidence outranks containment. A destructive action waits; it does not win.
     if (hasFailure(checks, "evidence")) {
