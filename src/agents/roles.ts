@@ -253,6 +253,9 @@ export const writer: WorkerSpec = {
 Every factual claim about the researcher or the company must cite a dataset id. Never invent a publication, project, patent or capability. If you lack a source for a sentence, drop the sentence.
 Citations must be bare ids exactly as given: "R1008", "C001-CH1", "SYN-PUB-10472". Never a phrase, a description, or a field name such as "company products".
 Budget: at most 550 words of markdown. One page, not a report.
+Do not quote the challenge back; summarise it in one sentence.
+Every number you write about the company, the researcher or their data (headcount, distances, volumes, durations, years, costs) must appear verbatim in a provided source. If the number is not there, write "to be confirmed" — never invent a number to make the proposal concrete.
+Include one line naming the evidence you could not verify and what would make this pair fail.
 ${JSON_ONLY}
 Schema: {"title": string, "markdown": string, "citations": string[], "claims": [{"text": string, "sources": string[]}]}`,
 
@@ -351,6 +354,9 @@ export interface CitationCheck {
  * without a runtime, a model or a network: a citation either resolves in the
  * dataset or it does not, and no prompt can change that.
  */
+/** One page, enforced in code: a model's promise about length is not a limit. */
+export const MAX_PROPOSAL_WORDS = 650;
+
 export const checkCitations = (
   citations: readonly string[],
   sourceIds: ReadonlySet<string>,
@@ -371,7 +377,9 @@ RULES:
 1. Any citation that does not exist in knownIds is a fabricated source: verdict "reject".
 2. Any claim about a person that has no source, or whose source is not about that person, is unsupported: verdict "reject".
 3. A claim that is true but irrelevant to the pairing is not a reason to reject; note it.
-4. Do not accept a proposal because it is well written. Check the evidence.
+4. Any number about the company, the researcher or their data that does not appear in a cited source is a fabrication: verdict "reject".
+5. A proposal longer than 650 words is padded: verdict "reject", and say so.
+6. Do not accept a proposal because it is well written. Check the evidence.
 Keep the note under 60 words.
 ${JSON_ONLY}
 Schema: {"verdict": "approve" | "reject", "note": string, "claims": [{"text": string, "sources": string[]}]}`,

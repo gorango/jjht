@@ -1,17 +1,17 @@
 {
   "summary": {
-    "runId": "run-2026-10-30T07-32-21-623Z",
-    "elapsedMs": 96740,
+    "runId": "run-2026-10-30T07-37-34-597Z",
+    "elapsedMs": 127360,
     "companies": 6,
     "challenges": 12,
     "proposals": 10,
     "approved": 7,
     "portfolio": 5,
-    "rejections": 7,
-    "modelCalls": 82,
-    "inputTokens": 103278,
-    "outputTokens": 44320,
-    "costUsd": 0.1613
+    "rejections": 9,
+    "modelCalls": 86,
+    "inputTokens": 108486,
+    "outputTokens": 44513,
+    "costUsd": 0.167
   },
-  "lines": 803
+  "lines": 836
 }

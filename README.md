@@ -74,7 +74,8 @@ Two honest readings:
    of quality.
 
 At the full scale in `examples/run-full/`: 12 challenges, **2 left unmatched on purpose**, 10
-proposals, 7 approved after **7 Critic rejections**, portfolio of 5, 82 model calls, $0.16, 97 s.
+proposals, 7 approved after **9 Critic rejections** (3 abandoned after failing twice), portfolio of
+5, 86 model calls, $0.17, 127 s.
 
 ---
 
