@@ -230,7 +230,7 @@ const finishRun = (record: RunRecord, exitCode: number | null): void => {
 };
 
 const diskRecord = (id: string): RunRecord | undefined => {
-  if (!/^[A-Za-z0-9._-]+$/.test(id)) return undefined;
+  if (id === "." || id === ".." || !/^[A-Za-z0-9._-]+$/.test(id)) return undefined;
   const dir = join(RUNS, id);
   if (!existsSync(dir) || !statSync(dir).isDirectory()) return undefined;
   const resultPath = join(dir, "result.json");
