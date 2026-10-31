@@ -118,9 +118,9 @@ This proves one real ingress `403` at a local nginx edge, one real `docker compo
 and one capture path whose hashes recompute. It also shows the same runtime code and the same
 scenario ran with a different adapter.
 
-It does not prove destination-based egress filtering. `deny` is an ingress rule, so the honest
-label is "ingress 403 at the local edge", never "real egress block". The edge can still connect out
-to the same address.
+It does not prove destination-based egress filtering. nginx `deny` matches the client address at the
+edge; C02 showed that the edge can still connect out to the same CIDR. The honest label is
+"ingress 403 at the local edge", never "real egress block".
 
 It does not capture memory, packets, disk, or a rootfs. The hashes prove integrity after capture.
 They do not prove identity, reproducibility, or the absence of tampering before capture.
