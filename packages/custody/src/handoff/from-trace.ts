@@ -145,8 +145,11 @@ export const buildHandoff = (
   const anchorLine = source.anchor
     ? `  - snapshot anchor ${source.anchor}${source.bundle ? ` (${source.bundle})` : ""}`
     : "  - no evidence anchor in this run (the simulated adapter does not anchor)";
+  // A story cannot publish: baro's story lanes reject `git push` and every `gh`
+  // call. The finalizer pushes the integrated branch and opens the PR. Asking a
+  // story to open one only burns its turn budget on the publish guard.
   const publication = options.push
-    ? "  - open a pull request against main; do not merge"
+    ? "  - do not merge; leave delivery to baro's finalizer"
     : "  - do not push or open a pull request; leave the fix as a local commit";
 
   const goal = `goal: Fix the shell injection in src/checkout.ts in gorango/jjhts.

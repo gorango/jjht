@@ -56,9 +56,11 @@ describe("the trace handoff", () => {
     expect(handoff.goal).not.toContain("open a pull request against main");
   });
 
-  test("--push asks for a PR instead", () => {
+  test("--push leaves delivery to the finalizer, not a story", () => {
     const handoff = buildHandoff(rows, money, "/tmp/trace.jsonl", { push: true });
-    expect(handoff.goal).toContain("open a pull request against main");
+    expect(handoff.goal).toContain("leave delivery to baro's finalizer");
+    expect(handoff.goal).toContain("do not merge");
+    expect(handoff.goal).not.toContain("open a pull request");
     expect(handoff.goal).not.toContain("leave the fix as a local commit");
   });
 

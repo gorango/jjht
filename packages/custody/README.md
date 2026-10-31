@@ -151,6 +151,17 @@ passes, `src/checkout.ts` uses `execFileSync("printf", ["%s", userAgent])`, and
 one declared grep test used unsupported quoting and the final critic call hit a connection error.
 The PR is open and unmerged.
 
+### Why the PR is not a story
+
+baro's story lanes cannot publish, by design. `publish-guard.ts` rejects `git push` and every `gh`
+invocation, and no flag or lane role turns that off. `--local-only` only controls baro's own
+publishing. Removing it lets baro's **finalizer** push the integrated branch and open the PR after
+the run. A failed run with changes gets a checkpoint PR; a passing run gets a normal one.
+
+The goal therefore asks for the fix and says not to merge. It does not ask a story to open the PR.
+A goal that says "open a pull request" makes a story fight the guard and burn its turn budget on
+something it can never do.
+
 ## The ten scenarios
 
 Expectations are committed in the fixtures. The live CLI and the pure airlock agree on all ten.

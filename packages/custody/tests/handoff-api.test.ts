@@ -110,7 +110,8 @@ describe("the dashboard handoff", () => {
     expect(job.push).toBe(true);
 
     const goal = readFileSync(job.goalPath, "utf8");
-    expect(goal).toContain("open a pull request against main");
+    expect(goal).toContain("leave delivery to baro's finalizer");
+    expect(goal).not.toContain("open a pull request");
     expect(goal).not.toContain("leave the fix as a local commit");
 
     const second = await postJson("/api/handoffs", { runId, push: true });
