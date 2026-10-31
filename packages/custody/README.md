@@ -24,6 +24,9 @@ bun run custody:test
 The Docker recording and the baro handoff have their own commands under
 [One recorded Docker run](#one-recorded-docker-run) and [The slow loop](#the-slow-loop).
 
+`bun run custody:test` runs 70 tests: 64 pass and 6 skip without Docker. Set `CUSTODY_DOCKER=1`
+to run the Docker contract test instead of skipping it.
+
 `bun run custody` boots the real Mozaik runtime, joins ten participants, starts one loop per
 proposed action, and holds every `act` call in the interception handler until the window closes.
 The model is canned for the offline run. The runtime is not.
