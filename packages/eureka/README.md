@@ -30,9 +30,9 @@ bun run audit run-mock             # re-resolve every claim in a committed trace
 **Measured, not asserted:** the real OpenRouter run has **4 proposals, 4 Critic rejections (all
 real), 7 turns in flight, $0.1934, 131s** (`examples/run-openrouter/`). The offline full-scale run has
 **24 challenges, 201 model calls, 14 turns in flight, $0.00** (`examples/run-full/`). The
-pool-scaling curve is **1 / 3 / 5 workers per role → 1,133 / 640 / 607 ms wall clock and 5 / 9 / 11
-max in flight** (`eval/concurrency.md`). Retrieval: **84.2% hit@3**, **47.4% precision@1**
-(`bun run eval`).
+pool-scaling curve is **1 / 3 / 5 workers per role → 5 / 9 / 11 turns in flight**, with the wall
+clock in `eval/concurrency.md` (`bun run concurrency`). Retrieval: **84.2% hit@3**, **47.4%
+precision@1** (`bun run eval`).
 
 ---
 
@@ -125,9 +125,9 @@ The claim is measured, not asserted. `bun run concurrency` runs the same 6-chall
 
 | Pools (workers/role) | Wall clock | Max in flight | Model calls | Cost |
 | --- | --- | --- | --- | --- |
-| 1 | 1,133 ms | 5 | 52 | $0.0000 |
-| 3 | 640 ms | 9 | 53 | $0.0000 |
-| 5 | 607 ms | 11 | 52 | $0.0000 |
+| 1 | 1,148 ms | 5 | 52 | $0.0000 |
+| 3 | 631 ms | 9 | 53 | $0.0000 |
+| 5 | 572 ms | 11 | 52 | $0.0000 |
 
 Max in-flight is derived from `inference.started` minus `inference.completed` in each trace. The
 default-scale mock run reaches **14 turns in flight at once** across five roles (103 calls, $0.00).
@@ -147,9 +147,24 @@ bun run trace                      # serve the trace viewer at http://localhost:
 bun run audit run-mock             # re-resolve every claim; exits non-zero on an unknown source
 bun run check:examples             # README numbers vs committed run.json/trace.jsonl
 bun run concurrency                # pool-scaling curve -> eval/concurrency.md
+bun run refresh:examples           # re-run every free artefact and rewrite the tables
 bun run serve                      # POST /challenges, GET /events (SSE), GET /portfolio/:runId
 bun run openalex                   # optional: verify the OpenAlex key, pull UNS context
 ```
+
+### Refreshing the evidence
+
+```bash
+bun run refresh:examples            # mock + full-scale mock + curve + eval, tables updated
+bun run refresh:examples -- --real  # also re-run the paid OpenRouter evidence
+bun run check:examples              # fails if any number or trace claim drifts
+```
+
+`refresh:examples` copies each finished run from `runs/<id>/` into `examples/<name>/` and rewrites
+the metrics tables in `examples/README.md` and `README.md`. The paid run is adopted **only if it is
+at least as demonstrative as the one it replaces** — three or more proposals, a real Critic
+rejection, and at least one machine-readable hard reject. Otherwise the old artefact is kept and the
+script exits non-zero, because a refresh that weakens the evidence is not a refresh.
 
 The same scripts work from this package directory (`cd packages/eureka && bun run mock`).
 `@mozaik-ai/core` resolves to the pinned `modules/mozaik` git submodule, which the root

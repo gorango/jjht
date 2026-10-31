@@ -123,7 +123,8 @@ Critic can reject.
 > discarded instead of overwriting the worker that replaced it. Each worker runs one turn at a time,
 > which keeps `model.answer` unambiguous and bounds cost — parallelism comes from the pool, not
 > from fan-out inside one agent. Measured on a 6-challenge workload at 1 / 3 / 5 workers per role:
-> 1,133 / 640 / 607 ms and 5 / 9 / 11 turns in flight. The default mock run reaches 14 in flight;
-> the trace proves it: `inference.started` minus `inference.completed` over time is the curve.
+> 5 / 9 / 11 turns in flight, with the wall clock in `eval/concurrency.md`. The default mock run
+> reaches 14 in flight; the trace proves it: `inference.started` minus `inference.completed` over
+> time is the curve.
 
 **Track:** EINSTEIN: Science-to-Business Matchmaker

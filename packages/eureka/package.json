@@ -21,6 +21,7 @@
     "refresh:calls": "bun scripts/refresh-calls.ts",
     "eval": "bun scripts/eval.ts",
     "concurrency": "bun scripts/concurrency.ts",
+    "refresh:examples": "bun scripts/refresh-examples.ts",
     "check:examples": "bun scripts/check-examples.ts"
   },
   "dependencies": {

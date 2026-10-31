@@ -15,6 +15,7 @@
     "eureka:audit": "bun run --filter eureka audit",
     "eureka:serve": "bun run --filter eureka serve",
     "eureka:concurrency": "bun run --filter eureka concurrency",
+    "eureka:refresh-examples": "bun run --filter eureka refresh:examples",
     "eureka:check-examples": "bun run --filter eureka check:examples",
     "eureka:typecheck": "bun run --filter eureka typecheck",
     "eureka:build": "bun run --filter eureka build",

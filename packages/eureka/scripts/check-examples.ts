@@ -87,74 +87,37 @@ const artefacts = Object.fromEntries(EXAMPLES.map((dir) => [dir, readArtefact(di
   Artefact
 >;
 
-const expected: Record<(typeof EXAMPLES)[number], Partial<Summary> & { maxInFlight: number }> = {
-  "run-openrouter": {
-    companies: 4,
-    challenges: 4,
-    proposals: 4,
-    approved: 4,
-    portfolio: 4,
-    rejections: 4,
-    modelCalls: 36,
-    costUsd: 0.1934,
-    maxInFlight: 7,
-  },
-  "run-proposals": {
-    companies: 4,
-    challenges: 4,
-    proposals: 4,
-    approved: 4,
-    portfolio: 4,
-    rejections: 4,
-    modelCalls: 36,
-    costUsd: 0.1934,
-    maxInFlight: 7,
-  },
-  "run-full": {
-    companies: 12,
-    challenges: 24,
-    proposals: 24,
-    approved: 24,
-    portfolio: 5,
-    rejections: 24,
-    modelCalls: 201,
-    costUsd: 0,
-    maxInFlight: 14,
-  },
-  "run-mock": {
-    companies: 6,
-    challenges: 12,
-    proposals: 12,
-    approved: 12,
-    portfolio: 5,
-    rejections: 12,
-    modelCalls: 103,
-    costUsd: 0,
-    maxInFlight: 14,
-  },
-};
-
+// Expectations are read from the artefacts themselves. Hard-coding them here
+// meant every refresh needed a code edit, which is exactly the drift the guard
+// is supposed to prevent. Structural invariants stay hard-coded.
 for (const dir of EXAMPLES) {
   const artefact = artefacts[dir];
-  for (const [key, value] of Object.entries(expected[dir])) {
-    if (key === "maxInFlight") expectEqual(`${dir} maxInFlight`, artefact.maxInFlight, value);
-    else expectEqual(`${dir}.${key}`, (artefact.summary as any)[key], value);
-  }
   if (!artefact.hasPortfolioReady) fail(`${dir}: trace has no portfolio.ready`);
   if (!artefact.hasRunCompleted) fail(`${dir}: trace has no run.completed`);
   if (artefact.approvedReviews !== artefact.summary.approved) {
     fail(`${dir}: ${artefact.approvedReviews} approve reviews but summary.approved=${artefact.summary.approved}`);
   }
+  if (artefact.rejected !== artefact.summary.rejections) {
+    fail(`${dir}: ${artefact.rejected} reject reviews but summary.rejections=${artefact.summary.rejections}`);
+  }
   if (artefact.rejected < 1) fail(`${dir}: trace has no Critic rejection`);
+  if (artefact.summary.modelCalls < 1) fail(`${dir}: trace has no model calls`);
+  if (artefact.summary.challenges < 1) fail(`${dir}: run processed no challenges`);
 }
 
-if (artefacts["run-openrouter"].rejected < 1) fail("run-openrouter must contain a real Critic rejection");
-if (!artefacts["run-openrouter"].hasHardRejects) {
-  fail("run-openrouter must show at least one machine-readable hard reject");
+for (const dir of ["run-mock", "run-full"] as const) {
+  if (artefacts[dir].summary.costUsd !== 0) fail(`${dir}: a mock run must report $0.0000`);
 }
+
 const openrouter = artefacts["run-openrouter"].summary;
 const proposals = artefacts["run-openrouter"];
+if (openrouter.costUsd <= 0) fail("run-openrouter must be a paid run");
 if (proposals.summary.proposals < 3) fail("run-openrouter must contain at least three proposals");
+if (proposals.rejected < 1) fail("run-openrouter must contain a real Critic rejection");
+if (!proposals.hasHardRejects) fail("run-openrouter must show at least one machine-readable hard reject");
+if (artefacts["run-proposals"].summary.runId !== openrouter.runId) {
+  fail("run-proposals must be the same run as run-openrouter");
+}
 
 // The table in examples/README.md is the human-facing copy; parse it and compare.
 const examplesReadme = readFileSync(resolve(ROOT, "examples/README.md"), "utf8");
@@ -211,6 +174,17 @@ const snippets = [
 ];
 for (const [label, snippet] of snippets) {
   if (!readme.includes(snippet)) fail(`README.md does not contain ${label}: ${JSON.stringify(snippet)}`);
+}
+
+// The pool-scaling table in README.md must match the committed measurement.
+const curve = (
+  JSON.parse(readFileSync(resolve(ROOT, "eval/concurrency.json"), "utf8")) as {
+    results: Array<{ pools: number; wallClockMs: number; maxInFlight: number; modelCalls: number; costUsd: number }>;
+  }
+).results;
+for (const row of curve) {
+  const needle = `| ${row.pools} | ${row.wallClockMs.toLocaleString("en-US")} ms | ${row.maxInFlight} | ${row.modelCalls} | $${row.costUsd.toFixed(4)} |`;
+  if (!readme.includes(needle)) fail(`README.md pool-scaling row for pools=${row.pools} is stale: expected ${JSON.stringify(needle)}`);
 }
 
 if (failures.length > 0) {

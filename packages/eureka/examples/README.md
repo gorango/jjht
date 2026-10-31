@@ -5,7 +5,7 @@ at least three proposals.
 
 | | `run-openrouter/` | `run-proposals/` | `run-full/` | `run-mock/` |
 | --- | --- | --- | --- | --- |
-| Date | 2026-10-30 | 2026-10-30 | 2026-10-30 | 2026-10-30 |
+| Date | 2026-10-30 | 2026-10-30 | 2026-10-31 | 2026-10-31 |
 | Provider | OpenRouter (`deepseek/deepseek-v4-pro` for every role) | same run as `run-openrouter/` | deterministic mock, full scale | deterministic mock, default scale |
 | Command | `EUREKA_FAST_MODEL=deepseek/deepseek-v4-pro bun start -- --companies=4 --challenges=1` | same run | `MOCK=1 bun start -- --companies=12 --challenges=2` | `bun run mock` |
 | Companies / challenges | 4 / 4 | 4 / 4 | 12 / 24 | 6 / 12 |
@@ -64,3 +64,16 @@ rejections are in the trace. Nothing was coerced by a test flag.
 
 `bun run check:examples` re-reads these files and fails if any number in the READMEs or any claimed
 trace event drifts.
+
+## Refreshing these artefacts
+
+```bash
+bun run refresh:examples            # free: mock, full-scale mock, curve, eval, tables
+bun run refresh:examples -- --real  # paid: also re-run the OpenRouter evidence
+```
+
+A paid refresh is adopted only if it still shows a real Critic rejection **and** a machine-readable
+hard reject. On 2026-10-31 a refresh produced 4 proposals and 2 real model-verdict rejections but no
+structural hard reject, so it was rejected and the 2026-10-30 artefact was kept; that run is left in
+`runs/` and its cost was $0.0959. The guard exists because replacing stronger evidence with weaker
+evidence is not a refresh.
