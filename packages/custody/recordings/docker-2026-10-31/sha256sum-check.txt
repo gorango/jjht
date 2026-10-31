@@ -1,0 +1,7 @@
+connections.txt: OK
+inspect.redacted.json: OK
+logs.txt: OK
+meta.json: OK
+processes.txt: OK
+deda28dc385e5ae3e9f07347ce4585bc4d40b3a437a7f8c43ea0cb2a3fcb4a12  hashes.txt
+deda28dc385e5ae3e9f07347ce4585bc4d40b3a437a7f8c43ea0cb2a3fcb4a12

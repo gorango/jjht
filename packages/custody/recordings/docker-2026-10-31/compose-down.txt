@@ -1,0 +1,40 @@
+$ docker compose -f docker/compose.yaml down -v
+ Container custody-docker-edge-1 Stopping 
+ Container custody-docker-edge-1 Stopped 
+ Container custody-docker-edge-1 Removing 
+ Container custody-docker-edge-1 Removed 
+ Container custody-docker-app-2 Stopping 
+ Container custody-docker-app-3 Stopping 
+ Container custody-docker-app-1 Stopping 
+ Container custody-docker-app-5 Stopping 
+ Container custody-docker-app-4 Stopping 
+ Container custody-docker-app-6 Stopping 
+ Container custody-docker-app-1 Stopped 
+ Container custody-docker-app-1 Removing 
+ Container custody-docker-app-1 Removed 
+ Container custody-docker-app-6 Stopped 
+ Container custody-docker-app-6 Removing 
+ Container custody-docker-app-2 Stopped 
+ Container custody-docker-app-2 Removing 
+ Container custody-docker-app-3 Stopped 
+ Container custody-docker-app-3 Removing 
+ Container custody-docker-app-6 Removed 
+ Container custody-docker-app-5 Stopped 
+ Container custody-docker-app-5 Removing 
+ Container custody-docker-app-2 Removed 
+ Container custody-docker-app-3 Removed 
+ Container custody-docker-app-4 Stopped 
+ Container custody-docker-app-4 Removing 
+ Container custody-docker-app-5 Removed 
+ Container custody-docker-app-4 Removed 
+ Network custody-docker_custody Removing 
+ Network custody-docker_custody Removed 
+
+$ docker ps -a --filter name=custody-docker
+(empty above means none)
+
+$ docker volume ls --filter name=custody-docker
+(empty above means none)
+
+$ docker network ls --filter name=custody-docker
+(empty above means none)

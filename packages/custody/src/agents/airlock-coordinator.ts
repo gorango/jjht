@@ -4,7 +4,7 @@
  */
 import type { Finding, InvariantContext } from "../domain/invariants.js";
 import type { Decision, Intent } from "../domain/types.js";
-import type { SimAdapter } from "../infra/adapter.js";
+import { applyIntent, type InfraAdapter } from "../infra/adapter.js";
 import type { Clock, Timer } from "../runtime/clock.js";
 import { publish } from "../runtime/ingest.js";
 import type { CustodyState } from "../runtime/state.js";
@@ -21,7 +21,7 @@ export interface AirlockCoordinatorOptions {
   state: CustodyState;
   clock: Clock;
   windowMs: number;
-  adapter: SimAdapter;
+  adapter: InfraAdapter;
   /** The invariant context is rebuilt at each deadline so locks and second keys are current. */
   context: () => InvariantContext;
   producerId?: string;
@@ -84,6 +84,13 @@ export class AirlockCoordinator {
   private readonly retryTimers = new Set<Timer>();
 
   private readonly idleWaiters: Array<() => void> = [];
+
+  /**
+   * Effects started by a window close are not tied to a loop, and the close is
+   * a sync timer callback. Track them so `whenIdle`/`shutdown` cannot report a
+   * run as finished before the adapter has applied the effect.
+   */
+  private readonly inflight = new Set<Promise<void>>();
 
   private readonly producerId: string;
 
@@ -169,17 +176,19 @@ export class AirlockCoordinator {
     });
   }
 
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     this.active = false;
     for (const window of this.open.values()) window.timer.cancel();
     this.open.clear();
     for (const timer of this.retryTimers) timer.cancel();
     this.retryTimers.clear();
     this.idleWaiters.splice(0).forEach((resolve) => resolve());
+    await Promise.all([...this.inflight]);
   }
 
   private isIdle(): boolean {
     if (this.open.size > 0) return false;
+    if (this.inflight.size > 0) return false;
     return ![...this.pending.values()].some((entry) => entry.handler && !entry.settled);
   }
 
@@ -286,7 +295,7 @@ export class AirlockCoordinator {
       }
       // On a retry or after a timeout no handler is left to run the effect, so
       // the airlock executes the accepted intent through the shared port.
-      if (entry.retry || entry.abandoned) this.execute(entry, decision);
+      if (entry.retry || entry.abandoned) this.track(this.execute(entry, decision));
     }
 
     this.checkIdle();
@@ -368,10 +377,19 @@ export class AirlockCoordinator {
     this.checkIdle();
   }
 
-  private execute(entry: Entry, decision: Decision): void {
+  private async execute(entry: Entry, decision: Decision): Promise<void> {
     const intent = decision.kind === "rewrite" && decision.final ? decision.final : entry.intent;
     if (decision.kind === "accept" || decision.kind === "rewrite") {
-      this.options.adapter.apply(intent, "airlock-retry");
+      await applyIntent(this.options.adapter, intent, "airlock-retry", this.producerId);
     }
+  }
+
+  private track(promise: Promise<void>): void {
+    this.inflight.add(promise);
+    const settle = (): void => {
+      this.inflight.delete(promise);
+      this.checkIdle();
+    };
+    void promise.then(settle, settle);
   }
 }

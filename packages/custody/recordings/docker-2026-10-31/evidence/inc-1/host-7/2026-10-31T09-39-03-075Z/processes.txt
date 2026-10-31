@@ -1,0 +1,10 @@
+PID                 PPID                USER                STAT                STARTED             COMMAND
+1635836             1635811             root                Ss                  Sat                 Oct 31 10:38:55 2026 nginx: master process nginx -g daemon off;
+1635876             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process
+1635877             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process
+1635878             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process
+1635879             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process
+1635880             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process
+1635881             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process
+1635882             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process
+1635883             1635836             101                 S                   Sat                 Oct 31 10:38:55 2026 nginx: worker process

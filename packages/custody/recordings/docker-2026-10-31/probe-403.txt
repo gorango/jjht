@@ -1,0 +1,2 @@
+command: docker run --rm --network custody-docker_custody --ip 203.0.113.9 curlimages/curl:8.10.0 -sS -o /dev/null -w '%{http_code}' http://edge/checkout
+result: 403

@@ -16,7 +16,15 @@ import {
 import type { Finding, InvariantContext } from "../domain/invariants.js";
 import { ACTIONS } from "../domain/registry.js";
 import type { Decision, Intent } from "../domain/types.js";
-import { SimAdapter } from "../infra/adapter.js";
+import {
+  applyIntent,
+  SimAdapter,
+  type AdapterKind,
+  type EvidenceAnchor,
+  type FailedAction,
+  type InfraAdapter,
+} from "../infra/adapter.js";
+import { DockerAdapter, type DockerAdapterOptions } from "../infra/docker.js";
 import { MockInferenceRunner } from "../inference/mock-runner.js";
 import { scriptsFor } from "../inference/scripts.js";
 import { realClock, type Clock } from "../runtime/clock.js";
@@ -39,6 +47,9 @@ export interface RunScenarioOptions {
   tracePath: string;
   verbose: boolean;
   clock?: Clock;
+  adapter?: AdapterKind;
+  evidenceRoot?: string;
+  docker?: Omit<DockerAdapterOptions, "evidenceRoot">;
 }
 
 export interface ScenarioReport {
@@ -57,6 +68,9 @@ export interface ScenarioReport {
   runner: "mock";
   costUsd: 0;
   findings: Finding[];
+  adapter: AdapterKind;
+  failed: FailedAction[];
+  evidence: EvidenceAnchor[];
 }
 
 class BusEvent extends SituationSpecification {
@@ -151,7 +165,7 @@ const refuseActionTool = (): Tool => ({
   },
 });
 
-const actTool = (agentId: string, state: CustodyState, clock: Clock, adapter: SimAdapter): Tool => ({
+const actTool = (agentId: string, state: CustodyState, clock: Clock, adapter: InfraAdapter): Tool => ({
   type: "function",
   name: "act",
   description:
@@ -188,7 +202,17 @@ const actTool = (agentId: string, state: CustodyState, clock: Clock, adapter: Si
     if (!parsed.ok) {
       return { executed: false, refused: true, reason: parsed.reason, intentId: parsed.intentId };
     }
-    const executed = adapter.apply(parsed.intent, "loop");
+    const outcome = await applyIntent(adapter, parsed.intent, "loop", agentId);
+    if (!outcome.executed) {
+      return {
+        executed: false,
+        failed: true,
+        intentId: parsed.intent.id,
+        reason: outcome.failed?.reason ?? "adapter failed",
+        path: "loop",
+      };
+    }
+    const executed = outcome.executed;
     return {
       executed: true,
       intentId: executed.intentId,
@@ -236,7 +260,7 @@ const reportIncidentTool = (agentId: string, state: CustodyState, clock: Clock):
   },
 });
 
-const lockEvidenceTool = (agentId: string, state: CustodyState, adapter: SimAdapter): Tool => ({
+const lockEvidenceTool = (agentId: string, state: CustodyState, adapter: InfraAdapter): Tool => ({
   type: "function",
   name: "lock_evidence",
   description: "Hold a target while evidence is captured. Destructive actions must wait.",
@@ -292,7 +316,14 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
   trace.observe();
 
   const captureTargets = new Set(scenario.locks.map((lock) => lock.targetId));
-  const adapter = new SimAdapter(state, clock, captureTargets);
+  const adapterKind = options.adapter ?? "sim";
+  const adapter: InfraAdapter =
+    adapterKind === "docker"
+      ? new DockerAdapter(state, clock, {
+          ...options.docker,
+          evidenceRoot: options.evidenceRoot ?? "evidence",
+        })
+      : new SimAdapter(state, clock, captureTargets);
   const context = (): InvariantContext => ({
     topology: state.topology ?? scenario.topology,
     locks: [...state.locks.values()],
@@ -472,7 +503,7 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
     await coordinator.whenIdle();
   }
 
-  coordinator.shutdown();
+  await coordinator.shutdown();
 
   const expected = Object.entries(scenario.expected);
   const expectedMatches = expected.filter(
@@ -501,5 +532,12 @@ export const runScenario = async (options: RunScenarioOptions): Promise<Scenario
     runner: "mock",
     costUsd: 0,
     findings: coordinator.findings,
+    adapter: adapterKind,
+    failed: trace.rows
+      .filter((row) => row.type === "action.failed")
+      .map((row) => row.payload as FailedAction),
+    evidence: trace.rows
+      .filter((row) => row.type === "evidence.anchored")
+      .map((row) => row.payload as EvidenceAnchor),
   };
 };

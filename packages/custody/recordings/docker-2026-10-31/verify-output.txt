@@ -1,0 +1,2 @@
+OK /home/g/m/jigjoy/.worktrees/b/packages/custody/recordings/docker-2026-10-31/evidence/inc-1/host-7/2026-10-31T09-39-03-075Z
+verify-exit=0

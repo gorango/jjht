@@ -1,0 +1,6 @@
+== /proc/net/tcp ==
+  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode                                                     
+   0: 00000000:0050 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 22120351 1 0000000024f8c3ed 100 0 0 10 0                  
+   1: 0B00007F:932B 00000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 22122268 1 00000000669e60f5 100 0 0 10 0                  
+== /proc/net/tcp6 ==
+  sl  local_address                         remote_address                        st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode
