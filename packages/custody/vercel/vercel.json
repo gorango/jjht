@@ -3,5 +3,6 @@
   "installCommand": "echo no install",
   "buildCommand": "echo no build",
   "outputDirectory": ".",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "framework": null
 }

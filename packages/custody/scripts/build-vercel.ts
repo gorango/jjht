@@ -243,6 +243,7 @@ const main = async (): Promise<void> => {
       `${JSON.stringify(
         {
           $schema: "https://openapi.vercel.sh/vercel.json",
+          framework: null,
           installCommand: "echo no install",
           buildCommand: "echo no build",
           outputDirectory: ".",
