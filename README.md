@@ -7,7 +7,7 @@ Workspace for the NTP Novi Sad Hackathon ("Build agents that work together", 30�
 | Path | What it is |
 | --- | --- |
 | `packages/eureka/` | EUREKA — an evidence-first, concurrent researcher–company matchmaker built on Mozaik (Track 02). |
-| `packages/custody/` | CUSTODY — scaffold of the Freestyle pivot: an incident-response runtime where no agent can act alone. Decision core + tests + design docs; agents not yet wired. |
+| `packages/custody/` | CUSTODY — an incident-response runtime where no agent can act alone. Live Mozaik loops, an airlock, a dashboard, a Docker adapter with one recorded run, an ablation, and a baro handoff. |
 | `modules/mozaik/` | [`jigjoy-ai/mozaik`](https://github.com/jigjoy-ai/mozaik) submodule — the agent runtime, pinned at `v4.1.0` and linked into the workspace. |
 | `modules/baro/` | [`jigjoy-ai/baro`](https://github.com/jigjoy-ai/baro) submodule — the software-factory reference, kept alongside the workspace. |
 | `docs/rules/` | Global hackathon reference: event, rules, tracks, judging, submission, prizes, dataset/APIs, platform, source log. |
@@ -23,7 +23,8 @@ git clone --recurse-submodules <repo>
 bun install
 bun run eureka:mock               # offline, deterministic, no API key
 bun run eureka:trace              # serve the trace viewer at http://localhost:4173
-bun run custody                   # CUSTODY scaffold: replay the airlock scenario offline
+bun run custody                   # CUSTODY: live run, five intents, one decision window
+bun run custody:dashboard         # CUSTODY dashboard at http://localhost:8787
 ```
 
 Already cloned? Run `git submodule update --init --recursive` first. `bun install` builds the

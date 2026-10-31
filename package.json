@@ -17,6 +17,9 @@
     "eureka:test": "bun run --filter eureka test",
     "custody": "bun --cwd packages/custody src/index.ts demo",
     "custody:dashboard": "bun --cwd packages/custody src/server.ts",
+    "custody:verify-evidence": "bun --cwd packages/custody scripts/verify-evidence.ts",
+    "custody:docker:up": "bun --cwd packages/custody run docker:up",
+    "custody:docker:down": "bun --cwd packages/custody run docker:down",
     "custody:ablate": "bun --cwd packages/custody scripts/ablate.ts",
     "custody:test": "bun --cwd packages/custody test",
     "custody:typecheck": "bun --cwd packages/custody run typecheck"

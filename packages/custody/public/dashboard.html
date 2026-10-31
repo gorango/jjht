@@ -37,6 +37,10 @@
   }
   .badge b { color: var(--text); font-size: 20px; margin-left: 6px; }
   main { display: grid; grid-template-columns: 240px minmax(0, 1fr) 390px; flex: 1; min-height: 0; }
+  @media (max-width: 1100px) {
+    main { grid-template-columns: 200px minmax(0, 1fr) 320px; }
+    .row { grid-template-columns: 52px 92px 124px minmax(0, 1fr); }
+  }
   .rail, .right { overflow: auto; }
   .rail { border-right: 1px solid var(--line); padding: 14px; }
   .right { border-left: 1px solid var(--line); padding: 14px; }
@@ -80,7 +84,7 @@
   .t { color: var(--dim); text-align: right; white-space: nowrap; }
   .p { color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ty { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .s { overflow-wrap: anywhere; }
+  .s { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .row.proposal .s { color: var(--text); }
   .row.window .s { color: var(--warn); }
   .row.decision .s { color: var(--text); }

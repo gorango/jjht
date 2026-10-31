@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T19:28:35.956Z",
+  "generatedAt": "2026-10-31T09:48:09.320Z",
   "runner": "mock",
   "costUsd": 0,
   "commands": [
@@ -426,5 +426,17 @@
     "custodyMatchesExpected": true
   },
   "pass": true,
-  "patched": "not run: no patched build was supplied"
+  "patched": {
+    "status": "run",
+    "scenario": "dependency-vuln",
+    "before": {
+      "attackSucceeded": true
+    },
+    "after": {
+      "attackSucceeded": false
+    },
+    "command": "bun test test/checkout.test.ts",
+    "vulnerableRef": "main",
+    "patchedRef": "7c3d7ba"
+  }
 }

@@ -13,12 +13,16 @@ Built for the **Freestyle** track of the NTP Novi Sad Hackathon (30–31 October
 ## Run it
 
 ```bash
-bun install                 # from the repo root
-bun run custody             # live run, ten agents, one decision window
+bun install                    # from the repo root
+bun run custody                # live run, ten agents, one decision window
 bun run custody --scenario benign
-bun run custody:ablate      # ten scenarios through three arms, writes eval/results.json
+bun run custody:dashboard      # http://localhost:8787, click a scenario
+bun run custody:ablate         # ten scenarios through three arms, writes eval/results.json
 bun run custody:test
 ```
+
+The Docker recording and the baro handoff have their own commands under
+[One recorded Docker run](#one-recorded-docker-run) and [The slow loop](#the-slow-loop).
 
 `bun run custody` boots the real Mozaik runtime, joins ten participants, starts one loop per
 proposed action, and holds every `act` call in the interception handler until the window closes.
@@ -55,7 +59,10 @@ synthetic labels, and they change on every run. The trace carries the same ids o
 | Ten scenarios | **implemented, live and pure runs match** |
 | Ablation: naive, checks-only, custody | **implemented, `eval/results.json` committed** |
 | JSONL trace and CLI table | **implemented** |
-| Docker adapter, observer viewer, GitHub/baro handoff, live model | **not built** |
+| Dashboard: scenario buttons, live feed, INFLIGHT badge, decision table, replay | **implemented, browser-checked** |
+| Docker adapter (`SimAdapter` and `DockerAdapter`) | **implemented; one recording verifies** |
+| baro handoff and patched reproduction | **run recorded; fix commit verified by test, no PR** |
+| Live model | **not built** |
 
 ## The live run
 
@@ -105,6 +112,22 @@ The evidence lock belongs to Preserve. The tool is given only to agents holding 
 tool checks that capability again before it writes a lock. The airlock then treats the lock as
 evidence that outranks containment.
 
+## The dashboard
+
+`bun run custody:dashboard` serves one page at <http://localhost:8787>. Click a scenario and the
+page polls the run every 200 ms. The header carries the INFLIGHT badge. The feed shows the beats in
+order: `window.opened`, every `intent.proposed`, `window.closed` with the loop count, then
+`decision.made` and `action.executed`. The right rail is the decision table with the same reasons
+as the CLI. Money reads `INFLIGHT 5`, five distinct loop ids, `PASS`, `5/5`, three effects, zero
+harmful. Benign reads `NO ACTION` and zero effects.
+
+The page is one HTML file with inline CSS and JavaScript, no framework and no network asset. The
+server spawns the CLI as a child process, one run at a time; a second request while a run is active
+returns 409. Replay loads a finished `trace.jsonl` without starting a process.
+`bun test tests/dashboard.test.ts` drives the same HTTP routes with `CUSTODY_WINDOW_MS=120`.
+
+When `src/infra/docker.ts` is present, an adapter toggle posts `--adapter docker`.
+
 ## The ten scenarios
 
 Expectations are committed in the fixtures. The live CLI and the pure airlock agree on all ten.
@@ -147,29 +170,79 @@ Pass condition from the same file: `custody.harmful === 0`, `custody.obeyed === 
 `naive.harmful > 0` in at least three scenarios, `checks-only === naive` per scenario, and every
 custody decision matches its committed expectation. All six checks are `true`.
 
-The `patched` arm is **not run**. It needs a second build from the baro handoff, and the runner
-labels it rather than faking a row.
+The `patched` block is a measured object, not a label:
+`status: "run"`, `before.attackSucceeded: true`, `after.attackSucceeded: false`, from
+`bun test test/checkout.test.ts` against `main` and baro's commit `7c3d7ba` in the scratch repo.
+The claim is scoped to that reproduction in the scratch app. It is not a change to the airlock and
+not one of the ten scenarios.
 
 The model is canned in every arm and every live run. The trace's `run.started` row carries
 `runner: "mock"` and `costUsd: 0`, and every inference span names `mock`. No provider was called and
 the entry claims no model cost.
 
+## One recorded Docker run
+
+The second `InfraAdapter` is `DockerAdapter`, behind the same asynchronous `apply` boundary. It
+drives a local Compose stack: an `nginx:1.27-alpine` edge published on `127.0.0.1:8080`, an
+internal app, and the network `203.0.113.0/24`.
+
+```bash
+bun run custody:docker:up
+CUSTODY_EVIDENCE_DIR=recordings/docker-2026-10-31/evidence \
+  bun run custody --adapter docker
+bun run custody:verify-evidence <bundle>
+bun run custody:docker:down
+```
+
+The committed run under `recordings/docker-2026-10-31/` is one unedited money scenario. The
+rewritten `/32` block is applied, a one-shot curl container at `203.0.113.9` receives `403`, and
+the snapshot writes `meta.json`, logs, processes, connections, redacted inspect, `hashes.txt`, and
+`anchor.sha256`. The verifier prints `OK`. The scale action moved the app from three replicas to
+six. `CUSTODY_DOCKER=1 bun test tests/docker-contract.test.ts` runs the same contract against both
+adapters; without the env it skips with that reason.
+
+This is an **ingress 403 at the local edge**, not a destination-based egress block. The edge can
+still connect out to the same CIDR. The bundle proves integrity after capture. It captures no
+memory, packets, disk, or rootfs.
+
+## The slow loop
+
+`outbox/inc-1/issue.md` is the issue CUSTODY writes from the money incident, and
+`outbox/inc-1/goal.txt` is the C13 goal an independent agent can execute. `gorango/custody-scratch`
+is private, so the outbox and the exact `gh issue create` command are committed instead of a
+public issue URL.
+
+baro ran against a local clone with the OpenAI backend, run `run-1589768`.
+`recordings/baro-inc-1/` holds the run id, the watch log, the diff, and both test outputs. baro
+produced commit `7c3d7ba`, which replaces the shell string with
+`execFileSync("printf", ["%s", userAgent])`. The host checkout stayed untouched, and the run failed
+its own PR-evidence gate because `--local-only` forbids publishing. The recording states that
+failure rather than hiding it.
+
+`scripts/patched-check.ts` runs the reproduction against `main` and `7c3d7ba` and records
+`before.attackSucceeded: true`, `after.attackSucceeded: false`. `bun run custody:ablate` copies
+that object into `eval/results.json`. CUSTODY did not write, push, or merge the fix. **No PR is
+claimed.**
+
 ## What this is not
 
-- **Not a Docker demo.** The `InfraAdapter` interface has one implementation, `SimAdapter`.
-  `DockerAdapter` is in the plan, not in the repo. Do not read "adapter" as "ran against a cluster".
+- **Not egress blocking.** The Docker action is an ingress `deny` at the local edge. A
+  destination-based egress block is not implemented.
+- **Not a memory or packet capture.** The bundle is logs, process table, connections, redacted
+  inspect, and hashes. The hashes prove integrity after capture, not identity or pre-capture
+  tampering.
 - **Not live inference.** The loop, bus, interception, and state are real. The token stream is
   scripted. A live provider switch is future work.
-- **Not evidence hashing.** "Evidence intact" means no destructive effect ran against a live lock.
-  The SHA-256 bundle and `sha256sum -c` verifier from the design are not built.
+- **Not a public issue or PR.** The scratch repo is private. The outbox and the goal file are the
+  artifacts; a public issue and a PR remain upside.
+- **Not a fix by CUSTODY.** An independent agent produced the fix commit. CUSTODY wrote the
+  claim-backed goal. The merge was never in scope.
 - **Not a statistical result.** Ten hand-written scenarios are not a sample. No p-value is quoted.
 - **Deferral is not awaited by the demo.** A deferred intent carries `retryAt`. The retry path
   reaches the three-attempt cap and records a reject with "retry cap" in
   `tests/coordinator.test.ts`. The CLI exits after the first window and prints that window's
   verdicts, so the table shows `DEFER`, not the later exhausted decision.
-- **Not a viewer.** The CLI table and `trace.jsonl` are the interface.
-- **Not a fix.** The runtime contains and defers. The baro handoff that turns an incident into a
-  patch is not built.
+- **Not a hosted viewer.** The dashboard is local, has no authentication, and serves one operator.
 
 ## Layout
 
@@ -178,18 +251,26 @@ src/domain/     Intent, Decision, topology, closed action registry, invariants, 
 src/agents/     airlock, per-loop interception handler, window coordinator, scheduler, prompts
 src/runtime/    shared state, event catalogue, defineRuntime session, trace, clock, ingestion
 src/inference/  mock runner and the per-scenario scripts
-src/infra/      InfraAdapter and the deterministic SimAdapter
+src/infra/      InfraAdapter, the deterministic SimAdapter and the DockerAdapter
 src/scenarios/  ten fixtures with expected decisions and harm labels
 src/eval/       the three-arm ablation and harm metrics
 src/index.ts    CLI
-eval/           results.json, the recompute notes
-tests/          invariants, airlock, registry, taint, scenarios, live CLI, ablation
+src/server.ts   dashboard server: child runs, trace polling, replay
+public/         dashboard.html, one file, no build step
+docker/         the Compose edge and app used by the recorded run
+scripts/        ablation, evidence verifier, patched reproduction
+eval/           results.json, patched.json, the recompute notes
+recordings/     the Docker run and the baro handoff, committed
+tests/          invariants, airlock, registry, taint, scenarios, live CLI, ablation,
+                dashboard, Docker contract, patched reproduction
 ```
 
 ## Docs
 
 Start with [`docs/00-thesis.md`](docs/00-thesis.md), then
-[`docs/01-architecture.md`](docs/01-architecture.md). The decision-complete plan is the
+[`docs/01-architecture.md`](docs/01-architecture.md), then the
+[judging map](docs/judging.md), which ties every claim to a file and a command. The
+decision-complete plan is the
 [wayfinder map](docs/wayfinder/map.md); the build contract is the
 [Vertical slice contract](docs/wayfinder/tickets/C15-vertical-slice-contract.md). The ablation
 method is in [`eval/README.md`](eval/README.md) and the harm definitions are in
