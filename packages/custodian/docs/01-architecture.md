@@ -112,20 +112,27 @@ src/
     ingest.ts       taint before any participant sees telemetry                [implemented]
   infra/
     adapter.ts      InfraAdapter + deterministic SimAdapter                     [implemented]
-    docker.ts       real adapter                                               [not built]
+    docker.ts       DockerAdapter against the local Compose stack               [implemented; one recording verifies]
   inference/
     mock-runner.ts  scripted InferenceRunner, labelled mock, costUsd 0          [implemented]
   scenarios/
     *.ts            ten fixtures with expected decisions and harm labels        [implemented]
   eval/
     ablate.ts       naive / checks-only / custodian over all ten                 [implemented]
+  handoff/
+    *.ts            trace to issue, goal and handoff manifest                    [implemented]
   index.ts          `bun run custodian` live CLI                                 [implemented]
+  server.ts         dashboard server: child runs, polling, replay, handoff      [implemented]
 ```
+
+The Docker stack lives in `docker/` (the Compose edge and app), its recording in
+`recordings/docker-2026-10-31/`, and the static replay build in `vercel/`.
 
 ## What exists today, precisely
 
-- 53 passing tests: invariants, airlock, registry, taint, all ten scenarios, the live CLI, and the
-  ablation.
+- 81 tests: 75 pass and 6 skip without Docker. The suite covers invariants, airlock, registry, taint,
+  all ten scenarios, the live CLI, the ablation, the dashboard, the Docker contract, the patched
+  reproduction, and the handoff.
 - `bun run custodian` boots the real Mozaik runtime, joins ten participants, starts one loop per
   proposed action, holds every `act` call in the interception handler, and prints the decisions,
   `INFLIGHT 5`, and five distinct loop ids. It exits non-zero unless the five decisions match and at
@@ -137,5 +144,6 @@ src/
 
 ## What does not exist yet
 
-The Docker adapter, the observer viewer, live inference, the baro handoff, and the evidence hash
-bundle. Those are cut or later work, and the README says so.
+Live inference, the observer viewer, destination-based egress blocking, and memory, packet, disk or
+rootfs capture. The Docker adapter, the baro handoff and the evidence hash bundle do exist; the
+Docker block is an ingress `deny` at the local edge, not an egress filter.

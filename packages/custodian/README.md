@@ -193,7 +193,7 @@ Expectations are committed in the fixtures. The live CLI and the pure airlock ag
 
 | # | Scenario | Conflict | Expected |
 | --- | --- | --- | --- |
-| 1 | `money` | contain vs preserve vs availability vs provenance | narrow block, defer isolate, reject injection |
+| 1 | `benign-export` | detection vs action | no action, with a trace reason |
 | 2 | `credential-stuffing` | contain vs availability (shared NAT) | narrow to `/32`, reject the drain |
 | 3 | `lateral-movement` | contain vs evidence | isolate the free host, defer the locked one |
 | 4 | `ransomware-canary` | contain vs undo | revoke with a second key, reject the isolate |
@@ -202,9 +202,9 @@ Expectations are committed in the fixtures. The live CLI and the pure airlock ag
 | 7 | `operator-impersonation` | provenance | reject the log-sourced isolate |
 | 8 | `stolen-token` | authority | reject the out-of-scope token |
 | 9 | `control-plane-outage` | availability | defer everything, fail closed |
-| 10 | `benign-export` | detection vs action | no action, with a trace reason |
+| 10 | `money` | contain vs preserve vs availability vs provenance | narrow block, defer isolate, reject injection |
 
-External provenance: scenario 1 and 7 use the OWASP LLM01 injection pattern; 2, 3, 4, 6, and 8 use
+External provenance: scenarios 7 and 10 use the OWASP LLM01 injection pattern; 2, 3, 4, 6, and 8 use
 MITRE ATT&CK techniques. The rest are written for this entry. All labels are ours and the fixtures
 are committed so a reviewer can disagree and recompute.
 
@@ -253,6 +253,11 @@ bun run custodian:verify-evidence <bundle>
 bun run custodian:docker:down
 ```
 
+If `127.0.0.1:8080` is already taken, set `CUSTODIAN_EDGE_PORT=18081` for `docker:up`,
+`docker:down`, and the host-side `curl`. The adapter's probe runs inside the Compose network, so
+the host port does not change the decision. The illustrated walkthrough is
+[DEMO.md](DEMO.md#where-docker-is-used).
+
 The committed run under `recordings/docker-2026-10-31/` is one unedited money scenario. The
 rewritten `/32` block is applied, a one-shot curl container at `203.0.113.9` receives `403`, and
 the snapshot writes `meta.json`, logs, processes, connections, redacted inspect, `hashes.txt`, and
@@ -276,10 +281,17 @@ memory, packets, disk, or rootfs.
 
 The runner is OpenCode Go with the DeepSeek family. Pro writes code, Flash judges.
 
+Install the CLI from npm. `modules/baro/` is the reference source submodule, not the handoff
+runtime; do not build or invoke baro from there.
+
 ```bash
-cp .env.example .env        # fill OPENCODE_GO_API_KEY
-bun run baro:check          # print the resolved command
-bun run baro                # run against modules/custodian-scratch
+npm install -g baro-ai
+baro --version               # 0.121.0 at the time of writing
+baro --doctor                # optional; the claude/devin checks are for other backends
+
+cp .env.example .env         # fill OPENCODE_GO_API_KEY
+bun run baro:check           # print the resolved command
+bun run baro                 # run against modules/custodian-scratch
 ```
 
 From a live money run, generate the issue and goal from its trace first:
@@ -312,7 +324,7 @@ original C13 PR line for the recorded run.
 | `--detach` | off | Detach; needs `--opencode-cli` |
 | `--opencode-cli` | off | Use baro's OpenCode harness, no proxy or key |
 | `-- <args>` | none | Pass the rest to baro |
-| `BARO_BIN` | `baro` | baro executable |
+| `BARO_BIN` | `baro` | baro executable, normally the npm-installed CLI |
 | `OPENCODE_GO_BASE_URL` | Go endpoint | Upstream for the proxy |
 | `OPENCODE_GO_API_KEY` | empty | Bearer key for the proxy |
 | `BARO_*_MODEL` | table above | Per-phase model ids |

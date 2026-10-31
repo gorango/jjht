@@ -11,16 +11,17 @@
 
 ## Mapping, honestly
 
-| Criterion | Current evidence | Missing |
+| Criterion | Current evidence | Still missing |
 | --- | --- | --- |
-| Useful & original | the thesis + the five-intent replay + the injection rejection | the ablation numbers; a real adapter run |
-| Mozaik use | `reconcile` is the joint decision; adapter is typed against v4.1.0 | agents are not wired yet, so "parallel" is still a fixture |
-| It works | `bun run custodian` is deterministic and exits non-zero on mismatch | `npm ci`-equivalent from a clean clone; the wired run |
-| README | this docs set + package README | the 60-second block is drafted, not final |
+| Useful & original | the thesis, the five-intent replay, the injection rejection, and the 15 → 0 ablation | statistical significance; external validation of the labels |
+| Mozaik use | five real loops held in one window, shared `CustodianState`, trace ids joined to core spans | live inference; the model is scripted |
+| It works | `bun install && bun run custodian`, 81 tests, the dashboard, the Docker recording | a production deployment |
+| README | package README, `DEMO.md`, `docs/judging.md`, and the replay deploy | nothing required for the submission |
 
-**The gap that matters:** right now the concurrency is *modelled* (five intents in one call), not
-*observed* (five loops actually interleaving). The 30-point criterion is about the latter. Wiring the
-worker/pool is the highest-value next step, ahead of any adapter.
+**The gap that matters:** the runtime is real, but the model is canned. Five loops actually
+interleave, and the airlock decides them together; the text each agent emits is scripted. Say that
+plainly. The 30-point criterion is about observed concurrency, and the `INFLIGHT 5` line plus five
+distinct loop ids are the proof.
 
 ## Three-minute script
 
@@ -46,15 +47,16 @@ Point at the five rows, not the prose:
 > "Authority is code, not a prompt. Capability, provenance, taint, undoability, blast radius,
 > evidence lock. The model cannot talk its way past a function."
 
-**1:30 — the ablation.** Show the table (once it exists).
+**1:30 — the ablation.** Show the table in `eval/results.json`.
 
-> "Same ten incidents, two arms. Without the airlock: N harmful actions, M injected instructions
-> obeyed. With it: zero. The scenarios and labels are in the repo."
+> "Same ten incidents, three arms. Without the airlock: 15 harmful actions and 2 injected
+> instructions obeyed. With it: zero and zero. The scenarios and labels are in the repo."
 
 **2:15 — the real seam.** One Docker run, recorded: nginx deny → 403 in the log; snapshot bundle
 with hashes.
 
-**2:40 — the handoff.** The issue text and the baro goal file.
+**2:40 — the handoff.** The issue text and the baro goal file. Install the published CLI with
+`npm install -g baro-ai`; `modules/baro/` is reference source only.
 
 > "The runtime does not write code. It writes a claim-backed issue and a goal an independent coding
 > agent can execute. The PR is the slow loop; containment is the fast one."
@@ -78,17 +80,15 @@ Replay table (15s) → "taint rejected, capability held" (10s) → ablation numb
 | Viewer breaks | `trace.jsonl` + the CLI table |
 | A judge asks "is this real?" | open `src/domain/invariants.ts` and run `bun test` |
 
-## Judging map (to finish)
+## Judging map
 
-Create `docs/judging.md` at the end with one row per criterion, each pointing at a file and a
-command:
+[`judging.md`](judging.md) is the finished map: one row per rubric criterion, each pointing at a
+file and a command. Use it as the index when a judge has five minutes.
 
 ```md
 | Criterion | Where | Proof |
 | --- | --- | --- |
-| Parallel agents | src/agents/pool.ts | `bun run custodian` → N turns in flight (fill N after wiring) |
-| Shared state | src/runtime/state.ts | trace: two participants mutate `locks` and `decisions` |
+| Parallel agents | src/agents/scheduler.ts | `bun run custodian` → `INFLIGHT 5`, five loop ids |
+| Shared state | src/runtime/state.ts | trace: `evidence.locked` and `decision.made` on one state |
 | Works | README | `bun install && bun run custodian` |
 ```
-
-A judge with five minutes will not read 22 KB of prose. That table is the entry's index.

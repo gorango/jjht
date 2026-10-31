@@ -1,13 +1,11 @@
-# CUSTODIAN — NTP Novi Sad 2026, Track 3 (Freestyle)
+CUSTODIAN is an incident-response runtime where no agent can act alone. Agents propose typed, 
+reversible actions. An airlock holds them and decides together in one window, weighing containment
+against evidence preservation, availability and provenance. Only an accepted intent reaches an 
+adapter. The runtime, the bus, the five concurrent loops and the shared state are real [Mozaik](https://github.com/jigjoy-ai/mozaik).
 
-CUSTODIAN is the entry in this workspace. It is an incident-response runtime where no agent can act
-alone. Agents propose typed, reversible actions. An airlock holds them and decides together in one
-window, weighing containment against evidence preservation, availability and provenance. Only an
-accepted intent reaches an adapter. The runtime, the bus, the five concurrent loops and the shared
-state are real Mozaik.
-
-**Track note.** `packages/eureka/` is a completed Track 2 (EINSTEIN) submission, kept for reference.
-It is not the entry. CUSTODIAN, Track 3, is.
+> [!NOTE]
+> **Track note.** `packages/eureka/` is a completed Track 2 (EINSTEIN) submission, kept for reference.
+> It is not the entry. CUSTODIAN, Track 3, is.
 
 ## Run it
 
@@ -38,10 +36,10 @@ with a file and a command, is [`packages/custodian/docs/judging.md`](packages/cu
 | `packages/custodian/` | The Track 3 entry. Live Mozaik loops, an airlock, a dashboard, a Docker adapter with one recorded run, an ablation, and a baro handoff. |
 | `packages/eureka/` | Completed Track 2 (EINSTEIN) submission. Kept for reference; not the entry. |
 | `modules/mozaik/` | [`jigjoy-ai/mozaik`](https://github.com/jigjoy-ai/mozaik) submodule, the agent runtime, pinned at `v4.1.0` and linked into the workspace. |
-| `modules/baro/` | [`jigjoy-ai/baro`](https://github.com/jigjoy-ai/baro) submodule, the software-factory reference. |
+| `modules/baro/` | [`jigjoy-ai/baro`](https://github.com/jigjoy-ai/baro) submodule, the software-factory reference. Install the CLI with `npm install -g baro-ai`; do not build the handoff runtime from this checkout. |
 | `modules/custodian-scratch/` | [`gorango/jjhts`](https://github.com/gorango/jjhts) submodule, the small checkout fixture CUSTODIAN hands to an independent agent. |
 | `packages/custodian/docs/` | CUSTODIAN design, the judging map, and the historical decision record. |
-| `packages/eureka/docs/` | EUREKA documentation. Its commit history predates this event. |
+| `packages/eureka/docs/` | EUREKA documentation. |
 
 Already cloned? Run `git submodule update --init --recursive`. `bun install` builds the pinned
 Mozaik submodule (`tsup`) so every package resolves `@mozaik-ai/core` from the workspace instead of

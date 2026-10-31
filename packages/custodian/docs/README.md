@@ -17,6 +17,7 @@ The product README is [../README.md](../README.md). The presenter script is
 | [03-airlock](03-airlock.md) | The only place an intent becomes an action. Algorithm, precedence, failure modes. |
 | [04-judge-and-evidence](04-judge-and-evidence.md) | Invariants, scenario suite, ablation arms, pass conditions. |
 | [05-scenarios](05-scenarios.md) | The ten incidents. |
+| [06-infrastructure-and-repo-handoff](06-infrastructure-and-repo-handoff.md) | The Docker adapter mapping, evidence bundle, and baro handoff. |
 | [07-demo-and-rubric](07-demo-and-rubric.md) | Freestyle mapping and the three-minute script. |
 | [09-mozaik-api-notes](09-mozaik-api-notes.md) | Verified v4.1.0 signatures and pitfalls. |
 | [research/c02](research/c02-docker-reversibility.md) | The Docker fact sheet behind the ingress claim. |
@@ -40,6 +41,8 @@ bun run custodian --scenario benign
 bun run custodian:dashboard   # http://localhost:8787
 bun run custodian:ablate      # three arms, writes eval/results.json
 bun run custodian:test        # 81 tests, 75 pass and 6 skip without Docker
+npm install -g baro-ai        # slow-loop CLI; modules/baro is reference source only
+bun run custodian:baro -- --dry-run
 ```
 
 The live run prints five decisions and `INFLIGHT 5`. One capture is accepted, one block is narrowed,

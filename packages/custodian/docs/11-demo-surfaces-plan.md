@@ -10,6 +10,10 @@ for the remaining demo work so a builder needs no further architecture call.
 and are kept as the record. Issue #1 now exists at
 <https://github.com/gorango/jjhts/issues/1>.
 
+**Post-execution correction:** do not build baro from `modules/baro`. Install the published CLI
+with `npm install -g baro-ai`; the submodule is reference source only. The precondition below is
+kept as the plan record, not as current instructions.
+
 **Baseline:** `master` at `5f82c19`. The vertical-slice predicate is met. `bun run custodian` exits 0
 with `INFLIGHT 5`, all ten scenarios pass, and `bun run custodian:ablate` reports `custodian = 0` and
 `naive = 15`. Nothing in this plan may regress that baseline.
@@ -286,9 +290,10 @@ and a reproduction that fails before the patch and passes after it. No fake PR.
 
 ### Preconditions
 
-1. Install the baro binary. From `modules/baro`, run `npm rebuild baro-ai` or
-   `cargo build --release -p baro-tui` and place the binary at `~/.baro/bin/baro`. Then run
-   `baro --doctor`.
+1. Install the baro binary. **Superseded:** install the published CLI with
+   `npm install -g baro-ai`. The original plan said: from `modules/baro`, run `npm rebuild baro-ai`
+   or `cargo build --release -p baro-tui` and place the binary at `~/.baro/bin/baro`. Do not do that;
+   the submodule is reference source. Then run `baro --doctor`.
 2. Choose a backend. `OPENAI_API_KEY` is set, so `--llm openai` is the default. `opencode` and `pi`
    are installed and are the fallback. Never use `--local-only` off against this repository.
 3. Resolve the scratch repo visibility. `gorango/custody-scratch` is **private**, while C13 assumes

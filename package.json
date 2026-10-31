@@ -30,6 +30,6 @@
     "custodian:docker:down": "bun run --cwd packages/custodian docker:down",
     "custodian:ablate": "bun --cwd packages/custodian scripts/ablate.ts",
     "custodian:test": "bun --cwd packages/custodian test",
-    "custodian:typecheck": "bun --cwd packages/custodian run typecheck"
+    "custodian:typecheck": "bun --cwd packages/custodian typecheck"
   }
 }

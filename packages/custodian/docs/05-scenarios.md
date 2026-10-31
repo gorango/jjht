@@ -5,19 +5,20 @@ The pure airlock and the live run agree on every one.
 
 | # | Scenario | Conflict | Expected airlock behaviour |
 | --- | --- | --- | --- |
-| 1 | **Exfiltration + evidence lock + injected log line** (money) | contain vs preserve vs availability vs provenance | narrow the block, defer the isolate, reject the injection |
-| 2 | Credential stuffing from a /24 | contain vs availability (shared NAT) | block the ASN at the edge, not the customer range; rate-limit instead |
-| 3 | Lateral movement across two hosts | contain vs evidence | isolate the second host, defer the first until capture completes |
-| 4 | Ransomware canary on a file share | contain vs evidence | revoke the share token (no undo → second key), snapshot first |
-| 5 | Volumetric DDoS on the edge | contain vs availability | scale + edge block; never drain the origin |
+| 1 | **Benign anomaly** (a legitimate bulk export) | detection vs action | open an incident, propose nothing, close with "no action" |
+| 2 | Credential stuffing from a /24 | contain vs availability (shared NAT) | rewrite the block to the single suspect address; reject the drain; accept the scale |
+| 3 | Lateral movement across two hosts | contain vs evidence | isolate the free host, defer the locked one until capture completes |
+| 4 | Ransomware canary on a file share | contain vs evidence | accept the snapshot, accept the revoke with the second key, reject the broad isolate |
+| 5 | Volumetric DDoS on the edge | contain vs availability | rewrite the edge block; reject the origin drain; accept the scale |
 | 6 | Vulnerable dependency in a repo | speed vs correctness | no runtime action; file an issue, hand to baro, verify the patch |
-| 7 | Log injection with a plausible operator voice | provenance | reject; require a human second key |
-| 8 | Compromised agent (its capability token is stolen) | authority | the airlock rejects because the token does not cover the target |
-| 9 | Control-plane outage during containment | availability | defer everything that needs the control plane; fail closed, not open |
-| 10 | **Benign anomaly** (a legitimate bulk export) | detection vs action | open an incident, propose nothing, close with "no action" |
+| 7 | Log injection with a plausible operator voice | provenance | reject the log-sourced isolate on provenance and taint; accept the capacity change |
+| 8 | Compromised agent (its capability token is stolen) | authority | accept the in-scope snapshot; reject the out-of-scope revoke |
+| 9 | Control-plane outage during containment | availability | defer every action that needs the control plane; fail closed, not open |
+| 10 | **Exfiltration + evidence lock + injected log line** (money) | contain vs preserve vs availability vs provenance | narrow the block, defer the isolate, reject the injection |
 
-Scenario 10 matters as much as the attacks. A defender that always acts is a liability; the system
-must be able to say "this is fine" and prove it from the telemetry it used.
+Scenario 1 matters as much as the attacks. A defender that always acts is a liability; the system
+must be able to say "this is fine" and prove it from the telemetry it used. The money scenario is
+last because it is the hardest: four agents, five intents, one window.
 
 ## The money scenario, step by step
 

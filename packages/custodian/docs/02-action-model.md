@@ -83,20 +83,25 @@ Trusted: kernel/network counters the attacker cannot write, deploy events, the t
 A tainted rationale does not ban the action. It means the action needs a second key — a human or an
 independent participant — which is the same authority model as a nuclear two-man rule.
 
-## The adapter interface (next)
+## The adapter interface
 
-The airlock decides; an adapter executes. Proposed shape:
+The airlock decides; an adapter executes. The shipped boundary is deliberately small:
 
 ```ts
+type AdapterKind = "sim" | "docker";
+
 interface InfraAdapter {
-  observe(): AsyncIterable<TelemetryEvent>;
-  execute(intent: Intent): Promise<{ ok: boolean; undo: Intent | null; observed?: string }>;
-  compensate(intent: Intent): Promise<void>;
-  blastRadius(intent: Intent): number;      // must agree with the registry
-  describe(): string;                        // "sim" | "docker"
+  apply(intent: Intent, path: ExecutedAction["path"]): Promise<ExecutedAction>;
+  lockEvidence(input: LockInput): EvidenceLock;
 }
 ```
 
-`SimAdapter` is the deterministic fixture. `DockerAdapter` implements the same calls against a local
-Compose stack. The registry's `blastRadius` stays the source of truth; the adapter's job is to
-refuse an execution whose observed impact disagrees with it, not to redefine it.
+`apply` is asynchronous because a real adapter takes seconds. Every caller awaits it. A rejection is
+wrapped by `AdapterError` and published as `action.failed`; it never enters `state.executed` (C05).
+`lockEvidence` writes the time-bounded evidence lock that `Preserve` holds.
+
+`SimAdapter` is the deterministic fixture. `DockerAdapter` implements the same calls against the
+local Compose stack: block and unblock at the nginx edge, snapshot into a hashed bundle, pause and
+unpause the app container, and scale the app service. `revoke_token` and `drain_node` fail closed
+with `not_supported` in this slice. The registry's `blastRadius` stays the source of truth; the
+adapter's job is to refuse an execution whose observed impact disagrees with it, not to redefine it.
