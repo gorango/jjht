@@ -158,6 +158,17 @@ passes, `src/checkout.ts` uses `execFileSync("printf", ["%s", userAgent])`, and
 one declared grep test used unsupported quoting and the final critic call hit a connection error.
 The PR is open and unmerged.
 
+### Replay-only deploy
+
+`bun run vercel:build` writes `vercel/`, a static copy of the dashboard with ten recorded runs plus
+the Docker recording. It needs no server, Docker, baro, or key at runtime, and Vercel has nothing to install or build;
+the static folder is the deployment. The scenario buttons load the saved traces, the URL hash
+still selects one, and the popovers are included.
+
+Deploy with `cd vercel && npx vercel --prod`, or point a Vercel project at
+`packages/custody/vercel`. A repository-connected deploy needs the generated `vercel/` folder
+committed. See [`vercel/README.md`](vercel/README.md).
+
 ### Why the PR is not a story
 
 baro's story lanes cannot publish, by design. `publish-guard.ts` rejects `git push` and every `gh`

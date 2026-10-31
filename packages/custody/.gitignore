@@ -3,3 +3,4 @@ evidence/
 runs/
 dist/
 trace.jsonl
+.vercel

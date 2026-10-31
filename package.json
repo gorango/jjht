@@ -24,6 +24,7 @@
     "custody:dashboard": "bun --cwd packages/custody src/server.ts",
     "custody:baro": "bun --cwd packages/custody scripts/baro-handoff.ts",
     "custody:handoff": "bun --cwd packages/custody scripts/handoff.ts",
+    "custody:vercel:build": "bun --cwd packages/custody scripts/build-vercel.ts",
     "custody:verify-evidence": "bun packages/custody/scripts/verify-evidence.ts",
     "custody:docker:up": "bun run --cwd packages/custody docker:up",
     "custody:docker:down": "bun run --cwd packages/custody docker:down",

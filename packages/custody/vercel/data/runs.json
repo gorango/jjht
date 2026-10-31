@@ -1,0 +1,112 @@
+[
+  {
+    "runId": "20261031T172551667Z-money-7586",
+    "scenario": "money",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:25:51.896Z",
+    "finishedAt": "2026-10-31T17:25:53.544Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172553755Z-credential-stuffing-d192",
+    "scenario": "credential-stuffing",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:25:54.014Z",
+    "finishedAt": "2026-10-31T17:25:55.606Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172555794Z-lateral-movement-6b95",
+    "scenario": "lateral-movement",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:25:56.060Z",
+    "finishedAt": "2026-10-31T17:25:57.671Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172557851Z-ransomware-canary-96ee",
+    "scenario": "ransomware-canary",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:25:58.144Z",
+    "finishedAt": "2026-10-31T17:25:59.721Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172559893Z-ddos-edge-8c32",
+    "scenario": "ddos-edge",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:26:00.220Z",
+    "finishedAt": "2026-10-31T17:26:01.815Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172601919Z-dependency-vuln-1e9c",
+    "scenario": "dependency-vuln",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:26:02.224Z",
+    "finishedAt": "2026-10-31T17:26:03.801Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172603961Z-operator-impersonation-2f35",
+    "scenario": "operator-impersonation",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:26:04.261Z",
+    "finishedAt": "2026-10-31T17:26:05.857Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172605997Z-stolen-token-8063",
+    "scenario": "stolen-token",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:26:06.212Z",
+    "finishedAt": "2026-10-31T17:26:07.783Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172607834Z-control-plane-outage-5d2c",
+    "scenario": "control-plane-outage",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:26:08.155Z",
+    "finishedAt": "2026-10-31T17:26:09.756Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "20261031T172609885Z-benign-export-fb08",
+    "scenario": "benign-export",
+    "adapter": "sim",
+    "startedAt": "2026-10-31T17:26:10.332Z",
+    "finishedAt": "2026-10-31T17:26:10.375Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  },
+  {
+    "runId": "docker-2026-10-31",
+    "scenario": "money",
+    "adapter": "docker",
+    "startedAt": "2026-10-31T09:39:01.416Z",
+    "finishedAt": "2026-10-31T09:39:04.288Z",
+    "exitCode": 0,
+    "pass": true,
+    "state": "done"
+  }
+]

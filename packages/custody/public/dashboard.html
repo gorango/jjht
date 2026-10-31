@@ -283,6 +283,8 @@
 </dialog>
 <script>
 const el = (id) => document.getElementById(id);
+const REPLAY_ONLY = Boolean(window.CUSTODY_REPLAY);
+const DATA_ROOT = "data/";
 
 const esc = (value) => String(value ?? "").replace(/[&<>"]/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;",
@@ -594,7 +596,7 @@ const startHandoff = async () => {
 const renderResult = (summary) => {
   const verdict = el("r-verdict");
   currentSummary = summary;
-  el("handoff").hidden = !(summary && summary.scenario === "money" && summary.pass);
+  el("handoff").hidden = REPLAY_ONLY || !(summary && summary.scenario === "money" && summary.pass);
   if (!summary) {
     verdict.textContent = "";
     verdict.className = "verdict";
@@ -677,12 +679,34 @@ const beginReplay = (rows, label, runId) => {
 };
 
 const loadSummary = async (runId) => {
+  const url = REPLAY_ONLY
+    ? `${DATA_ROOT}runs/${encodeURIComponent(runId)}/summary.json`
+    : `/api/runs/${encodeURIComponent(runId)}/summary`;
   try {
-    const response = await fetch(`/api/runs/${encodeURIComponent(runId)}/summary`, { cache: "no-store" });
+    const response = await fetch(url, { cache: "no-store" });
     if (response.ok) renderResult(await response.json());
   } catch {
     renderResult(null);
   }
+};
+
+const playRecordedRun = async (runId) => {
+  const text = await fetch(`${DATA_ROOT}runs/${encodeURIComponent(runId)}/trace.jsonl`, {
+    cache: "no-store",
+  }).then((response) => response.text());
+  const rows = text
+    .split("\n")
+    .filter((line) => line.trim())
+    .map((line) => JSON.parse(line));
+  el("replay").value = runId;
+  beginReplay(rows, runId, runId);
+};
+
+const playRecordedScenario = async (scenarioId) => {
+  const run = state.runs.find((item) => item.scenario === scenarioId) ?? state.runs[0];
+  if (!run) return;
+  setActiveScenario(scenarioId);
+  await playRecordedRun(run.runId);
 };
 
 const resetView = () => {
@@ -738,6 +762,10 @@ const poll = async () => {
 
 const startRun = async (scenario) => {
   if (state.running) return;
+  if (REPLAY_ONLY) {
+    await playRecordedScenario(scenario.id);
+    return;
+  }
   const adapter = el("adapter").value || "sim";
   resetView();
   setBusy(true);
@@ -893,7 +921,7 @@ const renderScenarios = (scenarios) => {
 const renderReplayOptions = (runs) => {
   const select = el("replay");
   const previous = select.value;
-  let html = `<option value="">live / none</option>`;
+  let html = `<option value="">${REPLAY_ONLY ? "pick a recorded run" : "live / none"}</option>`;
   if (state.startup) {
     const name = String(state.startup).split("/").pop();
     html += `<option value="__startup__">startup · ${esc(name)}</option>`;
@@ -907,6 +935,10 @@ const renderReplayOptions = (runs) => {
 };
 
 const refreshRuns = async () => {
+  if (REPLAY_ONLY) {
+    renderReplayOptions(state.runs);
+    return;
+  }
   try {
     const runs = await fetch("/api/runs", { cache: "no-store" }).then((response) => response.json());
     state.runs = runs;
@@ -964,6 +996,12 @@ el("replay").onchange = async (event) => {
     return;
   }
   try {
+    if (REPLAY_ONLY) {
+      const run = state.runs.find((item) => item.runId === value);
+      if (run) setActiveScenario(run.scenario);
+      await playRecordedRun(value);
+      return;
+    }
     if (value === "__startup__") {
       const body = await fetch("/api/replay", { cache: "no-store" }).then((response) => response.json());
       beginReplay(body.rows || [], `startup · ${String(body.tracePath || "").split("/").pop()}`, null);
@@ -1064,6 +1102,29 @@ window.addEventListener("hashchange", () => {
 });
 
 const boot = async () => {
+  if (REPLAY_ONLY) {
+    try {
+      const [scenarios, runs] = await Promise.all([
+        fetch(`${DATA_ROOT}scenarios.json`, { cache: "no-store" }).then((response) => response.json()),
+        fetch(`${DATA_ROOT}runs.json`, { cache: "no-store" }).then((response) => response.json()),
+      ]);
+      state.scenarios = scenarios;
+      state.runs = runs;
+      renderScenarios(scenarios);
+      renderReplayOptions(runs);
+      el("adapter-wrap").hidden = true;
+      el("handoff").hidden = true;
+      const wanted = decodeURIComponent(location.hash.slice(1));
+      const scenario =
+        scenarios.find((item) => item.id === wanted) ??
+        scenarios.find((item) => item.id === "money") ??
+        scenarios[0];
+      if (scenario) await playRecordedScenario(scenario.id);
+    } catch (error) {
+      el("feed").innerHTML = `<div class="empty">${esc(error.message)}</div>`;
+    }
+    return;
+  }
   try {
     const [scenarios, status, runs] = await Promise.all([
       fetch("/api/scenarios", { cache: "no-store" }).then((response) => response.json()),
