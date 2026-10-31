@@ -45,9 +45,14 @@ const liveName = live
 live(liveName, () => {
   const before = resolveCheckout(vulnerable);
   const after = resolveCheckout(patched);
-  if (!before || !after) throw new Error("env supplied but checkout did not resolve");
-  const result = buildPatched(before, after);
-  if (result.status !== "run") throw new Error("expected a measured patched block");
-  expect(result.before.attackSucceeded).toBe(true);
-  expect(result.after.attackSucceeded).toBe(false);
+  try {
+    if (!before || !after) throw new Error("env supplied but checkout did not resolve");
+    const result = buildPatched(before, after);
+    if (result.status !== "run") throw new Error("expected a measured patched block");
+    expect(result.before.attackSucceeded).toBe(true);
+    expect(result.after.attackSucceeded).toBe(false);
+  } finally {
+    before?.cleanup?.();
+    after?.cleanup?.();
+  }
 });
