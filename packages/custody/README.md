@@ -144,6 +144,13 @@ returns 409. Jobs land under `runs/handoffs/<id>/` with `job.json`, `goal.txt`, 
 Pushing needs `gh auth setup-git` once and a filled `OPENCODE_GO_API_KEY`. The server binds
 `127.0.0.1` only, because the button can write to a public repository.
 
+The button was exercised against the public repository on 2026-10-31. It opened
+[PR #2](https://github.com/gorango/jjhts/pull/2) as a checkpoint. At head `3b22f62`, `bun test`
+passes, `src/checkout.ts` uses `execFileSync("printf", ["%s", userAgent])`, and
+`test/checkout.test.ts` and `package.json` are unchanged. baro labelled the PR a checkpoint because
+one declared grep test used unsupported quoting and the final critic call hit a connection error.
+The PR is open and unmerged.
+
 ## The ten scenarios
 
 Expectations are committed in the fixtures. The live CLI and the pure airlock agree on all ten.
