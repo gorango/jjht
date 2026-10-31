@@ -22,12 +22,16 @@ import { fileURLToPath } from "node:url";
 
 import type { Decision } from "./domain/types.js";
 import { isAllowedEffect } from "./eval/harm.js";
+import { buildHandoff } from "./handoff/from-trace.js";
 import { scenarioById, SCENARIOS } from "./scenarios/index.js";
 import type { Scenario } from "./scenarios/types.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const REPO_ROOT = resolve(ROOT, "../..");
 const RUNS = join(ROOT, "runs");
+const HANDOFFS = join(RUNS, "handoffs");
 const PAGE = join(ROOT, "public", "dashboard.html");
+const WRAPPER = process.env.CUSTODY_BARO_WRAPPER ?? join(ROOT, "scripts", "baro-handoff.ts");
 const DEFAULT_PORT = 8787;
 const BODY_LIMIT = 64 * 1024;
 const DOCKER_AVAILABLE = existsSync(join(ROOT, "src", "infra", "docker.ts"));
@@ -79,8 +83,26 @@ interface RunRecord {
   error?: string;
 }
 
+interface HandoffJob {
+  id: string;
+  runId: string;
+  scenario: string;
+  push: boolean;
+  status: "running" | "done" | "failed";
+  exitCode: number | null;
+  startedAt: string;
+  finishedAt: string | null;
+  goalPath: string;
+  issuePath: string;
+  logPath: string;
+  prUrl: string | null;
+  child?: ChildProcess;
+}
+
 const records = new Map<string, RunRecord>();
+const handoffs = new Map<string, HandoffJob>();
 let active: RunRecord | null = null;
+let activeHandoff: HandoffJob | null = null;
 let replayPath: string | null = null;
 
 const messageOf = (error: unknown): string =>
@@ -287,6 +309,189 @@ const listRuns = (): unknown[] => {
   return items;
 };
 
+const publicHandoff = (job: HandoffJob): Record<string, unknown> => {
+  const { child: _child, ...rest } = job;
+  return rest;
+};
+
+const persistHandoff = (job: HandoffJob): void => {
+  writeFileSync(join(HANDOFFS, job.id, "job.json"), `${JSON.stringify(publicHandoff(job), null, 2)}\n`);
+};
+
+const handoffFromDisk = (id: string): HandoffJob | undefined => {
+  if (!/^[A-Za-z0-9._-]+$/.test(id)) return undefined;
+  const file = join(HANDOFFS, id, "job.json");
+  if (!existsSync(file)) return undefined;
+  try {
+    return JSON.parse(readFileSync(file, "utf8")) as HandoffJob;
+  } catch {
+    return undefined;
+  }
+};
+
+const handoffFor = (id: string): HandoffJob | undefined =>
+  handoffs.get(id) ?? handoffFromDisk(id);
+
+const listHandoffs = (): unknown[] => {
+  if (!existsSync(HANDOFFS)) return [];
+  return readdirSync(HANDOFFS, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => handoffFromDisk(entry.name))
+    .filter((job): job is HandoffJob => Boolean(job))
+    .sort((a, b) => b.startedAt.localeCompare(a.startedAt))
+    .map(publicHandoff);
+};
+
+const vulnerableSource = (): string | undefined => {
+  const file = resolve(REPO_ROOT, "modules/custody-scratch/src/checkout.ts");
+  return existsSync(file) ? readFileSync(file, "utf8") : undefined;
+};
+
+const startHandoff = async (
+  request: IncomingMessage,
+  response: ServerResponse,
+): Promise<void> => {
+  if (activeHandoff?.status === "running") {
+    json(response, 409, { error: "a handoff is already running", handoffId: activeHandoff.id });
+    return;
+  }
+
+  let body: any;
+  try {
+    body = JSON.parse(await readBody(request));
+  } catch (error) {
+    json(response, 400, { error: `invalid JSON body: ${messageOf(error)}` });
+    return;
+  }
+
+  const runId = stringValue(body?.runId);
+  const record = recordFor(runId);
+  if (!record) {
+    json(response, 404, { error: `no run "${runId}"` });
+    return;
+  }
+  if (record.running) {
+    json(response, 400, { error: "the run has not finished" });
+    return;
+  }
+  if (record.scenario !== "money") {
+    json(response, 400, { error: "the handoff is defined for the money scenario only" });
+    return;
+  }
+  let runResult: any = null;
+  try {
+    runResult = JSON.parse(readFileSync(record.resultPath, "utf8"));
+  } catch {
+    runResult = null;
+  }
+  if (!runResult || runResult.pass !== true || runResult.exitCode !== 0) {
+    json(response, 400, { error: "the money run did not pass" });
+    return;
+  }
+
+  const scenario = scenarioById(record.scenario);
+  if (!scenario) {
+    json(response, 400, { error: `no fixture for "${record.scenario}"` });
+    return;
+  }
+
+  const stamp = new Date().toISOString().replace(/[^0-9TZ]/g, "");
+  const id = `handoff-${stamp}-${randomUUID().slice(0, 4)}`;
+  const dir = join(HANDOFFS, id);
+  mkdirSync(dir, { recursive: true });
+
+  const push = body?.push !== false;
+  const source = vulnerableSource();
+  const handoff = buildHandoff(readRows(record.tracePath), scenario, record.tracePath, {
+    push,
+    ...(source ? { vulnerableSource: source } : {}),
+  });
+  const goalPath = join(dir, "goal.txt");
+  const issuePath = join(dir, "issue.md");
+  writeFileSync(goalPath, handoff.goal);
+  writeFileSync(issuePath, handoff.issue);
+
+  const job: HandoffJob = {
+    id,
+    runId,
+    scenario: record.scenario,
+    push,
+    status: "running",
+    exitCode: null,
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
+    goalPath,
+    issuePath,
+    logPath: join(dir, "baro.log"),
+    prUrl: null,
+  };
+  persistHandoff(job);
+
+  const args = [WRAPPER, "--goal", goalPath];
+  if (push) args.push("--push");
+  const child = spawn(BUN, args, {
+    cwd: ROOT,
+    env: { ...process.env },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  job.child = child;
+
+  const log = createWriteStream(job.logPath, { flags: "a" });
+  const scan = (chunk: Buffer): void => {
+    const match = /https:\/\/github\.com\/[^\s"'<>]+\/pull\/\d+/.exec(chunk.toString());
+    if (match) job.prUrl = match[0];
+  };
+  child.stdout?.on("data", (chunk: Buffer) => {
+    log.write(chunk);
+    scan(chunk);
+  });
+  child.stderr?.on("data", (chunk: Buffer) => {
+    log.write(chunk);
+    scan(chunk);
+  });
+  child.on("error", (error) => {
+    job.status = "failed";
+    job.finishedAt = new Date().toISOString();
+    job.exitCode = 127;
+    log.write(`\nhandoff: ${messageOf(error)}\n`);
+    log.end();
+    persistHandoff(job);
+    if (activeHandoff === job) activeHandoff = null;
+  });
+  child.on("close", (code, signal) => {
+    log.end();
+    if (job.status === "running") {
+      job.status = code === 0 ? "done" : "failed";
+      job.exitCode = code ?? (signal ? 1 : 0);
+      job.finishedAt = new Date().toISOString();
+    }
+    persistHandoff(job);
+    if (activeHandoff === job) activeHandoff = null;
+  });
+
+  handoffs.set(id, job);
+  activeHandoff = job;
+  json(response, 200, { id, goalPath, issuePath, logPath: job.logPath, push });
+};
+
+const stopHandoff = (id: string, response: ServerResponse): void => {
+  const job = handoffFor(id);
+  if (!job) {
+    json(response, 404, { error: `no handoff "${id}"` });
+    return;
+  }
+  if (job.status !== "running") {
+    json(response, 409, { error: `handoff is ${job.status}` });
+    return;
+  }
+  job.child?.kill("SIGTERM");
+  job.status = "failed";
+  job.finishedAt = new Date().toISOString();
+  persistHandoff(job);
+  if (activeHandoff?.id === job.id) activeHandoff = null;
+  json(response, 200, { id: job.id, status: job.status });
+};
+
 const scenarioList = (): unknown[] => {
   const ordered = [
     ...SCENARIOS.filter((scenario) => scenario.id === "money"),
@@ -433,12 +638,52 @@ const handle = async (request: IncomingMessage, response: ServerResponse) => {
             startedAt: active.startedAt,
           }
         : null,
+      handoff: activeHandoff ? publicHandoff(activeHandoff) : null,
+      handoffs: listHandoffs().length,
     });
   }
 
   if (method === "GET" && path === "/api/replay") {
     if (!replayPath) return json(response, 404, { error: "no replay trace loaded" });
     return json(response, 200, { tracePath: replayPath, rows: readRows(replayPath) });
+  }
+
+  if (path === "/api/handoffs") {
+    if (method === "GET") return json(response, 200, listHandoffs());
+    if (method === "POST") return startHandoff(request, response);
+    return json(response, 405, { error: "GET or POST" });
+  }
+
+  const handoffMatch = /^\/api\/handoffs\/([^/]+)$/.exec(path);
+  if (handoffMatch && method === "GET") {
+    const job = handoffFor(handoffMatch[1] ?? "");
+    if (!job) return json(response, 404, { error: "no such handoff" });
+    return json(response, 200, publicHandoff(job));
+  }
+
+  const handoffLogMatch = /^\/api\/handoffs\/([^/]+)\/log$/.exec(path);
+  if (handoffLogMatch && method === "GET") {
+    const job = handoffFor(handoffLogMatch[1] ?? "");
+    if (!job) return json(response, 404, { error: "no such handoff" });
+    const raw = url.searchParams.get("offset");
+    const offset = raw === null ? 0 : Number(raw);
+    if (!Number.isInteger(offset) || offset < 0) {
+      return json(response, 400, { error: "offset must be a non-negative integer" });
+    }
+    const text = existsSync(job.logPath) ? readFileSync(job.logPath, "utf8") : "";
+    const start = Math.min(offset, text.length);
+    return json(response, 200, {
+      text: text.slice(start),
+      next: text.length,
+      status: job.status,
+      running: job.status === "running",
+      prUrl: job.prUrl,
+    });
+  }
+
+  const handoffStopMatch = /^\/api\/handoffs\/([^/]+)\/stop$/.exec(path);
+  if (handoffStopMatch && method === "POST") {
+    return stopHandoff(handoffStopMatch[1] ?? "", response);
   }
 
   if (path === "/api/runs") {
@@ -561,10 +806,10 @@ const server = createServer((request, response) => {
   });
 });
 
-server.listen(port, () => {
+server.listen(port, "127.0.0.1", () => {
   const address = server.address();
   const actual = typeof address === "object" && address ? address.port : port;
-  console.log(`\n  CUSTODY dashboard  http://localhost:${actual}\n`);
+  console.log(`\n  CUSTODY dashboard  http://127.0.0.1:${actual}\n`);
   if (replayPath) console.log(`  replay  ${replayPath}\n`);
 });
 

@@ -126,6 +126,23 @@
   .verdict.pass { color: var(--ok); }
   .verdict.fail { color: var(--bad); }
   .verdict.action { color: var(--accent); }
+  #handoff { border-color: var(--accent); color: var(--accent); }
+  dialog {
+    background: var(--panel); color: var(--text); border: 1px solid var(--line);
+    border-radius: 10px; width: min(780px, 92vw); padding: 0;
+  }
+  dialog::backdrop { background: rgba(0, 0, 0, .65); }
+  .dialog-body { padding: 18px 20px; display: grid; gap: 10px; }
+  .dialog-body h2 { margin: 0; font-size: 14px; letter-spacing: .08em; }
+  .dialog-body p { margin: 0; color: var(--dim); line-height: 1.5; }
+  .dialog-body code { color: var(--text); }
+  #handoff-log {
+    margin: 0; max-height: 42vh; overflow: auto; background: #0e1218; border: 1px solid var(--line);
+    border-radius: 6px; padding: 8px 10px; font-size: 11px; line-height: 1.45; white-space: pre-wrap;
+  }
+  .dialog-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .dialog-actions button { padding: 6px 12px; }
+  #handoff-confirm { border-color: var(--accent); color: var(--accent); }
 </style>
 </head>
 <body>
@@ -183,8 +200,24 @@
   <span>harmful <b id="r-harmful">–</b></span>
   <span id="r-note"></span>
   <span class="grow"></span>
+  <button id="handoff" type="button" hidden>Hand off to baro</button>
   <span>trace <code id="r-trace">–</code></span>
 </footer>
+
+<dialog id="handoff-dialog">
+  <div class="dialog-body">
+    <h2>Hand off to baro</h2>
+    <p id="handoff-copy"></p>
+    <div id="handoff-status" class="stat"></div>
+    <pre id="handoff-log" hidden></pre>
+    <p id="handoff-pr" hidden></p>
+    <div class="dialog-actions">
+      <button id="handoff-cancel" type="button">Cancel</button>
+      <button id="handoff-confirm" type="button">Push and open PR</button>
+      <button id="handoff-close" type="button" hidden>Close</button>
+    </div>
+  </div>
+</dialog>
 <script>
 const el = (id) => document.getElementById(id);
 
@@ -360,8 +393,79 @@ const renderDecisions = () => {
   });
 };
 
+let currentSummary = null;
+let handoffOffset = 0;
+let handoffTimer = null;
+
+const handoffStatus = (text) => { el("handoff-status").textContent = text; };
+
+const pollHandoff = async (id) => {
+  try {
+    const body = await fetch(`/api/handoffs/${id}/log?offset=${handoffOffset}`, {
+      cache: "no-store",
+    }).then((response) => response.json());
+    handoffOffset = body.next;
+    if (body.text) {
+      const pre = el("handoff-log");
+      pre.hidden = false;
+      pre.textContent += body.text;
+      pre.scrollTop = pre.scrollHeight;
+    }
+    if (body.prUrl) {
+      const link = document.createElement("a");
+      link.href = body.prUrl;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = body.prUrl;
+      el("handoff-pr").replaceChildren("PR ", link);
+      el("handoff-pr").hidden = false;
+    }
+    if (body.running) {
+      handoffStatus("baro is running…");
+      handoffTimer = setTimeout(() => pollHandoff(id), 1000);
+    } else {
+      handoffStatus(`baro ${body.status}`);
+      el("handoff-confirm").hidden = true;
+      el("handoff-cancel").hidden = true;
+      el("handoff-close").hidden = false;
+    }
+  } catch (error) {
+    handoffStatus(`error: ${error.message}`);
+  }
+};
+
+const startHandoff = async () => {
+  const runId = currentSummary?.runId;
+  if (!runId) return;
+  el("handoff-confirm").disabled = true;
+  handoffStatus("starting baro…");
+  try {
+    const response = await fetch("/api/handoffs", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ runId, push: true }),
+    });
+    const body = await response.json();
+    if (!response.ok) {
+      handoffStatus(body.error || `HTTP ${response.status}`);
+      el("handoff-confirm").disabled = false;
+      return;
+    }
+    handoffOffset = 0;
+    el("handoff-log").textContent = "";
+    el("handoff-log").hidden = false;
+    el("handoff-copy").textContent = `Goal ${body.goalPath}. baro will push a branch and open a PR against gorango/jjhts. Merge is not automated.`;
+    pollHandoff(body.id);
+  } catch (error) {
+    handoffStatus(`error: ${error.message}`);
+    el("handoff-confirm").disabled = false;
+  }
+};
+
 const renderResult = (summary) => {
   const verdict = el("r-verdict");
+  currentSummary = summary;
+  el("handoff").hidden = !(summary && summary.scenario === "money" && summary.pass);
   if (!summary) {
     verdict.textContent = "";
     verdict.className = "verdict";
@@ -640,6 +744,24 @@ el("replay").onchange = async (event) => {
     setState(`error · ${error.message}`);
   }
 };
+
+el("handoff").onclick = () => {
+  if (!currentSummary) return;
+  el("handoff-copy").textContent = `Send run ${currentSummary.runId} (${currentSummary.scenario}) to baro. It will push a branch and open a PR against gorango/jjhts. Merge is not automated.`;
+  el("handoff-status").textContent = "";
+  el("handoff-log").textContent = "";
+  el("handoff-log").hidden = true;
+  el("handoff-pr").hidden = true;
+  el("handoff-pr").replaceChildren("");
+  el("handoff-confirm").hidden = false;
+  el("handoff-confirm").disabled = false;
+  el("handoff-cancel").hidden = false;
+  el("handoff-close").hidden = true;
+  el("handoff-dialog").showModal();
+};
+el("handoff-cancel").onclick = () => el("handoff-dialog").close();
+el("handoff-close").onclick = () => el("handoff-dialog").close();
+el("handoff-confirm").onclick = startHandoff;
 
 const boot = async () => {
   try {

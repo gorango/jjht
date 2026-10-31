@@ -134,6 +134,16 @@ returns 409. Replay loads a finished `trace.jsonl` without starting a process.
 
 When `src/infra/docker.ts` is present, an adapter toggle posts `--adapter docker`.
 
+When a money run passes, the result strip shows **Hand off to baro**. The confirmation names the
+target repository and says it will push a branch and open a PR. Confirming starts
+`scripts/baro-handoff.ts --push` against `modules/custody-scratch`. The dialog streams the run log
+and shows the PR URL when it appears. Merge is not automated. One handoff runs at a time; a second
+returns 409. Jobs land under `runs/handoffs/<id>/` with `job.json`, `goal.txt`, `issue.md`, and
+`baro.log`.
+
+Pushing needs `gh auth setup-git` once and a filled `OPENCODE_GO_API_KEY`. The server binds
+`127.0.0.1` only, because the button can write to a public repository.
+
 ## The ten scenarios
 
 Expectations are committed in the fixtures. The live CLI and the pure airlock agree on all ten.

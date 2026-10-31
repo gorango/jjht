@@ -63,10 +63,10 @@ const urlFrom = async (proc: ReturnType<typeof Bun.spawn>, timeoutMs = 10_000): 
     const { value, done } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
-    const match = /http:\/\/localhost:(\d+)/.exec(buffer);
+    const match = /http:\/\/(?:localhost|127\.0\.0\.1):(\d+)/.exec(buffer);
     if (match) {
       reader.releaseLock();
-      return `http://localhost:${match[1]}`;
+      return `http://127.0.0.1:${match[1]}`;
     }
   }
   throw new Error(`server did not print a URL: ${buffer}${stderr}`);
