@@ -18,6 +18,9 @@
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
+  /* Hidden scrollbars everywhere; panels still scroll by wheel, trackpad and keys. */
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { width: 0; height: 0; display: none; }
   body {
     margin: 0; background: var(--bg); color: var(--text);
     font: 13px/1.45 var(--mono); height: 100vh; display: flex; flex-direction: column;
@@ -28,6 +31,9 @@
   }
   h1 { font-size: 15px; margin: 0; letter-spacing: .1em; }
   h1 span { color: var(--accent); }
+  #scenario-name {
+    max-width: 38vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
   .stat { color: var(--dim); white-space: nowrap; }
   .stat b { color: var(--text); font-weight: 600; }
   .grow { flex: 1; }
@@ -35,10 +41,20 @@
     border: 1px solid var(--accent); border-radius: 8px; padding: 4px 12px;
     color: var(--accent); letter-spacing: .08em; white-space: nowrap;
   }
-  .badge b { color: var(--text); font-size: 20px; margin-left: 6px; }
-  main { display: grid; grid-template-columns: 240px minmax(0, 1fr) 390px; flex: 1; min-height: 0; }
+  .badge b { color: var(--text); font-size: 14px; margin-left: 6px; }
+  main {
+    display: grid;
+    grid-template-columns: var(--rail-w, 300px) 6px minmax(0, 1fr) 6px var(--right-w, 640px);
+    flex: 1; min-height: 0;
+  }
+  .rail, .right { min-width: 0; }
+  .resizer { cursor: col-resize; position: relative; touch-action: none; }
+  .resizer::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 1px; background: var(--line);
+  }
+  .resizer:hover::after, .resizer.dragging::after { background: var(--accent); }
   @media (max-width: 1100px) {
-    main { grid-template-columns: 200px minmax(0, 1fr) 320px; }
+    main { grid-template-columns: var(--rail-w, 220px) 6px minmax(0, 1fr) 6px var(--right-w, 360px); }
     .row { grid-template-columns: 52px 92px 124px minmax(0, 1fr); }
   }
   .rail, .right { overflow: auto; }
@@ -61,6 +77,12 @@
     display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; width: 100%;
     text-align: left; margin-bottom: 6px; padding: 7px 9px;
   }
+  .scenario.active {
+    border-color: var(--accent);
+    box-shadow: inset 3px 0 0 var(--accent);
+    background: #151b22;
+  }
+  .scenario.active b { color: var(--accent); }
   .scenario b { font-weight: 600; }
   .scenario span { grid-column: 1 / -1; color: var(--dim); font-size: 11px; }
   .scenario em { color: var(--accent); font-style: normal; font-size: 11px; }
@@ -95,14 +117,21 @@
   .row.executed .s { color: var(--ok); }
   .row.evidence .s { color: var(--accent); }
   .row.incident .s { color: var(--dim); }
+  .row.meta .s { color: var(--dim); }
   .row.error .s { color: var(--bad); }
   .empty { color: var(--dim); padding: 18px 8px; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  th:nth-child(1), td:nth-child(1) { width: 15%; }
+  th:nth-child(2), td:nth-child(2) { width: 17%; }
+  th:nth-child(3), td:nth-child(3) { width: 18%; }
+  th:nth-child(4), td:nth-child(4) { width: 10%; }
+  th:nth-child(5), td:nth-child(5) { width: 14%; }
+  th:nth-child(6), td:nth-child(6) { width: 26%; }
+  th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; overflow: hidden; }
   th { color: var(--dim); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
   tbody tr { cursor: pointer; }
   tbody tr:hover { background: var(--panel); }
-  td.reason { color: var(--dim); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td.reason { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   td.kind { font-weight: 600; white-space: nowrap; }
   td.kind.accept { color: var(--ok); }
   td.kind.rewrite { color: var(--warn); }
@@ -127,6 +156,36 @@
   .verdict.fail { color: var(--bad); }
   .verdict.action { color: var(--accent); }
   #handoff { border-color: var(--accent); color: var(--accent); }
+  .pop {
+    position: fixed; z-index: 50; width: min(560px, 88vw); max-height: 78vh; overflow: auto;
+    background: #10151b; border: 1px solid var(--accent); border-radius: 10px;
+    padding: 14px 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, .55);
+    pointer-events: auto; color: var(--text);
+  }
+  .pop h3 { margin: 0 0 3px; font-size: 13px; letter-spacing: 0; }
+  .pop-meta { color: var(--dim); font-size: 11px; margin-bottom: 9px; }
+  .pop p { margin: 0; color: var(--dim); line-height: 1.5; }
+  .pop-plain { color: var(--text) !important; margin: 10px 0 4px !important; }
+  .pop section { margin-top: 12px; }
+  .pop h4 {
+    margin: 0 0 4px; font-size: 10px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500;
+  }
+  .pop ul { margin: 0; padding-left: 16px; color: var(--text); }
+  .pop li { margin: 2px 0; }
+  .pop code { color: var(--text); }
+  .pop-expected { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+  .pop-expected span {
+    border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+    font-size: 11px; color: var(--dim);
+  }
+  .pop-legend { color: var(--dim); font-size: 10px; margin-top: 6px; }
+  .pop-terms {
+    display: grid; grid-template-columns: max-content minmax(0, 1fr);
+    gap: 5px 10px; margin: 0;
+  }
+  .pop-terms dt { color: var(--accent); }
+  .pop-terms dd { margin: 0; color: var(--dim); }
   dialog {
     background: var(--panel); color: var(--text); border: 1px solid var(--line);
     border-radius: 10px; width: min(780px, 92vw); padding: 0;
@@ -172,6 +231,7 @@
       <button id="replay-all" type="button">Show all</button>
     </div>
   </aside>
+  <div class="resizer" data-side="left" title="Drag to resize the scenario rail"></div>
   <section class="center">
     <div class="chips" id="chips">
       <button class="chip on" type="button" data-filter="all">all</button>
@@ -182,6 +242,7 @@
     <div id="feed"><div class="empty">nothing yet</div></div>
     <div id="inspect" hidden><button class="close" type="button" id="inspect-close">close</button><pre id="inspect-body"></pre></div>
   </section>
+  <div class="resizer" data-side="right" title="Drag to resize the decision panel"></div>
   <aside class="right">
     <h2>Decisions</h2>
     <table>
@@ -203,6 +264,8 @@
   <button id="handoff" type="button" hidden>Hand off to baro</button>
   <span>trace <code id="r-trace">–</code></span>
 </footer>
+
+<div id="scenario-pop" class="pop" role="tooltip" hidden></div>
 
 <dialog id="handoff-dialog">
   <div class="dialog-body">
@@ -227,6 +290,7 @@ const esc = (value) => String(value ?? "").replace(/[&<>"]/g, (c) => ({
 
 const state = {
   scenarios: [],
+  activeScenario: null,
   runs: [],
   startup: null,
   rows: [],
@@ -262,9 +326,67 @@ const relative = (row) => {
 const paramsOf = (params) =>
   Object.entries(params || {}).map(([key, value]) => `${key}=${value}`).join(" ");
 
+const short = (value, limit = 72) => {
+  const text = String(value ?? "").replace(/\s+/g, " ").trim();
+  return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
+};
+
+const describeCall = (call) => {
+  if (!call) return "tool called";
+  let args = call.args;
+  if (typeof args === "string") {
+    try {
+      args = JSON.parse(args);
+    } catch {
+      args = undefined;
+    }
+  }
+  const name = call.name || "tool";
+  if (name === "act" && args?.action) {
+    return `act called · ${args.action} ${args.target?.id ?? ""}`.trim();
+  }
+  if (name === "lock_evidence" && args?.targetId) return `lock_evidence called · ${args.targetId}`;
+  if (name === "report_incident" && args?.telemetryId) return `report_incident called · ${args.telemetryId}`;
+  if (name === "refuse_action") return "refuse_action called";
+  return `${name} called`;
+};
+
 const summaryOf = (row) => {
   const p = row.payload || {};
   switch (row.type) {
+    case "participant.joined":
+      return `${p.name || row.producerId} joined as ${p.role || "participant"}` +
+        (Array.isArray(p.capabilities) && p.capabilities.length
+          ? ` · ${p.capabilities.join(", ")}`
+          : "");
+    case "message_received.started":
+      return `${row.producerId} received its turn`;
+    case "message_received.completed":
+      return `${row.producerId} finished reading the turn`;
+    case "inference.started":
+      return `${row.producerId} is thinking`;
+    case "inference.completed": {
+      const calls = (p.items || []).filter((item) => item.type === "function_call");
+      return calls.length
+        ? `${row.producerId} chose ${calls.map((call) => call.name).join(", ")}`
+        : `${row.producerId} finished thinking`;
+    }
+    case "function_call.started":
+      return describeCall(p.call);
+    case "function_call.completed":
+      return `${p.callId || "tool"} returned`;
+    case "model.answer":
+      return `${row.producerId} finished its turn`;
+    case "interception.started":
+      return `${row.producerId} proposed an action; the airlock holds it`;
+    case "interception.finished":
+      return `the airlock released ${row.producerId}`;
+    case "evidence.anchored":
+      return `evidence anchored · ${short(p.anchor, 16)}`;
+    case "adapter.probe":
+      return `probe from ${p.from} got ${p.status}`;
+    case "adapter.scaled":
+      return `scaled ${p.service} to ${p.running} replicas`;
     case "run.started":
       return `scenario ${p.scenario} · runner ${p.runner} · window ${p.windowMs}ms`;
     case "incident.opened":
@@ -307,8 +429,14 @@ const summaryOf = (row) => {
       return `lock ${p.lock?.targetId} by ${p.lock?.holder} · ${p.lock?.reason}`;
     case "airlock.timeout":
       return `${p.intentId} timed out after ${p.timeoutMs}ms`;
-    default:
-      return JSON.stringify(p).slice(0, 140);
+    default: {
+      const detail = Object.entries(p)
+        .filter(([, value]) => value === null || typeof value !== "object")
+        .slice(0, 3)
+        .map(([key, value]) => `${key}=${value}`)
+        .join(" · ");
+      return detail ? `${row.type} · ${detail}` : row.type;
+    }
   }
 };
 
@@ -320,6 +448,7 @@ const rowClass = (row) => {
   if (row.type.startsWith("action.")) return row.type === "action.failed" ? "error" : "executed";
   if (row.type.startsWith("evidence.")) return "evidence";
   if (row.type.startsWith("incident.")) return "incident";
+  if (/^(participant|message_received|inference|function_call|model)\b/.test(row.type)) return "meta";
   if (/fail|error/.test(row.type)) return "error";
   return "";
 };
@@ -635,11 +764,104 @@ const startRun = async (scenario) => {
     state.running = true;
     state.next = 0;
     el("replay").value = "";
+    setActiveScenario(scenario.id);
     setState("running");
     poll();
   } catch (error) {
     setState(`error · ${error.message}`);
     setBusy(false);
+  }
+};
+
+const ACTION_HELP = {
+  block_egress: "block a network range at the edge",
+  unblock_egress: "remove a network block",
+  snapshot: "capture logs, processes and connections",
+  isolate: "freeze a host",
+  release: "unfreeze a host",
+  scale: "add capacity",
+  drain_node: "take a server out of rotation",
+  revoke_token: "revoke a credential, which cannot be undone",
+};
+
+let scenarioPopTimer = null;
+
+const hideScenarioPop = () => {
+  clearTimeout(scenarioPopTimer);
+  el("scenario-pop").hidden = true;
+};
+
+const scheduleHideScenarioPop = () => {
+  clearTimeout(scenarioPopTimer);
+  scenarioPopTimer = setTimeout(hideScenarioPop, 220);
+};
+
+const showScenarioPop = (button, scenario) => {
+  clearTimeout(scenarioPopTimer);
+  const intents = Array.isArray(scenario.intents) ? scenario.intents : [];
+  const expected = Array.isArray(scenario.expectedDecisions) ? scenario.expectedDecisions : [];
+  const terms = Array.isArray(scenario.terms) ? scenario.terms : [];
+  const runs = intents.length
+    ? `<ul>${intents
+        .map((intent) => {
+          const target = String(intent.target || "").replace(/^[^/]+\//, "");
+          const help = ACTION_HELP[intent.action] || intent.action.replace(/_/g, " ");
+          return `<li><b>${esc(intent.agent)}</b> wants to ${esc(help)} on <code>${esc(target)}</code></li>`;
+        })
+        .join("")}</ul>`
+    : `<p>No agent proposes an action. Watch opens the incident and triage closes it with a reason.</p>`;
+  const decisions = expected.length
+    ? `<div class="pop-expected">${expected
+        .map(
+          (item) =>
+            `<span><code>${esc(item.intentId)}</code> ${esc(String(item.kind).toUpperCase())}</span>`,
+        )
+        .join("")}</div>
+       <div class="pop-legend">ACCEPT run · REWRITE run a safer version · DEFER wait · REJECT do not run</div>`
+    : `<p>No action. The incident closes with a reason written to the trace.</p>`;
+
+  const pop = el("scenario-pop");
+  pop.innerHTML = `
+    <h3>${esc(scenario.title)}</h3>
+    <div class="pop-meta">${esc(scenario.id)} · ${esc(
+      scenario.source ? `pattern: ${scenario.source}` : "written for this demo",
+    )} · ${scenario.noAction ? "no action" : `${scenario.expected} expected`}</div>
+    <p class="pop-plain">${esc(scenario.plain || scenario.story)}</p>
+    <section><h4>Why it exists</h4><p>${esc(scenario.why)}</p></section>
+    <section><h4>What each agent wants</h4>${runs}</section>
+    <section><h4>What it proves</h4><p>${esc(scenario.proves)}</p></section>
+    <section><h4>What the airlock decides</h4>${decisions}</section>
+    ${
+      terms.length
+        ? `<section><h4>Words used here</h4><dl class="pop-terms">${terms
+            .map((term) => `<dt>${esc(term.term)}</dt><dd>${esc(term.meaning)}</dd>`)
+            .join("")}</dl></section>`
+        : ""
+    }`;
+  pop.hidden = false;
+
+  const rect = button.getBoundingClientRect();
+  const width = pop.offsetWidth;
+  const height = pop.offsetHeight;
+  let left = rect.right + 10;
+  if (left + width > window.innerWidth - 12) left = Math.max(12, rect.left - width - 10);
+  let top = rect.top;
+  if (top + height > window.innerHeight - 12) {
+    top = Math.max(12, window.innerHeight - height - 12);
+  }
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
+};
+
+const setActiveScenario = (id, updateHash = true) => {
+  state.activeScenario = id;
+  document.querySelectorAll(".scenario").forEach((button) => {
+    button.classList.toggle("active", button.dataset.id === id);
+  });
+  if (!updateHash) return;
+  const next = id ? `#${encodeURIComponent(id)}` : "";
+  if (location.hash !== next) {
+    history.replaceState(null, "", next || `${location.pathname}${location.search}`);
   }
 };
 
@@ -650,10 +872,20 @@ const renderScenarios = (scenarios) => {
       <em>${scenario.noAction ? "no action" : `${scenario.expected} expected`}</em>
       <span>${esc(scenario.title)}</span>
     </button>`).join("");
+  setActiveScenario(state.activeScenario, false);
   document.querySelectorAll(".scenario").forEach((button) => {
+    const scenario = state.scenarios.find((item) => item.id === button.dataset.id);
+    if (!scenario) return;
+    button.onmouseenter = () => {
+      clearTimeout(scenarioPopTimer);
+      scenarioPopTimer = setTimeout(() => showScenarioPop(button, scenario), 240);
+    };
+    button.onmouseleave = () => scheduleHideScenarioPop();
+    button.onfocus = () => showScenarioPop(button, scenario);
+    button.onblur = () => scheduleHideScenarioPop();
     button.onclick = () => {
-      const scenario = state.scenarios.find((item) => item.id === button.dataset.id);
-      if (scenario) startRun(scenario);
+      hideScenarioPop();
+      startRun(scenario);
     };
   });
 };
@@ -745,6 +977,49 @@ el("replay").onchange = async (event) => {
   }
 };
 
+const mainEl = document.querySelector("main");
+const savedRail = Number(localStorage.getItem("custody-rail-w"));
+const savedRight = Number(localStorage.getItem("custody-right-w"));
+if (Number.isFinite(savedRail) && savedRail >= 180) mainEl.style.setProperty("--rail-w", `${savedRail}px`);
+if (Number.isFinite(savedRight) && savedRight >= 260) mainEl.style.setProperty("--right-w", `${savedRight}px`);
+
+const beginResize = (event) => {
+  const side = event.currentTarget.dataset.side;
+  const rect = mainEl.getBoundingClientRect();
+  const startX = event.clientX;
+  const computed = getComputedStyle(mainEl);
+  const startRail = parseFloat(computed.getPropertyValue("--rail-w")) || (rect.width > 1100 ? 280 : 220);
+  const startRight = parseFloat(computed.getPropertyValue("--right-w")) || (rect.width > 1100 ? 460 : 360);
+  event.preventDefault();
+  document.querySelectorAll(".resizer").forEach((node) => node.classList.add("dragging"));
+  const onMove = (moveEvent) => {
+    if (side === "left") {
+      const next = Math.round(
+        Math.min(Math.max(180, startRail + moveEvent.clientX - startX), Math.max(220, rect.width * 0.45)),
+      );
+      mainEl.style.setProperty("--rail-w", `${next}px`);
+    } else {
+      const next = Math.round(
+        Math.min(Math.max(260, startRight - (moveEvent.clientX - startX)), Math.max(300, rect.width * 0.55)),
+      );
+      mainEl.style.setProperty("--right-w", `${next}px`);
+    }
+  };
+  const onUp = () => {
+    document.removeEventListener("pointermove", onMove);
+    document.querySelectorAll(".resizer").forEach((node) => node.classList.remove("dragging"));
+    const rail = parseFloat(getComputedStyle(mainEl).getPropertyValue("--rail-w"));
+    const right = parseFloat(getComputedStyle(mainEl).getPropertyValue("--right-w"));
+    if (Number.isFinite(rail)) localStorage.setItem("custody-rail-w", String(rail));
+    if (Number.isFinite(right)) localStorage.setItem("custody-right-w", String(right));
+  };
+  document.addEventListener("pointermove", onMove);
+  document.addEventListener("pointerup", onUp, { once: true });
+};
+document.querySelectorAll(".resizer").forEach((node) => {
+  node.addEventListener("pointerdown", beginResize);
+});
+
 el("handoff").onclick = () => {
   if (!currentSummary) return;
   el("handoff-copy").textContent = `Send run ${currentSummary.runId} (${currentSummary.scenario}) to baro. It will push a branch and open a PR against gorango/jjhts. Merge is not automated.`;
@@ -762,6 +1037,31 @@ el("handoff").onclick = () => {
 el("handoff-cancel").onclick = () => el("handoff-dialog").close();
 el("handoff-close").onclick = () => el("handoff-dialog").close();
 el("handoff-confirm").onclick = startHandoff;
+
+document.querySelector(".rail").addEventListener("scroll", hideScenarioPop, { passive: true });
+window.addEventListener("resize", hideScenarioPop);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") hideScenarioPop();
+});
+el("scenario-pop").addEventListener("mouseenter", () => clearTimeout(scenarioPopTimer));
+el("scenario-pop").addEventListener("mouseleave", () => scheduleHideScenarioPop());
+document.addEventListener("pointerdown", (event) => {
+  if (event.target.closest(".scenario") || event.target.closest("#scenario-pop")) return;
+  hideScenarioPop();
+});
+window.addEventListener("hashchange", () => {
+  const wanted = decodeURIComponent(location.hash.slice(1));
+  const scenario = state.scenarios.find((item) => item.id === wanted);
+  if (!scenario) {
+    setActiveScenario(null, false);
+    return;
+  }
+  if (state.running) {
+    setActiveScenario(state.activeScenario);
+    return;
+  }
+  startRun(scenario);
+});
 
 const boot = async () => {
   try {
@@ -781,6 +1081,7 @@ const boot = async () => {
       state.running = true;
       state.next = 0;
       state.scenarioName = status.active.scenario;
+      setActiveScenario(status.active.scenario);
       setBusy(true);
       setState("attached · running");
       poll();
@@ -788,6 +1089,10 @@ const boot = async () => {
       el("replay").value = "__startup__";
       const body = await fetch("/api/replay", { cache: "no-store" }).then((response) => response.json());
       beginReplay(body.rows || [], `startup · ${String(body.tracePath || "").split("/").pop()}`, null);
+    } else {
+      const wanted = decodeURIComponent(location.hash.slice(1));
+      const scenario = scenarios.find((item) => item.id === wanted);
+      if (scenario) startRun(scenario);
     }
   } catch (error) {
     el("feed").innerHTML = `<div class="empty">${esc(error.message)}</div>`;

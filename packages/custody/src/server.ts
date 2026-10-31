@@ -23,6 +23,7 @@ import { fileURLToPath } from "node:url";
 import type { Decision } from "./domain/types.js";
 import { isAllowedEffect } from "./eval/harm.js";
 import { buildHandoff } from "./handoff/from-trace.js";
+import { SCENARIO_DETAILS } from "./scenarios/details.js";
 import { scenarioById, SCENARIOS } from "./scenarios/index.js";
 import type { Scenario } from "./scenarios/types.js";
 
@@ -500,12 +501,31 @@ const scenarioList = (): unknown[] => {
       (scenario) => scenario.id !== "money" && scenario.id !== "benign-export",
     ),
   ];
-  return ordered.map((scenario) => ({
-    id: scenario.id,
-    title: scenario.title,
-    expected: Object.keys(scenario.expected).length,
-    noAction: scenario.intents.length === 0,
-  }));
+  return ordered.map((scenario) => {
+    const detail = SCENARIO_DETAILS[scenario.id];
+    return {
+      id: scenario.id,
+      title: scenario.title,
+      expected: Object.keys(scenario.expected).length,
+      noAction: scenario.intents.length === 0,
+      source: scenario.source ?? null,
+      story: scenario.story,
+      why: detail?.why ?? "",
+      proves: detail?.proves ?? "",
+      plain: detail?.plain ?? "",
+      terms: detail?.terms ?? [],
+      intents: scenario.intents.map((intent) => ({
+        intentId: intent.id,
+        agent: intent.agent,
+        action: intent.action,
+        target: `${intent.target.kind}/${intent.target.id}`,
+      })),
+      expectedDecisions: Object.entries(scenario.expected).map(([intentId, kind]) => ({
+        intentId,
+        kind,
+      })),
+    };
+  });
 };
 
 const json = (response: ServerResponse, status: number, body: unknown): void => {

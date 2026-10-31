@@ -144,6 +144,13 @@ returns 409. Jobs land under `runs/handoffs/<id>/` with `job.json`, `goal.txt`, 
 Pushing needs `gh auth setup-git` once and a filled `OPENCODE_GO_API_KEY`. The server binds
 `127.0.0.1` only, because the button can write to a public repository.
 
+The layout is resizable. Drag the dividers to widen the scenario rail or the decision panel; the
+widths persist. Scrollbars are hidden. The feed narrates each step in plain words; click a row for
+the raw payload. Hover or focus a scenario for a popover with why it exists, what it runs, what it
+proves, and the expected decisions. The URL hash tracks the active scenario and the active item
+keeps an accent border; opening `#money` loads and runs it. [DEMO.md](DEMO.md) is the presenter
+script for a live run.
+
 The button was exercised against the public repository on 2026-10-31. It opened
 [PR #2](https://github.com/gorango/jjhts/pull/2) as a checkpoint. At head `3b22f62`, `bun test`
 passes, `src/checkout.ts` uses `execFileSync("printf", ["%s", userAgent])`, and
@@ -369,7 +376,8 @@ tests/          invariants, airlock, registry, taint, scenarios, live CLI, ablat
 
 ## Docs
 
-Start with [`docs/00-thesis.md`](docs/00-thesis.md), then
+For a live walkthrough, read [`DEMO.md`](DEMO.md). Start with
+[`docs/00-thesis.md`](docs/00-thesis.md), then
 [`docs/01-architecture.md`](docs/01-architecture.md), then the
 [judging map](docs/judging.md), which ties every claim to a file and a command. The
 decision-complete plan is the

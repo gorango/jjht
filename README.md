@@ -28,6 +28,8 @@ bun run custody                   # CUSTODY: live run, five intents, one decisio
 bun run custody:dashboard         # CUSTODY dashboard at http://localhost:8787
 ```
 
+The CUSTODY presenter script is [packages/custody/DEMO.md](packages/custody/DEMO.md).
+
 Already cloned? Run `git submodule update --init --recursive` first. `bun install` builds the
 pinned Mozaik submodule (`tsup`) so every package resolves `@mozaik-ai/core` from the workspace
 instead of npm.

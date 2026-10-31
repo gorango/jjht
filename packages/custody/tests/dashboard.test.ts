@@ -15,6 +15,14 @@ interface ScenarioItem {
   title: string;
   expected: number;
   noAction: boolean;
+  source: string | null;
+  story: string;
+  why: string;
+  proves: string;
+  plain: string;
+  terms: Array<{ term: string; meaning: string }>;
+  intents: Array<{ intentId: string; agent: string; action: string; target: string }>;
+  expectedDecisions: Array<{ intentId: string; kind: string }>;
 }
 
 interface DecisionItem {
@@ -141,7 +149,9 @@ describe("the dashboard server", () => {
     const page = await fetch(`${base}/`);
     expect(page.status).toBe(200);
     expect(page.headers.get("content-type")).toContain("text/html");
-    expect(await page.text()).toContain("CUSTODY");
+    const html = await page.text();
+    expect(html).toContain("CUSTODY");
+    expect(html).toContain('id="scenario-pop"');
 
     const scenarios = await getJson<ScenarioItem[]>("/api/scenarios");
     expect(scenarios).toHaveLength(10);
@@ -150,6 +160,14 @@ describe("the dashboard server", () => {
     expect(scenarios[0]?.expected).toBe(5);
     expect(scenarios[1]?.expected).toBe(0);
     expect(scenarios[1]?.noAction).toBe(true);
+    expect(scenarios[0]?.why).toContain("hardest case");
+    expect(scenarios[0]?.proves).toContain("narrowed");
+    expect(scenarios[0]?.plain).toContain("203.0.113.9/32");
+    expect(scenarios[0]?.terms.some((term) => term.term === "CIDR")).toBe(true);
+    expect(scenarios[0]?.intents).toHaveLength(5);
+    expect(scenarios[0]?.expectedDecisions).toHaveLength(5);
+    expect(scenarios[1]?.intents).toHaveLength(0);
+    expect(scenarios[1]?.plain).toContain("nightly backup");
 
     const status = await getJson<{ docker: boolean; replay: string | null; active: unknown }>(
       "/api/status",
