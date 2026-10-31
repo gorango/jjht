@@ -12,7 +12,7 @@ Built for the **EINSTEIN: Science-to-Business Matchmaker** track of the NTP Novi
 (30–31 October 2026).
 
 **Track note.** This is the completed Track 2 submission. It is kept as prior work. The entry in
-this workspace is CUSTODY, Track 3, in [`packages/custody/`](../custody/).
+this workspace is CUSTODIAN, Track 3, in [`packages/custodian/`](../custodian/).
 
 ## 60 seconds
 

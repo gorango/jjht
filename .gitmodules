@@ -4,6 +4,6 @@
 [submodule "modules/baro"]
 	path = modules/baro
 	url = https://github.com/jigjoy-ai/baro
-[submodule "modules/custody-scratch"]
-	path = modules/custody-scratch
+[submodule "modules/custodian-scratch"]
+	path = modules/custodian-scratch
 	url = https://github.com/gorango/jjhts

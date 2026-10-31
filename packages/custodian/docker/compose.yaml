@@ -1,0 +1,27 @@
+name: custodian-docker
+
+services:
+  edge:
+    image: nginx:1.27-alpine
+    ports:
+      - "127.0.0.1:${CUSTODIAN_EDGE_PORT:-8080}:80"
+    volumes:
+      - ./edge/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./edge/include:/etc/nginx/include:ro
+    depends_on:
+      - app
+    networks:
+      - custodian
+  app:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./app/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - custodian
+
+networks:
+  custodian:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${CUSTODIAN_DOCKER_SUBNET:-203.0.113.0/24}

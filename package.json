@@ -20,16 +20,16 @@
     "eureka:typecheck": "bun run --filter eureka typecheck",
     "eureka:build": "bun run --filter eureka build",
     "eureka:test": "bun run --filter eureka test",
-    "custody": "bun --cwd packages/custody src/index.ts demo",
-    "custody:dashboard": "bun --cwd packages/custody src/server.ts",
-    "custody:baro": "bun --cwd packages/custody scripts/baro-handoff.ts",
-    "custody:handoff": "bun --cwd packages/custody scripts/handoff.ts",
-    "custody:vercel:build": "bun --cwd packages/custody scripts/build-vercel.ts",
-    "custody:verify-evidence": "bun packages/custody/scripts/verify-evidence.ts",
-    "custody:docker:up": "bun run --cwd packages/custody docker:up",
-    "custody:docker:down": "bun run --cwd packages/custody docker:down",
-    "custody:ablate": "bun --cwd packages/custody scripts/ablate.ts",
-    "custody:test": "bun --cwd packages/custody test",
-    "custody:typecheck": "bun --cwd packages/custody run typecheck"
+    "custodian": "bun --cwd packages/custodian src/index.ts demo",
+    "custodian:dashboard": "bun --cwd packages/custodian src/server.ts",
+    "custodian:baro": "bun --cwd packages/custodian scripts/baro-handoff.ts",
+    "custodian:handoff": "bun --cwd packages/custodian scripts/handoff.ts",
+    "custodian:vercel:build": "bun --cwd packages/custodian scripts/build-vercel.ts",
+    "custodian:verify-evidence": "bun packages/custodian/scripts/verify-evidence.ts",
+    "custodian:docker:up": "bun run --cwd packages/custodian docker:up",
+    "custodian:docker:down": "bun run --cwd packages/custodian docker:down",
+    "custodian:ablate": "bun --cwd packages/custodian scripts/ablate.ts",
+    "custodian:test": "bun --cwd packages/custodian test",
+    "custodian:typecheck": "bun --cwd packages/custodian run typecheck"
   }
 }
