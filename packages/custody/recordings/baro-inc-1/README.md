@@ -17,6 +17,7 @@ The repository was `gorango/custody-scratch` during the run. It is now public as
 | `run-id.txt` | The baro run id. |
 | `watch.log` | `baro watch run-1589768` output for the finished run, the milestone view. |
 | `run.log` | The full baro run log, 617 lines. It carries every model call, token count, tool call and retry. |
+| `run.stderr.txt` | The run's stderr, including the `llm=openai` routing line and the worktree setup warnings. |
 | `timeline.md` | The 478 s computed from `run.log`, with the phase table and the retry sequence. |
 | `diff.patch` | `git diff main 7c3d7ba`, the fix baro produced. |
 | `commit.txt` | `git log` and `git show` for `7c3d7ba` from the local clone, plus the branch that contains it. This is the binding between the SHA and the diff. The commit was never pushed. |

@@ -56,6 +56,27 @@ to a command the guard rejects. The `local-verify` split did its job and produce
 This is the contradiction recorded in the recording README. It is a property of the demo-safe
 invocation C13 chose, not a defect in the fix.
 
+## Provider
+
+The calls went to OpenAI directly, through the official `openai` JavaScript SDK v6.38.0 that
+`modules/mozaik` depends on. The routing evidence is the run's stderr:
+
+```text
+[orchestrate] llm=openai: Story, Critic, Surgeon all running through Mozaik's native OpenAI runner (gpt-5.x).
+[story-factory] S1 → openai:gpt-5.5 (model="heavy")
+```
+
+`OPENAI_API_KEY` is set. `OPENAI_BASE_URL` is not set, and Mozaik's client config passes no
+`baseURL`, so the SDK default `https://api.openai.com/v1` applies. `MOZAIK_API_KEY` is not set, so
+the Mozaik cloud gateway is not in the path.
+
+The models are `gpt-5.5` for story, surgeon, architect and planner, and `gpt-5.4-mini` for the
+critic. That is 43 calls on `gpt-5.5` and 31 on `gpt-5.4-mini`.
+
+The log rows say `"backend":"openai"`, `"provider":null` and `"providerRequestId":null`. baro did
+not record the provider response id. The `pending_gateway_meter` string in the cost field is baro's
+accounting placeholder, not evidence of a proxy.
+
 ## What the log does not have
 
 - Wall time per model call. Every `model_usage` row says `"durationMs":{"reason":"not_reported"}`.
