@@ -29,6 +29,8 @@ export const startOpencodeGoProxy = (options: ProxyOptions): ProxyHandle => {
   const server = Bun.serve({
     hostname: "127.0.0.1",
     port: 0,
+    // Planner and architect calls can run past Bun's 10 second default.
+    idleTimeout: 255,
     async fetch(request) {
       const incoming = new URL(request.url);
       const target = `${upstream}${incoming.pathname}${incoming.search}`;
