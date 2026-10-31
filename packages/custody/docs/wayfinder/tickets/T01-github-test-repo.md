@@ -62,4 +62,4 @@ issues against a real third-party project as part of the demo.
   `uid=1000(g)...`), commit `0cdbc5a` on `main`.
 - **Push rights verified:** the fixture commit was pushed to the scratch repo.
 - **Fallback:** if auth expires, `outbox/` plus the exact `gh issue create` command; no silent fake.
-- **Safety:** the private `origin` (`gorango/eureka`) was not touched; no production target.
+- **Safety:** the private `origin` (`gorango/jjht`) was not touched; no production target.

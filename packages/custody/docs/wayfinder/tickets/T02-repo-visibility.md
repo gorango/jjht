@@ -48,7 +48,7 @@ risk register already flags this. Do not commit secrets while renaming.
 
 **Ruled out of scope 2026-10-30.** Repo visibility/rename and site submission are **submission
 logistics**, not decisions that block the plan or the slice. The naming decision is CUSTODY (C16).
-The origin repo (`gorango/eureka`) stays private until a separate submission pass that includes a
+The origin repo (`gorango/jjht`) stays private until a separate submission pass that includes a
 secret scan, a clean-clone test, and a deliberate decision about the EUREKA history. That pass is
 past this map's destination (plan + slice), so the ticket is closed without doing the work.
 
