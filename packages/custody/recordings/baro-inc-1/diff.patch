@@ -1,0 +1,19 @@
+diff --git a/src/checkout.ts b/src/checkout.ts
+index 6b0c91d..fbe14d7 100644
+--- a/src/checkout.ts
++++ b/src/checkout.ts
+@@ -1,10 +1,10 @@
+-import { execSync } from "node:child_process";
++import { execFileSync } from "node:child_process";
+ 
+ /**
+  * Deliberately vulnerable fixture for the CUSTODY handoff demo.
+  *
+- * Request-controlled text reaches a shell. The fix is an argument array, not a
+- * WAF rule. Do not copy this pattern.
++ * Request-controlled text reaches a child process. The fix is an argument
++ * array, not a WAF rule. Do not copy the old shell-string pattern.
+  */
+ export const healthProbe = (userAgent: string): string =>
+-  execSync(`printf '%s' "${userAgent}"`, { encoding: "utf8" });
++  execFileSync("printf", ["%s", userAgent], { encoding: "utf8" });

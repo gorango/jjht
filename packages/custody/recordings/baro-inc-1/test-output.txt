@@ -1,0 +1,33 @@
+$ cd /tmp/custody-vuln-rec   # main: before the patch
+$ bun test test/checkout.test.ts
+bun test v1.4.3 (c6da4a4d3)
+
+test/checkout.test.ts:
+2 | 
+3 | import { healthProbe } from "../src/checkout";
+4 | 
+5 | test("does not execute a shell metacharacter from User-Agent", () => {
+6 |   const output = healthProbe("$(id)");
+7 |   expect(output).not.toContain("uid=");
+                         ^
+error: expect(received).not.toContain(expected)
+
+Expected to not contain: "uid="
+Received: "uid=1000(g) gid=1001(g) groups=1001(g),3(sys),960(docker),981(rfkill),994(input),998(wheel),1000(autologin),1002(plugdev)"
+
+      at <anonymous> (/tmp/custody-vuln-rec/test/checkout.test.ts:7:22)
+(fail) does not execute a shell metacharacter from User-Agent [8.67ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [14.00ms]
+
+$ cd /tmp/custody-patched-rec   # 7c3d7ba: baro commit
+$ bun test test/checkout.test.ts
+bun test v1.4.3 (c6da4a4d3)
+
+ 1 pass
+ 0 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [7.00ms]

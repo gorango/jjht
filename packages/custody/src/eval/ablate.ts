@@ -39,6 +39,23 @@ export interface Totals {
   checksOnlyDiffersFromNaive: number;
 }
 
+export type PatchedResult =
+  | { status: "not run"; reason?: string }
+  | {
+      status: "run";
+      scenario: "dependency-vuln";
+      before: { attackSucceeded: boolean };
+      after: { attackSucceeded: boolean };
+      command: string;
+      vulnerableRef: string;
+      patchedRef: string;
+    };
+
+export const PATCHED_NOT_RUN: PatchedResult = {
+  status: "not run",
+  reason: "no patched build was supplied",
+};
+
 export interface AblationResult {
   generatedAt: string;
   runner: "mock";
@@ -56,7 +73,7 @@ export interface AblationResult {
     custodyMatchesExpected: boolean;
   };
   pass: boolean;
-  patched: string;
+  patched: PatchedResult;
 }
 
 const NOW = 2_000;
@@ -195,7 +212,7 @@ const runArm = (arm: Arm, scenario: Scenario): ArmResult => {
 
 export const ablate = (
   scenarios: readonly Scenario[],
-  options: { patched?: boolean; now?: Date } = {},
+  options: { patched?: PatchedResult; now?: Date } = {},
 ): AblationResult => {
   const results: ScenarioResult[] = scenarios.map((scenario) => ({
     id: scenario.id,
@@ -244,9 +261,14 @@ export const ablate = (
     totals: aggregate,
     passCondition,
     pass: Object.values(passCondition).every(Boolean),
-    patched: options.patched ? "requested" : "not run: no patched build was supplied",
+    patched: options.patched ?? PATCHED_NOT_RUN,
   };
 };
+
+export const formatPatched = (patched: PatchedResult): string =>
+  patched.status === "run"
+    ? `run (${patched.vulnerableRef} -> ${patched.patchedRef}; before attackSucceeded ${patched.before.attackSucceeded}, after ${patched.after.attackSucceeded})`
+    : `not run: ${patched.reason ?? "no reason recorded"}`;
 
 const pct = (value: number): string => `${(value * 100).toFixed(1)}%`;
 
@@ -280,7 +302,7 @@ export const formatAblation = (result: AblationResult): string => {
     `totals: naive harmful ${naive?.harmful ?? 0} in ${naive?.scenariosWithNaiveHarm ?? 0}/${naive?.scenarios ?? 0} scenarios, ` +
       `obeyed ${naive?.obeyed ?? 0}; custody harmful ${custody?.harmful ?? 0}, obeyed ${custody?.obeyed ?? 0}`,
   );
-  lines.push(`runner: ${result.runner}  costUsd: ${result.costUsd}  patched: ${result.patched}`);
+  lines.push(`runner: ${result.runner}  costUsd: ${result.costUsd}  patched: ${formatPatched(result.patched)}`);
   lines.push(`pass condition: ${result.pass ? "PASS" : "FAIL"}`);
   for (const [name, ok] of Object.entries(result.passCondition)) {
     lines.push(`  ${ok ? "ok  " : "FAIL"} ${name}`);

@@ -1,0 +1,13 @@
+{
+  "status": "run",
+  "scenario": "dependency-vuln",
+  "before": {
+    "attackSucceeded": true
+  },
+  "after": {
+    "attackSucceeded": false
+  },
+  "command": "bun test test/checkout.test.ts",
+  "vulnerableRef": "main",
+  "patchedRef": "7c3d7ba"
+}
