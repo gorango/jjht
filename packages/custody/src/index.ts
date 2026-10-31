@@ -11,6 +11,7 @@ import { resolve } from "node:path";
 import type { ScenarioReport } from "./agents/scheduler.js";
 import { isAllowedEffect } from "./eval/harm.js";
 import type { Decision } from "./domain/types.js";
+import type { AdapterKind } from "./infra/adapter.js";
 import { run } from "./run.js";
 
 const DEFAULT_WINDOW_MS = 1_500;
@@ -23,11 +24,16 @@ const help = (): void => {
 
   bun src/index.ts                  run the money scenario through the real runtime
   bun src/index.ts --scenario <id>  run a named scenario
+  bun src/index.ts --adapter <sim|docker>
+                                    sim is the deterministic twin; docker needs the Compose stack
+  bun src/index.ts --trace <path>   write the JSONL trace to a path
   bun src/index.ts --verbose        print every invariant finding and veto
   bun src/index.ts help             this text
 
-  CUSTODY_WINDOW_MS  decision window in milliseconds (default ${DEFAULT_WINDOW_MS})
-  CUSTODY_TRACE      trace path (default ./trace.jsonl)
+  CUSTODY_WINDOW_MS    decision window in milliseconds (default ${DEFAULT_WINDOW_MS})
+  CUSTODY_TRACE        trace path (default ./trace.jsonl)
+  CUSTODY_EVIDENCE_DIR evidence root for the Docker adapter (default ./evidence)
+  CUSTODY_DOCKER_PROJECT  compose project name (default custody-docker)
 
   exit 0 requires the expected decisions, INFLIGHT >= 2 with distinct loop ids,
   and the trace file. The offline runner is labelled mock with costUsd 0.
@@ -45,9 +51,23 @@ const windowMs = (): number | undefined => {
   return parsed;
 };
 
-const tracePath = (): string => {
-  const raw = process.env.CUSTODY_TRACE;
+const tracePath = (flag: string | undefined): string => {
+  const raw = flag ?? process.env.CUSTODY_TRACE;
   return resolve(raw && raw.trim().length > 0 ? raw : "trace.jsonl");
+};
+
+const printAdapter = (report: ScenarioReport): void => {
+  console.log(`adapter: ${report.adapter}`);
+  if (report.failed.length > 0) {
+    const detail = report.failed
+      .map((failed) => `${failed.intentId} (${failed.reason})`)
+      .join("; ");
+    console.log(`failed actions: ${report.failed.length} - ${detail}`);
+  }
+  for (const anchor of report.evidence) {
+    console.log(`recording: ${anchor.bundle}`);
+    console.log(`anchor: ${anchor.anchor}`);
+  }
 };
 
 const printTable = (decisions: readonly Decision[]): void => {
@@ -114,6 +134,7 @@ const printMoney = (report: ScenarioReport, verbose: boolean): number => {
   );
   console.log(`expected outcomes: ${report.expectedMatches}/${report.expectedTotal} match`);
   console.log(`effects executed: ${report.executed.length}`);
+  printAdapter(report);
   console.log(`trace: ${report.tracePath}`);
 
   if (verbose) printVerbose(report);
@@ -141,6 +162,26 @@ const printMoney = (report: ScenarioReport, verbose: boolean): number => {
   }
   if (report.traceEvents < 20) reasons.push(`trace has ${report.traceEvents} events`);
   if (!report.closed) reasons.push("the incident did not close");
+  if (report.adapter === "docker") {
+    // A failed scale may fail closed by contract; every other allowed effect
+    // is required, and a run with no anchored bundle did not capture evidence.
+    const required = report.scenario.allowedEffects.filter((effect) => effect.action !== "scale");
+    const missing = required.filter(
+      (constraint) =>
+        !report.executed.some((effect) =>
+          isAllowedEffect(
+            { action: effect.action, target: effect.target, params: effect.params },
+            [constraint],
+          ),
+        ),
+    );
+    if (missing.length > 0) {
+      reasons.push(
+        `docker adapter did not execute ${missing.map((effect) => `${effect.action}:${effect.targetId}`).join(", ")}`,
+      );
+    }
+    if (report.evidence.length === 0) reasons.push("docker adapter produced no evidence bundle");
+  }
 
   if (reasons.length > 0) {
     for (const reason of reasons) console.error(`custody: FAIL: ${reason}`);
@@ -158,6 +199,7 @@ const printNoAction = (report: ScenarioReport, verbose: boolean): number => {
   console.log(`NO ACTION: ${reason}`);
   console.log(`effects executed: ${report.executed.length}`);
   console.log(`runner: ${report.runner}  costUsd: ${report.costUsd}`);
+  printAdapter(report);
   console.log(`trace: ${report.tracePath}`);
 
   if (verbose) printVerbose(report);
@@ -177,6 +219,8 @@ const printNoAction = (report: ScenarioReport, verbose: boolean): number => {
 const argv = process.argv.slice(2);
 let command = "demo";
 let scenarioId = "money";
+let adapter: AdapterKind = "sim";
+let traceFlag: string | undefined;
 let verbose = false;
 let bad = false;
 
@@ -186,6 +230,42 @@ for (let index = 0; index < argv.length; index += 1) {
 
   if (arg === "--verbose") {
     verbose = true;
+    continue;
+  }
+  if (arg === "--adapter") {
+    const value = argv[index + 1];
+    if (value !== "sim" && value !== "docker") {
+      console.error("custody: --adapter needs sim or docker");
+      bad = true;
+      break;
+    }
+    adapter = value;
+    index += 1;
+    continue;
+  }
+  if (arg.startsWith("--adapter=")) {
+    const value = arg.slice("--adapter=".length);
+    if (value !== "sim" && value !== "docker") {
+      console.error("custody: --adapter needs sim or docker");
+      bad = true;
+      break;
+    }
+    adapter = value;
+    continue;
+  }
+  if (arg === "--trace") {
+    const value = argv[index + 1];
+    if (!value) {
+      console.error("custody: --trace needs a path");
+      bad = true;
+      break;
+    }
+    traceFlag = value;
+    index += 1;
+    continue;
+  }
+  if (arg.startsWith("--trace=")) {
+    traceFlag = arg.slice("--trace=".length);
     continue;
   }
   if (arg === "--scenario") {
@@ -226,7 +306,14 @@ if (bad) {
   if (ms === undefined) {
     process.exitCode = 2;
   } else {
-    run({ scenarioId, windowMs: ms, tracePath: tracePath(), verbose })
+    run({
+      scenarioId,
+      windowMs: ms,
+      tracePath: tracePath(traceFlag),
+      verbose,
+      adapter,
+      evidenceRoot: resolve(process.env.CUSTODY_EVIDENCE_DIR ?? "evidence"),
+    })
       .then((report) => {
         const noAction = report.expectedTotal === 0;
         process.exitCode = noAction ? printNoAction(report, verbose) : printMoney(report, verbose);

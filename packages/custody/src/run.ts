@@ -1,4 +1,5 @@
 import { runScenario, type ScenarioReport } from "./agents/scheduler.js";
+import type { AdapterKind } from "./infra/adapter.js";
 import { realClock, type Clock } from "./runtime/clock.js";
 import { scenarioById, scenarioIds } from "./scenarios/index.js";
 
@@ -8,6 +9,8 @@ export interface RunOptions {
   tracePath: string;
   verbose: boolean;
   clock?: Clock;
+  adapter?: AdapterKind;
+  evidenceRoot?: string;
 }
 
 /** The demo command names the no-action beat "benign"; the catalogue uses its fuller id. */
@@ -29,5 +32,7 @@ export const run = async (options: RunOptions): Promise<ScenarioReport> => {
     tracePath: options.tracePath,
     verbose: options.verbose,
     clock: options.clock ?? realClock,
+    adapter: options.adapter ?? "sim",
+    evidenceRoot: options.evidenceRoot ?? process.env.CUSTODY_EVIDENCE_DIR ?? "evidence",
   });
 };
