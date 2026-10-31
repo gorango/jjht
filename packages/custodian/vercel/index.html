@@ -44,22 +44,47 @@
   .badge b { color: var(--text); font-size: 14px; margin-left: 6px; }
   main {
     display: grid;
-    grid-template-columns: var(--rail-w, 300px) 6px minmax(0, 1fr) 6px var(--right-w, 640px);
+    grid-template-columns:
+      var(--rail-w, 280px) 6px
+      minmax(500px, var(--detail-w, 500px)) 6px
+      minmax(0, 1fr);
     flex: 1; min-height: 0;
   }
-  .rail, .right { min-width: 0; }
+  .rail, .right { min-width: 0; min-height: 0; overflow: auto; }
+  .detail-panel { min-width: 500px; min-height: 0; overflow: auto; }
   .resizer { cursor: col-resize; position: relative; touch-action: none; }
   .resizer::after {
     content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 1px; background: var(--line);
   }
   .resizer:hover::after, .resizer.dragging::after { background: var(--accent); }
+  .resizer.horizontal { height: 6px; cursor: row-resize; }
+  .resizer.horizontal::after {
+    top: 2px; bottom: auto; left: 0; right: 0; width: auto; height: 1px;
+  }
+  @media (max-width: 1350px) {
+    main {
+      grid-template-columns:
+        var(--rail-w, 200px) 6px
+        minmax(500px, var(--detail-w, 500px)) 6px
+        minmax(0, 1fr);
+    }
+  }
   @media (max-width: 1100px) {
-    main { grid-template-columns: var(--rail-w, 220px) 6px minmax(0, 1fr) 6px var(--right-w, 360px); }
+    main {
+      grid-template-columns:
+        var(--rail-w, 180px) 6px
+        minmax(500px, var(--detail-w, 500px)) 6px
+        minmax(0, 1fr);
+    }
     .row { grid-template-columns: 52px 92px 124px minmax(0, 1fr); }
   }
-  .rail, .right { overflow: auto; }
   .rail { border-right: 1px solid var(--line); padding: 14px; }
-  .right { border-left: 1px solid var(--line); padding: 14px; }
+  .detail-panel { border-right: 1px solid var(--line); padding: 14px 16px; }
+  .right { border-top: 1px solid var(--line); padding: 14px; }
+  .console {
+    display: grid; grid-template-rows: var(--split, 70%) 6px minmax(0, 1fr);
+    min-width: 0; min-height: 0;
+  }
   .center { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
   h2 {
     font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
@@ -156,36 +181,28 @@
   .verdict.fail { color: var(--bad); }
   .verdict.action { color: var(--accent); }
   #handoff { border-color: var(--accent); color: var(--accent); }
-  .pop {
-    position: fixed; z-index: 50; width: min(560px, 88vw); max-height: 78vh; overflow: auto;
-    background: #10151b; border: 1px solid var(--accent); border-radius: 10px;
-    padding: 14px 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, .55);
-    pointer-events: auto; color: var(--text);
-  }
-  .pop h3 { margin: 0 0 3px; font-size: 13px; letter-spacing: 0; }
-  .pop-meta { color: var(--dim); font-size: 11px; margin-bottom: 9px; }
-  .pop p { margin: 0; color: var(--dim); line-height: 1.5; }
-  .pop-plain { color: var(--text) !important; margin: 10px 0 4px !important; }
-  .pop section { margin-top: 12px; }
-  .pop h4 {
+  .detail-panel h3 { margin: 0 0 3px; font-size: 13px; letter-spacing: 0; }
+  .detail-meta { color: var(--dim); font-size: 11px; margin-bottom: 9px; }
+  .detail-panel p { margin: 0; color: var(--dim); line-height: 1.5; }
+  .detail-panel .detail-plain { color: var(--text); margin: 10px 0 4px; }
+  .detail-panel section { margin-top: 14px; }
+  .detail-panel h4 {
     margin: 0 0 4px; font-size: 10px; letter-spacing: .13em; text-transform: uppercase;
     color: var(--accent); font-weight: 500;
   }
-  .pop ul { margin: 0; padding-left: 16px; color: var(--text); }
-  .pop li { margin: 2px 0; }
-  .pop code { color: var(--text); }
-  .pop-expected { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
-  .pop-expected span {
+  .detail-panel ul { margin: 0; padding-left: 16px; color: var(--text); }
+  .detail-panel li { margin: 2px 0; }
+  .detail-panel code { color: var(--text); }
+  .detail-expected { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+  .detail-expected span {
     border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
     font-size: 11px; color: var(--dim);
   }
-  .pop-legend { color: var(--dim); font-size: 10px; margin-top: 6px; }
-  .pop-terms {
-    display: grid; grid-template-columns: max-content minmax(0, 1fr);
-    gap: 5px 10px; margin: 0;
+  .detail-legend { color: var(--dim); font-size: 10px; margin-top: 6px; }
+  .detail-panel h5 {
+    margin: 8px 0 2px; font-size: 11px; font-weight: 600;
+    color: var(--accent); letter-spacing: .02em;
   }
-  .pop-terms dt { color: var(--accent); }
-  .pop-terms dd { margin: 0; color: var(--dim); }
   dialog {
     background: var(--panel); color: var(--text); border: 1px solid var(--line);
     border-radius: 10px; width: min(780px, 92vw); padding: 0;
@@ -232,27 +249,34 @@
     </div>
   </aside>
   <div class="resizer" data-side="left" title="Drag to resize the scenario rail"></div>
-  <section class="center">
-    <div class="chips" id="chips">
-      <button class="chip on" type="button" data-filter="all">all</button>
-      <button class="chip" type="button" data-filter="intents">intents</button>
-      <button class="chip" type="button" data-filter="decisions">decisions</button>
-      <button class="chip" type="button" data-filter="evidence">evidence</button>
-    </div>
-    <div id="feed"><div class="empty">nothing yet</div></div>
-    <div id="inspect" hidden><button class="close" type="button" id="inspect-close">close</button><pre id="inspect-body"></pre></div>
-  </section>
-  <div class="resizer" data-side="right" title="Drag to resize the decision panel"></div>
-  <aside class="right">
-    <h2>Decisions</h2>
-    <table>
-      <thead>
-        <tr><th>intent</th><th>agent</th><th>action</th><th>target</th><th>decision</th><th>reason</th></tr>
-      </thead>
-      <tbody id="decisions"><tr><td colspan="6" class="empty">no decisions yet</td></tr></tbody>
-    </table>
-    <div id="detail"><span class="empty">select a decision for votes</span></div>
+  <aside class="detail-panel" aria-label="Scenario details">
+    <h2>Scenario</h2>
+    <div id="scenario-detail"><span class="empty">hover or select a scenario</span></div>
   </aside>
+  <div class="resizer" data-side="detail" title="Drag to resize the scenario details"></div>
+  <section class="console">
+    <section class="center">
+      <div class="chips" id="chips">
+        <button class="chip on" type="button" data-filter="all">all</button>
+        <button class="chip" type="button" data-filter="intents">intents</button>
+        <button class="chip" type="button" data-filter="decisions">decisions</button>
+        <button class="chip" type="button" data-filter="evidence">evidence</button>
+      </div>
+      <div id="feed"><div class="empty">nothing yet</div></div>
+      <div id="inspect" hidden><button class="close" type="button" id="inspect-close">close</button><pre id="inspect-body"></pre></div>
+    </section>
+    <div class="resizer horizontal" data-side="split" title="Drag to resize the decision panel"></div>
+    <aside class="right">
+      <h2>Decisions</h2>
+      <table>
+        <thead>
+          <tr><th>intent</th><th>agent</th><th>action</th><th>target</th><th>decision</th><th>reason</th></tr>
+        </thead>
+        <tbody id="decisions"><tr><td colspan="6" class="empty">no decisions yet</td></tr></tbody>
+      </table>
+      <div id="detail"><span class="empty">select a decision for votes</span></div>
+    </aside>
+  </section>
 </main>
 <footer>
   <span class="verdict" id="r-verdict"></span>
@@ -264,8 +288,6 @@
   <button id="handoff" type="button" hidden>Hand off to baro</button>
   <span>trace <code id="r-trace">–</code></span>
 </footer>
-
-<div id="scenario-pop" class="pop" role="tooltip" hidden></div>
 
 <dialog id="handoff-dialog">
   <div class="dialog-body">
@@ -813,20 +835,13 @@ const ACTION_HELP = {
   revoke_token: "revoke a credential, which cannot be undone",
 };
 
-let scenarioPopTimer = null;
-
-const hideScenarioPop = () => {
-  clearTimeout(scenarioPopTimer);
-  el("scenario-pop").hidden = true;
-};
-
-const scheduleHideScenarioPop = () => {
-  clearTimeout(scenarioPopTimer);
-  scenarioPopTimer = setTimeout(hideScenarioPop, 220);
-};
-
-const showScenarioPop = (button, scenario) => {
-  clearTimeout(scenarioPopTimer);
+const renderScenarioDetail = (scenario) => {
+  const panel = el("scenario-detail");
+  if (!scenario) {
+    panel.innerHTML = `<span class="empty">hover or select a scenario</span>`;
+    panel.parentElement.scrollTop = 0;
+    return;
+  }
   const intents = Array.isArray(scenario.intents) ? scenario.intents : [];
   const expected = Array.isArray(scenario.expectedDecisions) ? scenario.expectedDecisions : [];
   const terms = Array.isArray(scenario.terms) ? scenario.terms : [];
@@ -840,46 +855,38 @@ const showScenarioPop = (button, scenario) => {
         .join("")}</ul>`
     : `<p>No agent proposes an action. Watch opens the incident and triage closes it with a reason.</p>`;
   const decisions = expected.length
-    ? `<div class="pop-expected">${expected
+    ? `<div class="detail-expected">${expected
         .map(
           (item) =>
             `<span><code>${esc(item.intentId)}</code> ${esc(String(item.kind).toUpperCase())}</span>`,
         )
         .join("")}</div>
-       <div class="pop-legend">ACCEPT run · REWRITE run a safer version · DEFER wait · REJECT do not run</div>`
+       <div class="detail-legend">ACCEPT run · REWRITE run a safer version · DEFER wait · REJECT do not run</div>`
     : `<p>No action. The incident closes with a reason written to the trace.</p>`;
 
-  const pop = el("scenario-pop");
-  pop.innerHTML = `
+  panel.innerHTML = `
     <h3>${esc(scenario.title)}</h3>
-    <div class="pop-meta">${esc(scenario.id)} · ${esc(
+    <div class="detail-meta">${esc(scenario.id)} · ${esc(
       scenario.source ? `pattern: ${scenario.source}` : "written for this demo",
     )} · ${scenario.noAction ? "no action" : `${scenario.expected} expected`}</div>
-    <p class="pop-plain">${esc(scenario.plain || scenario.story)}</p>
+    <p class="detail-plain">${esc(scenario.plain || scenario.story)}</p>
     <section><h4>Why it exists</h4><p>${esc(scenario.why)}</p></section>
     <section><h4>What each agent wants</h4>${runs}</section>
     <section><h4>What it proves</h4><p>${esc(scenario.proves)}</p></section>
     <section><h4>What the airlock decides</h4>${decisions}</section>
     ${
       terms.length
-        ? `<section><h4>Words used here</h4><dl class="pop-terms">${terms
-            .map((term) => `<dt>${esc(term.term)}</dt><dd>${esc(term.meaning)}</dd>`)
-            .join("")}</dl></section>`
+        ? `<section><h4>Words used here</h4>${terms
+            .map((term) => `<h5>${esc(term.term)}</h5><p>${esc(term.meaning)}</p>`)
+            .join("")}</section>`
         : ""
     }`;
-  pop.hidden = false;
+  panel.parentElement.scrollTop = 0;
+};
 
-  const rect = button.getBoundingClientRect();
-  const width = pop.offsetWidth;
-  const height = pop.offsetHeight;
-  let left = rect.right + 10;
-  if (left + width > window.innerWidth - 12) left = Math.max(12, rect.left - width - 10);
-  let top = rect.top;
-  if (top + height > window.innerHeight - 12) {
-    top = Math.max(12, window.innerHeight - height - 12);
-  }
-  pop.style.left = `${left}px`;
-  pop.style.top = `${top}px`;
+const renderActiveScenarioDetail = () => {
+  const scenario = state.scenarios.find((item) => item.id === state.activeScenario);
+  renderScenarioDetail(scenario);
 };
 
 const setActiveScenario = (id, updateHash = true) => {
@@ -887,6 +894,7 @@ const setActiveScenario = (id, updateHash = true) => {
   document.querySelectorAll(".scenario").forEach((button) => {
     button.classList.toggle("active", button.dataset.id === id);
   });
+  renderActiveScenarioDetail();
   if (!updateHash) return;
   const next = id ? `#${encodeURIComponent(id)}` : "";
   if (location.hash !== next) {
@@ -905,15 +913,12 @@ const renderScenarios = (scenarios) => {
   document.querySelectorAll(".scenario").forEach((button) => {
     const scenario = state.scenarios.find((item) => item.id === button.dataset.id);
     if (!scenario) return;
-    button.onmouseenter = () => {
-      clearTimeout(scenarioPopTimer);
-      scenarioPopTimer = setTimeout(() => showScenarioPop(button, scenario), 240);
-    };
-    button.onmouseleave = () => scheduleHideScenarioPop();
-    button.onfocus = () => showScenarioPop(button, scenario);
-    button.onblur = () => scheduleHideScenarioPop();
+    button.onmouseenter = () => renderScenarioDetail(scenario);
+    button.onmouseleave = renderActiveScenarioDetail;
+    button.onfocus = () => renderScenarioDetail(scenario);
+    button.onblur = renderActiveScenarioDetail;
     button.onclick = () => {
-      hideScenarioPop();
+      renderScenarioDetail(scenario);
       startRun(scenario);
     };
   });
@@ -1017,18 +1022,28 @@ el("replay").onchange = async (event) => {
 };
 
 const mainEl = document.querySelector("main");
+const consoleEl = document.querySelector(".console");
 const savedRail = Number(localStorage.getItem("custodian-rail-w"));
-const savedRight = Number(localStorage.getItem("custodian-right-w"));
+const savedDetail = Number(localStorage.getItem("custodian-detail-w"));
+const savedSplit = Number(localStorage.getItem("custodian-split"));
 if (Number.isFinite(savedRail) && savedRail >= 180) mainEl.style.setProperty("--rail-w", `${savedRail}px`);
-if (Number.isFinite(savedRight) && savedRight >= 260) mainEl.style.setProperty("--right-w", `${savedRight}px`);
+if (Number.isFinite(savedDetail) && savedDetail >= 500) mainEl.style.setProperty("--detail-w", `${savedDetail}px`);
+if (Number.isFinite(savedSplit) && savedSplit >= 20 && savedSplit <= 85) {
+  consoleEl.style.setProperty("--split", `${savedSplit}%`);
+}
 
 const beginResize = (event) => {
   const side = event.currentTarget.dataset.side;
-  const rect = mainEl.getBoundingClientRect();
+  const isSplit = side === "split";
+  const target = isSplit ? consoleEl : mainEl;
+  const rect = target.getBoundingClientRect();
   const startX = event.clientX;
-  const computed = getComputedStyle(mainEl);
-  const startRail = parseFloat(computed.getPropertyValue("--rail-w")) || (rect.width > 1100 ? 280 : 220);
-  const startRight = parseFloat(computed.getPropertyValue("--right-w")) || (rect.width > 1100 ? 460 : 360);
+  const startY = event.clientY;
+  const computed = getComputedStyle(target);
+  const defaults = rect.width > 1350 ? { rail: 240 } : rect.width > 1100 ? { rail: 200 } : { rail: 180 };
+  const startRail = parseFloat(computed.getPropertyValue("--rail-w")) || defaults.rail;
+  const startDetail = parseFloat(computed.getPropertyValue("--detail-w")) || 500;
+  const startSplit = parseFloat(computed.getPropertyValue("--split")) || 75;
   event.preventDefault();
   document.querySelectorAll(".resizer").forEach((node) => node.classList.add("dragging"));
   const onMove = (moveEvent) => {
@@ -1037,20 +1052,26 @@ const beginResize = (event) => {
         Math.min(Math.max(180, startRail + moveEvent.clientX - startX), Math.max(220, rect.width * 0.45)),
       );
       mainEl.style.setProperty("--rail-w", `${next}px`);
-    } else {
+    } else if (side === "detail") {
       const next = Math.round(
-        Math.min(Math.max(260, startRight - (moveEvent.clientX - startX)), Math.max(300, rect.width * 0.55)),
+        Math.min(Math.max(500, startDetail + moveEvent.clientX - startX), Math.max(520, rect.width * 0.5)),
       );
-      mainEl.style.setProperty("--right-w", `${next}px`);
+      mainEl.style.setProperty("--detail-w", `${next}px`);
+    } else {
+      const delta = ((moveEvent.clientY - startY) / rect.height) * 100;
+      const next = Math.round(Math.min(Math.max(30, startSplit + delta), 80) * 10) / 10;
+      consoleEl.style.setProperty("--split", `${next}%`);
     }
   };
   const onUp = () => {
     document.removeEventListener("pointermove", onMove);
     document.querySelectorAll(".resizer").forEach((node) => node.classList.remove("dragging"));
     const rail = parseFloat(getComputedStyle(mainEl).getPropertyValue("--rail-w"));
-    const right = parseFloat(getComputedStyle(mainEl).getPropertyValue("--right-w"));
+    const detail = parseFloat(getComputedStyle(mainEl).getPropertyValue("--detail-w"));
+    const split = parseFloat(getComputedStyle(consoleEl).getPropertyValue("--split"));
     if (Number.isFinite(rail)) localStorage.setItem("custodian-rail-w", String(rail));
-    if (Number.isFinite(right)) localStorage.setItem("custodian-right-w", String(right));
+    if (Number.isFinite(detail)) localStorage.setItem("custodian-detail-w", String(detail));
+    if (Number.isFinite(split)) localStorage.setItem("custodian-split", String(split));
   };
   document.addEventListener("pointermove", onMove);
   document.addEventListener("pointerup", onUp, { once: true });
@@ -1077,17 +1098,6 @@ el("handoff-cancel").onclick = () => el("handoff-dialog").close();
 el("handoff-close").onclick = () => el("handoff-dialog").close();
 el("handoff-confirm").onclick = startHandoff;
 
-document.querySelector(".rail").addEventListener("scroll", hideScenarioPop, { passive: true });
-window.addEventListener("resize", hideScenarioPop);
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") hideScenarioPop();
-});
-el("scenario-pop").addEventListener("mouseenter", () => clearTimeout(scenarioPopTimer));
-el("scenario-pop").addEventListener("mouseleave", () => scheduleHideScenarioPop());
-document.addEventListener("pointerdown", (event) => {
-  if (event.target.closest(".scenario") || event.target.closest("#scenario-pop")) return;
-  hideScenarioPop();
-});
 window.addEventListener("hashchange", () => {
   const wanted = decodeURIComponent(location.hash.slice(1));
   const scenario = state.scenarios.find((item) => item.id === wanted);
