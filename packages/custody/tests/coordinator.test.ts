@@ -96,7 +96,12 @@ const boot = (clock: FakeClock, executed: string[], retries = 2) => {
     reason: "capture in flight",
     until: 90_000,
   });
-  initializeRuntime({ state, inferenceRunnerConfig: { runner } });
+  // The Mozaik runtime is a process singleton; another test file may own it.
+  try {
+    initializeRuntime({ state, inferenceRunnerConfig: { runner } });
+  } catch (error) {
+    if (!(error instanceof Error) || error.message !== "Runtime already initialized") throw error;
+  }
   join(new Human({ id: "airlock", name: "Airlock", role: "human", capabilities: [] }, []));
 
   const context = (): InvariantContext => ({
