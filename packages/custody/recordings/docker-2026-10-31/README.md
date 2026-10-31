@@ -127,17 +127,18 @@ They do not prove identity, reproducibility, or the absence of tampering before 
 `logs.txt` and `connections.txt` change between captures; `meta.json`,
 `inspect.redacted.json`, and `processes.txt` were stable over the short capture window.
 
-`isolate` and `release` are implemented as `docker pause` and `docker unpause`, but the money
-scenario deferred the isolate intent, so this recording did not exercise them. `drain_node` and
-`revoke_token` fail closed with `not_supported`; the contract test asserts that failed actions are
-not counted as executed.
+`isolate` and `release` are implemented as `docker pause` and `docker unpause`. The money scenario
+deferred the isolate intent, so this recording did not exercise them; the contract test does.
+`drain_node` and `revoke_token` fail closed with `not_supported`; the contract test asserts that
+failed actions are not counted as executed.
 
 ## Contract evidence
 
 `contract-test.txt` is the run of `tests/docker-contract.test.ts` with `CUSTODY_DOCKER=1`. It runs
-the same action sequence against `SimAdapter` and `DockerAdapter`: lock, block, snapshot, scale, and
-unblock. The Docker side asserted `403` during the block, `200` after the unblock, two running app
-replicas after scaling to two, and byte-for-byte restoration of the edge include. It also ran
-`bun scripts/verify-evidence.ts` against the bundle and asserted `OK`. The test project is
-`custody-contract`, on `203.0.114.0/24` and `127.0.0.1:18080`, so it does not collide with the demo
-stack. It removed its containers, volumes, and network after the run.
+the same action sequence against `SimAdapter` and `DockerAdapter`: lock, block, snapshot, isolate,
+release, scale, and unblock. The Docker side asserted `403` during the block, a paused and then
+unpaused app container, `200` after the unblock, two running app replicas after scaling to two, and
+byte-for-byte restoration of the edge include. It also ran `bun scripts/verify-evidence.ts` against
+the bundle and asserted `OK`. The test project is `custody-contract`, on `203.0.114.0/24` and
+`127.0.0.1:18080`, so it does not collide with the demo stack. It removed its containers, volumes,
+and network after the run.

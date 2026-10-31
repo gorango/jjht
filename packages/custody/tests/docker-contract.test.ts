@@ -329,10 +329,13 @@ const scale = intent("i-scale", "availability-1", "scale", { kind: "service", id
 const unblock = intent("i-unblock", "contain-1", "unblock_egress", { kind: "edge", id: "edge" }, {
   cidr: `${probeIp}/32`,
 });
+const isolate = intent("i-isolate", "contain-1", "isolate", { kind: "host", id: "host-7" });
+const release = intent("i-release", "contain-1", "release", { kind: "host", id: "host-7" });
 
 const applySequence = async (
   adapter: InfraAdapter,
   afterBlock?: () => void,
+  afterIsolate?: () => void,
 ): Promise<void> => {
   await adapter.lockEvidence({
     targetId: "host-7",
@@ -343,6 +346,9 @@ const applySequence = async (
   await adapter.apply(block, "loop");
   afterBlock?.();
   await adapter.apply(snapshot, "loop");
+  await adapter.apply(isolate, "loop");
+  afterIsolate?.();
+  await adapter.apply(release, "loop");
   await adapter.apply(scale, "loop");
   await adapter.apply(unblock, "loop");
 };
@@ -393,21 +399,40 @@ describe.skipIf(!dockerEnabled)(
       const sim = new SimAdapter(simState, realClock);
       const dockerAdapter = docker(dockerState);
 
+      const pausedApp = (): string => {
+        const id = compose(["ps", "-q", "app"]).stdout.toString().split("\n")[0]?.trim() ?? "";
+        return Bun.spawnSync({
+          cmd: ["docker", "inspect", "-f", "{{.State.Paused}}", id],
+          cwd: root,
+          stdout: "pipe",
+          stderr: "pipe",
+        }).stdout.toString().trim();
+      };
+
       await applySequence(sim);
-      await applySequence(dockerAdapter, () => {
-        const blocked = probe(probeIp);
-        expect(blocked.stdout.toString().trim(), blocked.stderr.toString()).toBe("403");
-      });
+      await applySequence(
+        dockerAdapter,
+        () => {
+          const blocked = probe(probeIp);
+          expect(blocked.stdout.toString().trim(), blocked.stderr.toString()).toBe("403");
+        },
+        () => {
+          expect(pausedApp()).toBe("true");
+        },
+      );
 
       expect(simState.executed.map((effect) => effect.action)).toEqual([
         "block_egress",
         "snapshot",
+        "isolate",
+        "release",
         "scale",
         "unblock_egress",
       ]);
       expect(dockerState.executed.map((effect) => effect.action)).toEqual(
         simState.executed.map((effect) => effect.action),
       );
+      expect(pausedApp()).toBe("false");
 
       const afterUnblock = probe(probeIp);
       expect(afterUnblock.stdout.toString().trim(), afterUnblock.stderr.toString()).toBe("200");
