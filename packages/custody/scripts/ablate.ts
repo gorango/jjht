@@ -1,15 +1,25 @@
 #!/usr/bin/env bun
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ablate, formatAblation } from "../src/eval/ablate.js";
+import { ablate, formatAblation, type PatchedResult } from "../src/eval/ablate.js";
 import { SCENARIOS } from "../src/scenarios/index.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = resolve(root, "eval/results.json");
+const patchedFile = resolve(root, "eval/patched.json");
 
-const result = ablate(SCENARIOS, { patched: Boolean(process.env.CUSTODY_PATCHED_REF) });
+const readPatched = (): PatchedResult | undefined => {
+  if (!existsSync(patchedFile)) return undefined;
+  const parsed = JSON.parse(readFileSync(patchedFile, "utf8")) as PatchedResult;
+  if (parsed.status !== "run" && parsed.status !== "not run") {
+    throw new Error(`${patchedFile} has no valid status`);
+  }
+  return parsed;
+};
+
+const result = ablate(SCENARIOS, { patched: readPatched() });
 
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(result, null, 2)}\n`);

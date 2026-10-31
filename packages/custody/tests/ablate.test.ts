@@ -30,7 +30,7 @@ describe("the ablation", () => {
   });
 
   test("the patched arm is labelled, not faked", () => {
-    expect(result.patched).toContain("not run");
+    expect(result.patched.status).toBe("not run");
   });
 
   test("the pass condition holds and prints evidence", () => {
