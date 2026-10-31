@@ -219,6 +219,34 @@ memory, packets, disk, or rootfs.
 [`modules/custody-scratch`](../../modules/custody-scratch) submodule, and issue #1 is real:
 <https://github.com/gorango/jjhts/issues/1>.
 
+### Run the handoff now
+
+The runner is OpenCode Go with the DeepSeek family. Pro writes code, Flash judges.
+
+```bash
+cp .env.example .env        # fill OPENCODE_GO_API_KEY
+bun run baro:check          # print the resolved command
+bun run baro                # run against modules/custody-scratch
+```
+
+| Phase | Model | Why |
+| --- | --- | --- |
+| Story, Architect, Surgeon | `deepseek-v4-pro` | Writes and repairs code |
+| Planner, Critic, Dialogue | `deepseek-v4.1-flash` | Cheap structured judgment |
+
+The OpenCode Go gateway requires an `x-opencode-session` header on every request. baro's native
+OpenAI runner cannot add one, so `scripts/baro-handoff.ts` starts
+`scripts/opencode-go-proxy.ts` on loopback, points `OPENAI_BASE_URL` at it, and stops it when the
+run ends. `--opencode-cli` uses baro's OpenCode harness instead, which sends the header itself and
+needs no key in `.env`.
+
+Defaults are local-only and the pinned submodule. `--push` allows baro-owned pushes and PRs.
+`--detach` needs `--opencode-cli`, because the proxy has to outlive the wrapper.
+
+The recorded run in `recordings/baro-inc-1/` used OpenAI `gpt-5.5` and `gpt-5.4-mini`, before this
+route existed. That artifact is unchanged. Rerun the handoff with `bun run baro` to exercise the
+OpenCode Go route.
+
 baro ran against a local clone with the OpenAI backend, run `run-1589768`.
 `recordings/baro-inc-1/` holds the run id, the watch log, the diff, the commit log, and both test
 outputs. baro produced commit `7c3d7ba`, which replaces the shell string with

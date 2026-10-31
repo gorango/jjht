@@ -8,6 +8,10 @@ The repository was `gorango/custody-scratch` during the run. It is now public as
 [`gorango/jjhts`](https://github.com/gorango/jjhts) and pinned in this repository at
 `modules/custody-scratch`. The old URL redirects.
 
+This run used OpenAI `gpt-5.5` and `gpt-5.4-mini`. The current runner is
+`scripts/baro-handoff.ts`, which routes baro through OpenCode Go with `deepseek-v4-pro` and
+`deepseek-v4.1-flash`. The recorded artifacts are unchanged; rerun with `bun run baro`.
+
 ## Artifacts
 
 | File | What it is |

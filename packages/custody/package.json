@@ -13,6 +13,8 @@
     "start": "bun src/index.ts demo",
     "ablate": "bun scripts/ablate.ts",
     "dashboard": "bun src/server.ts",
+    "baro": "bun scripts/baro-handoff.ts",
+    "baro:check": "bun scripts/baro-handoff.ts --dry-run",
     "verify-evidence": "bun scripts/verify-evidence.ts",
     "docker:up": "docker compose -f docker/compose.yaml up -d",
     "docker:down": "docker compose -f docker/compose.yaml down -v",
