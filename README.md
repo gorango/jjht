@@ -6,7 +6,7 @@ Workspace for the NTP Novi Sad Hackathon ("Build agents that work together", 30�
 
 | Path | What it is |
 | --- | --- |
-| `packages/eureka/` | EUREKA — an evidence-first, concurrent researcher–company matchmaker built on Mozaik (Track 02). |
+| `packages/eureka/` | EUREKA — an evidence-first, concurrent researcher–company matchmaker built on Mozaik (Track 02). Its commit history predates this event; it is not part of the Freestyle entry. |
 | `packages/custody/` | CUSTODY — an incident-response runtime where no agent can act alone. Live Mozaik loops, an airlock, a dashboard, a Docker adapter with one recorded run, an ablation, and a baro handoff. |
 | `modules/mozaik/` | [`jigjoy-ai/mozaik`](https://github.com/jigjoy-ai/mozaik) submodule — the agent runtime, pinned at `v4.1.0` and linked into the workspace. |
 | `modules/baro/` | [`jigjoy-ai/baro`](https://github.com/jigjoy-ai/baro) submodule — the software-factory reference, kept alongside the workspace. |

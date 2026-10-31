@@ -91,6 +91,9 @@ What is real:
   `run.started` carries `runner: "mock"` and `costUsd: 0`. Every inference span names the literal
   model `mock`, because no provider was called.
 
+The narrowing shares in that table are computed from the CIDR prefix in `src/domain/registry.ts`
+and printed by the run; they are not read from `results.json`.
+
 The conflict is visible in the table. Contain's `/24` block is **rewritten** to the suspect `/32`
 before it runs. Contain's isolate is **deferred** because Preserve holds the host and it carries 40%
 of payment traffic. Edge-bot holds `block_egress` and its injected `/8` is still **rejected**,

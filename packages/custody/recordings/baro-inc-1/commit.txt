@@ -1,0 +1,24 @@
+# commit 7c3d7ba, from the private clone /tmp/custody-scratch
+
+## git log main..7c3d7ba
+7c3d7baff49735066e60a174927cd11d443bfc13 baro: merge story GREM-e5ca22c107ee-local-verify
+20f771bedf8b3132244293c593483afeb20d8c06 Verify checkout shell injection fix
+
+## git show --stat 7c3d7ba
+commit 7c3d7baff49735066e60a174927cd11d443bfc13
+Merge: 0cdbc5a 20f771b
+Author:     Goran <gospaso@gmail.com>
+AuthorDate: Sat Oct 31 10:36:23 2026 +0100
+Commit:     Goran <gospaso@gmail.com>
+CommitDate: Sat Oct 31 10:36:23 2026 +0100
+
+    baro: merge story GREM-e5ca22c107ee-local-verify
+
+ src/checkout.ts | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+## branch
+
+## branch containing the commit
+baro-recovery/run-progressive-762dfab8e6e41f5d/S1/3
+baro/ispraviti-shell-injection-u-src-checkout-ts-tako-31a708e3-39144

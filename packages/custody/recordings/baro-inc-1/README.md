@@ -12,7 +12,8 @@ CUSTODY did not write, merge, or push the fix.
 | `goal.txt` | The goal handed to baro, exactly as C13 specifies. |
 | `run-id.txt` | The baro run id. |
 | `watch.log` | `baro watch run-1589768` output for the finished run. |
-| `diff.patch` | `main` to the baro commit `7c3d7ba`, the fix baro produced. |
+| `diff.patch` | `git diff main 7c3d7ba`, the fix baro produced. |
+| `commit.txt` | `git log` and `git show` for `7c3d7ba` from the private clone, plus the branch that contains it. This is the binding between the SHA and the diff; the clone itself is not public. |
 | `test-output.txt` | The reproduction failing on `main` and passing on `7c3d7ba`. |
 
 ## Issue command
