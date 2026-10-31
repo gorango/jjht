@@ -38,8 +38,11 @@ const vulnerable = process.env.CUSTODY_VULNERABLE;
 const patched = process.env.CUSTODY_PATCHED;
 
 const live = vulnerable && patched ? test : test.skip;
+const liveName = live
+  ? "fails the reproduction before the patch and passes after it"
+  : "skipped: set CUSTODY_VULNERABLE and CUSTODY_PATCHED to run the real checkouts";
 
-live("fails the reproduction before the patch and passes after it", () => {
+live(liveName, () => {
   const before = resolveCheckout(vulnerable);
   const after = resolveCheckout(patched);
   if (!before || !after) throw new Error("env supplied but checkout did not resolve");
