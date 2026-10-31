@@ -5,9 +5,9 @@
 > `examples/README.md` and `docs/judging.md`, and run `bun run check:examples`.
 
 Snapshot taken at **10:30 CET on Friday 30 October**, in the middle of the build window.
-Repository: `jigjoy` / EUREKA, HEAD `27fa75a`, working tree plus the new `docs/rules/` set.
-Submission deadline: **Saturday 31 October, 14:00 CET**. This document is the working plan; the
-official material it refers to lives in [`docs/rules/`](../../../docs/rules/README.md).
+Repository: `jigjoy` / EUREKA, HEAD `27fa75a`, working tree plus the event notes kept outside the
+repository. Submission deadline: **Saturday 31 October, 14:00 CET**. This document is the working
+plan; the event material it refers to is not part of this repository.
 
 ---
 
@@ -235,7 +235,7 @@ Before pressing submit:
 - [ ] One linked trace shows a real Critic rejection; one shows the forced mock rejection.
 - [ ] `docs/judging.md` exists and every row points at a file that exists.
 - [ ] Repo public, no `.env`, no keys, no `runs/` committed, README renders.
-- [ ] Submission text re-read against `docs/rules/05-submission.md` for stale figures.
+- [ ] Submission text re-read against the event submission page for stale figures.
 - [ ] Submitted before 13:00, with a calendar reminder for 13:45 to re-check.
 
 ---

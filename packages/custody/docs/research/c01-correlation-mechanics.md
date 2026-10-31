@@ -394,7 +394,7 @@ Therefore:
 **Path:** `/tmp/opencode/c01/main.ts`
 **Log:** `/tmp/opencode/c01/run.log`
 **Dependency:** `/tmp/opencode/c01/node_modules/@mozaik-ai/core` symlinked to
-`/home/g/m/jigjoy/modules/mozaik` (the workspace build, version 4.1.0).
+`<repo>/modules/mozaik` (the workspace build, version 4.1.0).
 
 **Run:**
 

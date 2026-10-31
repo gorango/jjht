@@ -1,40 +1,51 @@
-# JigJoy — NTP Novi Sad hackathon
+# CUSTODY — NTP Novi Sad 2026, Track 3 (Freestyle)
 
-Workspace for the NTP Novi Sad Hackathon ("Build agents that work together", 30–31 October 2026).
+CUSTODY is the entry in this workspace. It is an incident-response runtime where no agent can act
+alone. Agents propose typed, reversible actions. An airlock holds them and decides together in one
+window, weighing containment against evidence preservation, availability and provenance. Only an
+accepted intent reaches an adapter. The runtime, the bus, the five concurrent loops and the shared
+state are real Mozaik.
+
+**Track note.** `packages/eureka/` is a completed Track 2 (EINSTEIN) submission, kept for reference.
+It is not the entry. CUSTODY, Track 3, is.
+
+## Run it
+
+Requires Bun 1.4 or newer. Docker 29 and Compose 5 are needed only for the recorded infrastructure
+surface.
+
+```bash
+git clone --recurse-submodules https://github.com/gorango/jjht.git
+cd jjht
+bun install
+bun run custody                # live money run, INFLIGHT 5
+bun run custody --scenario benign
+bun run custody:dashboard      # http://localhost:8787
+bun run custody:test
+bun run custody:ablate
+```
+
+The five-row table, the ablation, the dashboard walkthrough, the Docker recording and the baro
+handoff are in [`packages/custody/README.md`](packages/custody/README.md). The presenter script is
+[`packages/custody/DEMO.md`](packages/custody/DEMO.md). The claim map, one row per rubric criterion
+with a file and a command, is [`packages/custody/docs/judging.md`](packages/custody/docs/judging.md).
 
 ## Workspace layout
 
 | Path | What it is |
 | --- | --- |
-| `packages/eureka/` | EUREKA — an evidence-first, concurrent researcher–company matchmaker built on Mozaik (Track 02). Its commit history predates this event; it is not part of the Freestyle entry. |
-| `packages/custody/` | CUSTODY — an incident-response runtime where no agent can act alone. Live Mozaik loops, an airlock, a dashboard, a Docker adapter with one recorded run, an ablation, and a baro handoff. |
-| `modules/mozaik/` | [`jigjoy-ai/mozaik`](https://github.com/jigjoy-ai/mozaik) submodule — the agent runtime, pinned at `v4.1.0` and linked into the workspace. |
-| `modules/baro/` | [`jigjoy-ai/baro`](https://github.com/jigjoy-ai/baro) submodule — the software-factory reference, kept alongside the workspace. |
-| `modules/custody-scratch/` | [`gorango/jjhts`](https://github.com/gorango/jjhts) submodule — the small checkout fixture CUSTODY hands to an independent agent. It contains the failing regression test the patched reproduction runs. |
-| `docs/rules/` | Global hackathon reference: event, rules, tracks, judging, submission, prizes, dataset/APIs, platform, source log. |
-| `packages/eureka/docs/` | EUREKA-specific docs: architecture, pivot review, project review, trace-viewer screenshot. |
-| `packages/custody/docs/` | CUSTODY design: thesis, architecture, action model, airlock, judge, scenarios, plan, Mozaik API notes, wayfinder seed. |
+| `packages/custody/` | The Track 3 entry. Live Mozaik loops, an airlock, a dashboard, a Docker adapter with one recorded run, an ablation, and a baro handoff. |
+| `packages/eureka/` | Completed Track 2 (EINSTEIN) submission. Kept for reference; not the entry. |
+| `modules/mozaik/` | [`jigjoy-ai/mozaik`](https://github.com/jigjoy-ai/mozaik) submodule, the agent runtime, pinned at `v4.1.0` and linked into the workspace. |
+| `modules/baro/` | [`jigjoy-ai/baro`](https://github.com/jigjoy-ai/baro) submodule, the software-factory reference. |
+| `modules/custody-scratch/` | [`gorango/jjhts`](https://github.com/gorango/jjhts) submodule, the small checkout fixture CUSTODY hands to an independent agent. |
+| `packages/custody/docs/` | CUSTODY design, the judging map, and the historical decision record. |
+| `packages/eureka/docs/` | EUREKA documentation. Its commit history predates this event. |
 
-## Quick start
+Already cloned? Run `git submodule update --init --recursive`. `bun install` builds the pinned
+Mozaik submodule (`tsup`) so every package resolves `@mozaik-ai/core` from the workspace instead of
+npm.
 
-Requires [Bun](https://bun.sh) 1.4+.
-
-```bash
-git clone --recurse-submodules <repo>
-bun install
-bun run eureka:mock               # offline, deterministic, no API key
-bun run eureka:trace              # serve the trace viewer at http://localhost:4173
-bun run custody                   # CUSTODY: live run, five intents, one decision window
-bun run custody:dashboard         # CUSTODY dashboard at http://localhost:8787
-```
-
-The CUSTODY presenter script is [packages/custody/DEMO.md](packages/custody/DEMO.md).
-
-Already cloned? Run `git submodule update --init --recursive` first. `bun install` builds the
-pinned Mozaik submodule (`tsup`) so every package resolves `@mozaik-ai/core` from the workspace
-instead of npm.
-
-Every package script is available from the root with a package prefix: `bun run eureka:*` for the
-matchmaker and `bun run custody` / `custody:test` / `custody:typecheck` for the defender. See
-[`packages/eureka/README.md`](packages/eureka/README.md) for the full walkthrough and
-[`docs/rules/README.md`](docs/rules/README.md) for the official event material.
+Every package script is available from the root with a package prefix. `bun run custody`,
+`custody:test`, `custody:typecheck`, `custody:dashboard`, `custody:ablate` and `custody:docker:*`
+are CUSTODY. `bun run eureka:*` is the Track 2 package.

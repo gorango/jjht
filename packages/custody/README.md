@@ -10,6 +10,9 @@ provenance. An attacker who can write the logs still cannot write the system.
 Built for the **Freestyle** track of the NTP Novi Sad Hackathon (30–31 October 2026), on
 [Mozaik](https://github.com/jigjoy-ai/mozaik).
 
+**Track note.** This is the Track 3 (Freestyle) entry. `packages/eureka/` is the completed Track 2
+(EINSTEIN) submission, kept for reference and not part of this entry.
+
 ## Run it
 
 ```bash
