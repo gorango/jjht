@@ -386,9 +386,10 @@ export class AirlockCoordinator {
 
   private track(promise: Promise<void>): void {
     this.inflight.add(promise);
-    void promise.finally(() => {
+    const settle = (): void => {
       this.inflight.delete(promise);
       this.checkIdle();
-    });
+    };
+    void promise.then(settle, settle);
   }
 }
