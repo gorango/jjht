@@ -214,21 +214,31 @@ memory, packets, disk, or rootfs.
 ## The slow loop
 
 `outbox/inc-1/issue.md` is the issue CUSTODY writes from the money incident, and
-`outbox/inc-1/goal.txt` is the C13 goal an independent agent can execute. `gorango/custody-scratch`
-is private, so the outbox and the exact `gh issue create` command are committed instead of a
-public issue URL.
+`outbox/inc-1/goal.txt` is the C13 goal an independent agent can execute. The target is public at
+[`gorango/jjhts`](https://github.com/gorango/jjhts), pinned as the
+[`modules/custody-scratch`](../../modules/custody-scratch) submodule, and issue #1 is real:
+<https://github.com/gorango/jjhts/issues/1>.
 
 baro ran against a local clone with the OpenAI backend, run `run-1589768`.
-`recordings/baro-inc-1/` holds the run id, the watch log, the diff, and both test outputs. baro
-produced commit `7c3d7ba`, which replaces the shell string with
+`recordings/baro-inc-1/` holds the run id, the watch log, the diff, the commit log, and both test
+outputs. baro produced commit `7c3d7ba`, which replaces the shell string with
 `execFileSync("printf", ["%s", userAgent])`. The host checkout stayed untouched, and the run failed
-its own PR-evidence gate because `--local-only` forbids publishing. The recording states that
-failure rather than hiding it.
+its own PR-evidence gate because `--local-only` forbids publishing. No PR exists. The commit was
+not pushed, so `commit.txt` records it from the local clone.
 
 `scripts/patched-check.ts` runs the reproduction against `main` and `7c3d7ba` and records
 `before.attackSucceeded: true`, `after.attackSucceeded: false`. `bun run custody:ablate` copies
 that object into `eval/results.json`. CUSTODY did not write, push, or merge the fix. **No PR is
 claimed.**
+
+The recorded diff applies cleanly to the pinned submodule, so the fix can be re-created from
+committed artifacts alone:
+
+```bash
+git -C modules/custody-scratch apply packages/custody/recordings/baro-inc-1/diff.patch
+cd modules/custody-scratch && bun test test/checkout.test.ts
+git -C modules/custody-scratch checkout -- src/checkout.ts
+```
 
 ## What this is not
 

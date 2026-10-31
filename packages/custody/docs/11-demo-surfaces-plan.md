@@ -4,6 +4,12 @@
 closed. This document fixes the execution order, interfaces, files, acceptance tests and fallbacks
 for the remaining demo work so a builder needs no further architecture call.
 
+**Post-execution note (2026-10-31):** the scratch repository was renamed from
+`gorango/custody-scratch` to `gorango/jjhts` and made public, then pinned in this repository at
+`modules/custody-scratch`. The "private" statements below describe the conditions during execution
+and are kept as the record. Issue #1 now exists at
+<https://github.com/gorango/jjhts/issues/1>.
+
 **Baseline:** `master` at `5f82c19`. The vertical-slice predicate is met. `bun run custody` exits 0
 with `INFLIGHT 5`, all ten scenarios pass, and `bun run custody:ablate` reports `custody = 0` and
 `naive = 15`. Nothing in this plan may regress that baseline.

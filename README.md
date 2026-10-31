@@ -10,6 +10,7 @@ Workspace for the NTP Novi Sad Hackathon ("Build agents that work together", 30�
 | `packages/custody/` | CUSTODY — an incident-response runtime where no agent can act alone. Live Mozaik loops, an airlock, a dashboard, a Docker adapter with one recorded run, an ablation, and a baro handoff. |
 | `modules/mozaik/` | [`jigjoy-ai/mozaik`](https://github.com/jigjoy-ai/mozaik) submodule — the agent runtime, pinned at `v4.1.0` and linked into the workspace. |
 | `modules/baro/` | [`jigjoy-ai/baro`](https://github.com/jigjoy-ai/baro) submodule — the software-factory reference, kept alongside the workspace. |
+| `modules/custody-scratch/` | [`gorango/jjhts`](https://github.com/gorango/jjhts) submodule — the small checkout fixture CUSTODY hands to an independent agent. It contains the failing regression test the patched reproduction runs. |
 | `docs/rules/` | Global hackathon reference: event, rules, tracks, judging, submission, prizes, dataset/APIs, platform, source log. |
 | `packages/eureka/docs/` | EUREKA-specific docs: architecture, pivot review, project review, trace-viewer screenshot. |
 | `packages/custody/docs/` | CUSTODY design: thesis, architecture, action model, airlock, judge, scenarios, plan, Mozaik API notes, wayfinder seed. |

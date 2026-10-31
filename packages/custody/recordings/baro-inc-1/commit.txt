@@ -1,4 +1,4 @@
-# commit 7c3d7ba, from the private clone /tmp/custody-scratch
+# commit 7c3d7ba, from the local clone of the original custody-scratch (now jjhts); never pushed
 
 ## git log main..7c3d7ba
 7c3d7baff49735066e60a174927cd11d443bfc13 baro: merge story GREM-e5ca22c107ee-local-verify

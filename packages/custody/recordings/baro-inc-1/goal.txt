@@ -1,5 +1,5 @@
-goal: Fix the shell injection in src/checkout.ts in gorango/custody-scratch.
-repo: https://github.com/gorango/custody-scratch (branch main)
+goal: Fix the shell injection in src/checkout.ts in gorango/jjhts.
+repo: https://github.com/gorango/jjhts (branch main)
 file: src/checkout.ts
 failing test: test/checkout.test.ts > does not execute a shell metacharacter from User-Agent
 acceptance:

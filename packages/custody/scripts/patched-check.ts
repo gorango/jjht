@@ -46,7 +46,7 @@ const checkoutFromRef = (ref: string, repo: string): Checkout | undefined => {
 
 export const resolveCheckout = (
   value: string | undefined,
-  repo = process.env.CUSTODY_SCRATCH_REPO ?? "/tmp/custody-scratch",
+  repo = process.env.CUSTODY_SCRATCH_REPO ?? resolve(packageRoot, "../../modules/custody-scratch"),
 ): Checkout | undefined => {
   if (!value) return undefined;
   if (existsSync(value) && statSync(value).isDirectory()) {

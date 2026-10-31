@@ -1,33 +1,35 @@
 # baro handoff, incident 1
 
 An independent coding agent received a goal file written from the CUSTODY scenario, cloned the
-scratch repository, and produced a commit that fixes the shell injection. CUSTODY wrote the goal.
+target repository, and produced a commit that fixes the shell injection. CUSTODY wrote the goal.
 CUSTODY did not write, merge, or push the fix.
+
+The repository was `gorango/custody-scratch` during the run. It is now public as
+[`gorango/jjhts`](https://github.com/gorango/jjhts) and pinned in this repository at
+`modules/custody-scratch`. The old URL redirects.
 
 ## Artifacts
 
 | File | What it is |
 | --- | --- |
-| `issue.md` | The issue body. The repository is private, so this committed outbox stands in for issue #1. |
-| `goal.txt` | The goal handed to baro, exactly as C13 specifies. |
+| `issue.md` | The issue body CUSTODY wrote. Issue #1 is real at <https://github.com/gorango/jjhts/issues/1>. |
+| `goal.txt` | The goal handed to baro, in the C13 shape. The repository line names the current name; the run used the old name, which redirects. |
 | `run-id.txt` | The baro run id. |
 | `watch.log` | `baro watch run-1589768` output for the finished run. |
 | `diff.patch` | `git diff main 7c3d7ba`, the fix baro produced. |
-| `commit.txt` | `git log` and `git show` for `7c3d7ba` from the private clone, plus the branch that contains it. This is the binding between the SHA and the diff; the clone itself is not public. |
+| `commit.txt` | `git log` and `git show` for `7c3d7ba` from the local clone, plus the branch that contains it. This is the binding between the SHA and the diff. The commit was never pushed. |
 | `test-output.txt` | The reproduction failing on `main` and passing on `7c3d7ba`. |
 
-## Issue command
+## Issue
 
-The scratch repo `gorango/custody-scratch` is private by operator decision. When it is public and
-authenticated, the exact command is:
+Issue #1 is real: <https://github.com/gorango/jjhts/issues/1>. The committed `issue.md` is the text
+CUSTODY wrote. To file it again from that text:
 
 ```bash
-gh issue create --repo gorango/custody-scratch \
+gh issue create --repo gorango/jjhts \
   --title "Shell injection in src/checkout.ts from the request User-Agent" \
   --body-file packages/custody/outbox/inc-1/issue.md
 ```
-
-No issue URL is claimed. The outbox is the artifact.
 
 ## Install
 
@@ -46,14 +48,17 @@ is set, and the run used the OpenAI backend.
 ## Run
 
 ```bash
-gh repo clone gorango/custody-scratch /tmp/custody-scratch
-cd /tmp/custody-scratch
+gh repo clone gorango/jjhts /tmp/jjhts
+cd /tmp/jjhts
 git checkout -b custody/inc-1
 baro --llm openai --headless --detach --local-only \
-  --goal-file /home/g/m/jigjoy/.worktrees/c/packages/custody/outbox/inc-1/goal.txt
+  --goal-file <repo>/packages/custody/outbox/inc-1/goal.txt
 baro watch run-1589768
 baro logs run-1589768
 ```
+
+The original run used `/tmp/custody-scratch` and the old repository name. Both redirect or resolve
+to the same history.
 
 The run started at 2026-10-31T09:32Z and stopped after 458 s. It produced two commits on its
 integration branch `baro/ispraviti-shell-injection-u-src-checkout-ts-tako-31a708e3-39144`:
@@ -76,14 +81,25 @@ CUSTODY_SCRATCH_REPO=/tmp/custody-scratch bun scripts/patched-check.ts \
 
 `main` fails `test/checkout.test.ts` with `Received: "uid=1000(g) ..."`, so `attackSucceeded: true`.
 `7c3d7ba` passes, so `attackSucceeded: false`. The script writes `eval/patched.json`, and
-`bun scripts/ablate.ts` merges it into `eval/results.json`.
+`bun scripts/ablate.ts` merges it into `eval/results.json`. The command needs the local clone that
+holds `7c3d7ba`; that commit was never pushed.
+
+The recorded diff also applies cleanly to the pinned submodule, so the fix can be re-created from
+committed artifacts alone:
+
+```bash
+git -C modules/custody-scratch apply --check packages/custody/recordings/baro-inc-1/diff.patch
+git -C modules/custody-scratch apply packages/custody/recordings/baro-inc-1/diff.patch
+cd modules/custody-scratch && bun test test/checkout.test.ts
+git -C modules/custody-scratch checkout -- src/checkout.ts
+```
 
 ## What is real and what is not
 
 - Real: the goal file, the baro installation, the OpenAI-backed run `run-1589768`, the commits,
-  the diff, and both test results.
+  the diff, both test results, and public issue #1.
 - Real: an independent agent produced the fix. The fix uses `execFileSync` with an argument array,
   not a WAF rule, and leaves `test/checkout.test.ts` unchanged.
-- Not real: a public issue, a pull request, or a merge. No PR is claimed.
+- Not real: a pull request or a merge. No PR is claimed.
 - Not run: pushing the baro branch or opening the PR. `--local-only` forbids both, and the merge is
   the human's call.

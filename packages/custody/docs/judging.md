@@ -15,7 +15,7 @@ Run every command from the repository root unless the row says otherwise.
 | Dashboard | `src/server.ts`, `public/dashboard.html` | `bun run custody:dashboard`, click money, read `INFLIGHT 5`, the five decision rows, and `PASS 5/5`. From `packages/custody`, `bun test tests/dashboard.test.ts` covers the same beats over HTTP, and `bun scripts/dashboard-check.ts` drives all ten through a running server. Screenshots of the live page and replay are in `recordings/dashboard/`. |
 | Ablation | `eval/results.json` | `bun run custody:ablate`. The quoted numbers are `totals.naive.harmful = 15`, `totals.checks-only.harmful = 15`, `totals.custody.harmful = 0`, `totals.naive.obeyed = 2`, `totals.custody.obeyed = 0`, `pass = true`. |
 | Real seam: Docker | `src/infra/docker.ts`, `recordings/docker-2026-10-31/` | `bun run custody:docker:up`, `bun run custody --adapter docker` with `CUSTODY_EVIDENCE_DIR` set, then `bun run custody:verify-evidence <bundle>` prints `OK`. The recorded probe is `403` from `203.0.113.9`. From `packages/custody`, `CUSTODY_DOCKER=1 bun test tests/docker-contract.test.ts` runs the contract against both adapters. |
-| Slow loop: baro handoff | `outbox/inc-1/`, `recordings/baro-inc-1/` | The committed outbox, the exact `gh issue create` command, the goal file, the baro run id and watch log, and the recorded diff. No public issue or PR is claimed. |
+| Slow loop: baro handoff | `outbox/inc-1/`, `recordings/baro-inc-1/`, `modules/custody-scratch/` | Public issue #1 at <https://github.com/gorango/jjhts/issues/1>, the goal file, the baro run id and watch log, the recorded diff and commit log, and the repository pinned as a submodule. The diff applies cleanly to the pinned commit. No PR is claimed. |
 | Closed loop: patched reproduction | `scripts/patched-check.ts`, `eval/results.json` | `CUSTODY_SCRATCH_REPO=<clone> bun scripts/patched-check.ts --vulnerable main --patched 7c3d7ba` records `before.attackSucceeded: true` and `after.attackSucceeded: false`; `bun run custody:ablate` copies that object into `eval/results.json`. |
 
 ## What the artifacts prove and do not prove
@@ -40,8 +40,10 @@ Run every command from the repository root unless the row says otherwise.
 - Ten scenarios are not statistical significance. The results are per scenario, not a p-value.
 - The demo is deterministic by construction. One unedited Docker run and one real baro run balance
   it; the baro run failed its own PR-evidence gate, which the recording states.
-- The baro fix was produced against the private `gorango/custody-scratch`. The issue is an outbox,
-  not a public URL, by operator decision. A public issue URL and a PR remain upside.
+- The baro fix was produced on a local clone of the repository now public as `gorango/jjhts`.
+  Issue #1 is public. No PR exists and the fix commit was not pushed; the recording binds it with
+  `commit.txt`, and the recorded diff applies cleanly to the pinned `modules/custody-scratch`
+  submodule.
 - The repo's EUREKA package predates the event. Its history is disclosed in the workspace README.
 
 ## Likely judge questions
