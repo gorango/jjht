@@ -180,7 +180,10 @@ const printMoney = (report: ScenarioReport, verbose: boolean): number => {
         `docker adapter did not execute ${missing.map((effect) => `${effect.action}:${effect.targetId}`).join(", ")}`,
       );
     }
-    if (report.evidence.length === 0) reasons.push("docker adapter produced no evidence bundle");
+    const wantsSnapshot = required.some((effect) => effect.action === "snapshot");
+    if (wantsSnapshot && report.evidence.length === 0) {
+      reasons.push("docker adapter produced no evidence bundle");
+    }
   }
 
   if (reasons.length > 0) {

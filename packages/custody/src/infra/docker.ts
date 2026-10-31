@@ -106,7 +106,7 @@ const redactEnv = (env: unknown): unknown => {
 };
 
 /** Only the load-bearing fields; every env value is redacted. */
-export const redactInspect = (raw: unknown): unknown => {
+const redactInspect = (raw: unknown): unknown => {
   const inspect = (Array.isArray(raw) ? raw[0] : raw) as Record<string, any> | undefined;
   if (!inspect) return {};
   const state = inspect.State ?? {};
