@@ -37,12 +37,18 @@ gh issue create --repo gorango/jjhts \
 ## Install
 
 ```bash
-cd modules/baro
-cargo build --release -p baro-tui
-mkdir -p ~/.baro/bin && cp target/release/baro ~/.baro/bin/baro
-npm install -g baro-ai@0.121.0   # stages run-conversation.mjs and the other bundles
+npm install -g baro-ai@0.121.0
 baro --doctor
 ```
+
+`baro-ai`'s postinstall downloads the 0.121.0 release binary to `~/.baro/bin/baro` and stages the
+JavaScript bundles beside it. That is the binary that ran. A local `cargo build --release -p
+baro-tui` in `modules/baro` also builds 0.121.0, but the npm postinstall replaces the copy in
+`~/.baro/bin`, so the run used the downloaded artifact.
+
+The command runs from a clone of the target repository. The recorded run used
+`cwd=/tmp/custody-scratch` and the goal file from `packages/custody/outbox/inc-1/goal.txt`. baro
+then created its own worktrees under `/tmp/baro-worktrees/run-progressive-762dfab8e6e41f5d/`.
 
 `baro --doctor` reports 5 of 9 checks failed on this machine: `claude`, `codex` and `devin` are not
 installed. Those are optional. `opencode`, `pi`, `gh` and the audit directory pass. `OPENAI_API_KEY`
