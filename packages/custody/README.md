@@ -24,8 +24,8 @@ bun run custody:test
 The Docker recording and the baro handoff have their own commands under
 [One recorded Docker run](#one-recorded-docker-run) and [The slow loop](#the-slow-loop).
 
-`bun run custody:test` runs 70 tests: 64 pass and 6 skip without Docker. Set `CUSTODY_DOCKER=1`
-to run the Docker contract test instead of skipping it.
+`bun run custody:test` runs the full suite: 6 skip without Docker. Set `CUSTODY_DOCKER=1` to run
+the Docker contract test instead of skipping it.
 
 `bun run custody` boots the real Mozaik runtime, joins ten participants, starts one loop per
 proposed action, and holds every `act` call in the interception handler until the window closes.
@@ -229,10 +229,40 @@ bun run baro:check          # print the resolved command
 bun run baro                # run against modules/custody-scratch
 ```
 
+From a live money run, generate the issue and goal from its trace first:
+
+```bash
+bun run custody --scenario money
+bun run handoff -- --trace trace.jsonl --out runs/handoff-inc-1
+bun run baro -- --goal runs/handoff-inc-1/goal.txt
+```
+
+`handoff` writes `issue.md`, `goal.txt`, and `handoff.json`. The goal cites the trace, the tainted
+telemetry ids, the incident decisions, and the snapshot anchor when the Docker adapter ran. Add
+`--baro` to run the wrapper in the same step, and `--push` to ask for a PR instead of a local
+commit. The generated goal matches the invocation; the committed `outbox/inc-1/goal.txt` keeps the
+original C13 PR line for the recorded run.
+
 | Phase | Model | Why |
 | --- | --- | --- |
 | Story, Architect, Surgeon | `deepseek-v4-pro` | Writes and repairs code |
 | Planner, Critic, Dialogue | `deepseek-v4.1-flash` | Cheap structured judgment |
+
+| Option or env | Default | What it does |
+| --- | --- | --- |
+| `--dry-run` | off | Print the resolved command and exit |
+| `--scratch <dir>` / `BARO_SCRATCH_REPO` | `modules/custody-scratch` | Target checkout |
+| `--goal <file>` / `BARO_GOAL_FILE` | `outbox/inc-1/goal.txt` | Goal file |
+| `--effort <e>` / `BARO_EFFORT` | `high` | baro effort level |
+| `--timeout <s>` / `BARO_TIMEOUT` | `900` | Per-story timeout |
+| `--push` | off | Allow baro pushes and PRs; omits `--local-only` |
+| `--detach` | off | Detach; needs `--opencode-cli` |
+| `--opencode-cli` | off | Use baro's OpenCode harness, no proxy or key |
+| `-- <args>` | none | Pass the rest to baro |
+| `BARO_BIN` | `baro` | baro executable |
+| `OPENCODE_GO_BASE_URL` | Go endpoint | Upstream for the proxy |
+| `OPENCODE_GO_API_KEY` | empty | Bearer key for the proxy |
+| `BARO_*_MODEL` | table above | Per-phase model ids |
 
 The OpenCode Go gateway requires an `x-opencode-session` header on every request. baro's native
 OpenAI runner cannot add one, so `scripts/baro-handoff.ts` starts
