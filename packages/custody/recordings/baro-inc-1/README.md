@@ -15,7 +15,9 @@ The repository was `gorango/custody-scratch` during the run. It is now public as
 | `issue.md` | The issue body CUSTODY wrote. Issue #1 is real at <https://github.com/gorango/jjhts/issues/1>. |
 | `goal.txt` | The goal handed to baro, in the C13 shape. The repository line names the current name; the run used the old name, which redirects. |
 | `run-id.txt` | The baro run id. |
-| `watch.log` | `baro watch run-1589768` output for the finished run. |
+| `watch.log` | `baro watch run-1589768` output for the finished run, the milestone view. |
+| `run.log` | The full baro run log, 617 lines. It carries every model call, token count, tool call and retry. |
+| `timeline.md` | The 478 s computed from `run.log`, with the phase table and the retry sequence. |
 | `diff.patch` | `git diff main 7c3d7ba`, the fix baro produced. |
 | `commit.txt` | `git log` and `git show` for `7c3d7ba` from the local clone, plus the branch that contains it. This is the binding between the SHA and the diff. The commit was never pushed. |
 | `test-output.txt` | The reproduction failing on `main` and passing on `7c3d7ba`. |
