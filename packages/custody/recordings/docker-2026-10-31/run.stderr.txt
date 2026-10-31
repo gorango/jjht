@@ -1,0 +1,6 @@
+mozaik cloud: no API key — telemetry disabled. Set MOZAIK_API_KEY, or run `npx @mozaik-ai/cloud-sdk pair` to connect this machine.
+mozaik cloud: no API key — telemetry disabled. Set MOZAIK_API_KEY, or run `npx @mozaik-ai/cloud-sdk pair` to connect this machine.
+mozaik cloud: no API key — telemetry disabled. Set MOZAIK_API_KEY, or run `npx @mozaik-ai/cloud-sdk pair` to connect this machine.
+mozaik cloud: no API key — telemetry disabled. Set MOZAIK_API_KEY, or run `npx @mozaik-ai/cloud-sdk pair` to connect this machine.
+mozaik cloud: no API key — telemetry disabled. Set MOZAIK_API_KEY, or run `npx @mozaik-ai/cloud-sdk pair` to connect this machine.
+mozaik cloud: no API key — telemetry disabled. Set MOZAIK_API_KEY, or run `npx @mozaik-ai/cloud-sdk pair` to connect this machine.
