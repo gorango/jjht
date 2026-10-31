@@ -26,7 +26,8 @@ bun run custodian:ablate
 ```
 
 The five-row table, the ablation, the dashboard walkthrough, the Docker recording and the baro
-handoff are in [`packages/custodian/README.md`](packages/custodian/README.md). The presenter script is
+handoff are in [`packages/custodian/README.md`](packages/custodian/README.md). The illustrated
+scenario tour, with a link to each incident on the replay deploy, is
 [`packages/custodian/DEMO.md`](packages/custodian/DEMO.md). The claim map, one row per rubric criterion
 with a file and a command, is [`packages/custodian/docs/judging.md`](packages/custodian/docs/judging.md).
 

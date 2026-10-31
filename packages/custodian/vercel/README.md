@@ -20,9 +20,10 @@ From this directory:
 npx vercel --prod
 ```
 
-Or connect the repository in Vercel and set the project root to
-`packages/custodian/vercel`. The generated `index.html` and `data/` must be committed
-for a repository-connected deploy.
+The generated `index.html` and `data/` are committed. Rebuild and commit them after a change.
+
+If the project is rooted at the repository or at `packages/custodian`, the `vercel.json` there
+sets `framework: null`, disables install and build, and points the output at this folder.
 
 The page loads `data/scenarios.json`, `data/runs.json`, and one
 `data/runs/<id>/trace.jsonl` plus `summary.json` per run.

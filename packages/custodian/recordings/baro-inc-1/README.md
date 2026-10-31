@@ -84,9 +84,10 @@ integration branch `baro/ispraviti-shell-injection-u-src-checkout-ts-tako-31a708
 
 The local-verify story passed its critic. The run then failed the PR-evidence obligation `G-C5`
 because `--local-only` denies publish and PR commands. The host checkout was left untouched as an
-unverified checkpoint. The fix commit is real; the PR does not exist. That contradiction is in the
+unverified checkpoint. The fix commit is real; this run opened no PR. That contradiction is in the
 committed goal (`open a PR against main`) and in the demo-safe invocation C13 prescribes
-(`--local-only`). The run is recorded as failed, not as a success.
+(`--local-only`). The run is recorded as failed, not as a success. A later dashboard handoff,
+without `--local-only`, opened PR #2 as a checkpoint.
 
 ## Reproduction
 
@@ -116,6 +117,7 @@ git -C modules/custodian-scratch checkout -- src/checkout.ts
   the diff, both test results, and public issue #1.
 - Real: an independent agent produced the fix. The fix uses `execFileSync` with an argument array,
   not a WAF rule, and leaves `test/checkout.test.ts` unchanged.
-- Not real: a pull request or a merge. No PR is claimed.
+- Not real from this run: a pull request or a merge. This local-only run pushed nothing. A later
+  dashboard handoff opened PR #2 as a checkpoint; it is open and unmerged.
 - Not run: pushing the baro branch or opening the PR. `--local-only` forbids both, and the merge is
   the human's call.

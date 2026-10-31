@@ -17,7 +17,7 @@ Built for the **Freestyle** track of the NTP Novi Sad Hackathon (30–31 October
 
 ```bash
 bun install                    # from the repo root
-bun run custodian                # live run, ten agents, one decision window
+bun run custodian                # live run, ten participants, one decision window
 bun run custodian --scenario benign
 bun run custodian:dashboard      # http://localhost:8787, click a scenario
 bun run custodian:ablate         # ten scenarios through three arms, writes eval/results.json
@@ -27,8 +27,8 @@ bun run custodian:test
 The Docker recording and the baro handoff have their own commands under
 [One recorded Docker run](#one-recorded-docker-run) and [The slow loop](#the-slow-loop).
 
-`bun run custodian:test` runs the full suite: 6 skip without Docker. Set `CUSTODIAN_DOCKER=1` to run
-the Docker contract test instead of skipping it.
+`bun run custodian:test` runs 81 tests: 75 pass and 6 skip without Docker. Set `CUSTODIAN_DOCKER=1`
+to run the Docker contract test instead of skipping it.
 
 `bun run custodian` boots the real Mozaik runtime, joins ten participants, starts one loop per
 proposed action, and holds every `act` call in the interception handler until the window closes.
@@ -65,9 +65,11 @@ synthetic labels, and they change on every run. The trace carries the same ids o
 | Ten scenarios | **implemented, live and pure runs match** |
 | Ablation: naive, checks-only, custodian | **implemented, `eval/results.json` committed** |
 | JSONL trace and CLI table | **implemented** |
-| Dashboard: scenario buttons, live feed, INFLIGHT badge, decision table, replay | **implemented, browser-checked** |
+| Dashboard: live feed, INFLIGHT badge, decision table, replay, popovers, hash, resizable panels | **implemented, browser-checked** |
+| Dashboard handoff: push and open a PR, never merge | **implemented; opened PR #2 as a checkpoint** |
+| Replay-only static deploy under `vercel/` | **generated; 11 recorded runs** |
 | Docker adapter (`SimAdapter` and `DockerAdapter`) | **implemented; one recording verifies** |
-| baro handoff and patched reproduction | **run recorded; fix commit verified by test, no PR** |
+| baro handoff and patched reproduction | **recorded; PR #2 open and unmerged; fix verified by test** |
 | Live model | **not built** |
 
 ## The live run
@@ -151,8 +153,8 @@ The layout is resizable. Drag the dividers to widen the scenario rail or the dec
 widths persist. Scrollbars are hidden. The feed narrates each step in plain words; click a row for
 the raw payload. Hover or focus a scenario for a popover with why it exists, what it runs, what it
 proves, and the expected decisions. The URL hash tracks the active scenario and the active item
-keeps an accent border; opening `#money` loads and runs it. [DEMO.md](DEMO.md) is the presenter
-script for a live run.
+keeps an accent border; opening `#money` loads and runs it. [DEMO.md](DEMO.md) is the illustrated
+tour, with a link to each scenario on the replay deploy.
 
 The button was exercised against the public repository on 2026-10-31. It opened
 [PR #2](https://github.com/gorango/jjhts/pull/2) as a checkpoint. At head `3b22f62`, `bun test`
@@ -164,13 +166,15 @@ The PR is open and unmerged.
 ### Replay-only deploy
 
 `bun run vercel:build` writes `vercel/`, a static copy of the dashboard with ten recorded runs plus
-the Docker recording. It needs no server, Docker, baro, or key at runtime, and Vercel has nothing to install or build;
-the static folder is the deployment. The scenario buttons load the saved traces, the URL hash
-still selects one, and the popovers are included.
+the Docker recording. It needs no server, Docker, baro, or key at runtime, and Vercel has nothing
+to install or build; the static folder is the deployment. The scenario buttons load the saved
+traces, the URL hash still selects one, and the popovers are included.
 
 Deploy with `cd vercel && npx vercel --prod`, or point a Vercel project at
-`packages/custodian/vercel`. A repository-connected deploy needs the generated `vercel/` folder
-committed. See [`vercel/README.md`](vercel/README.md).
+`packages/custodian/vercel`. If the project is rooted at the repository or at
+`packages/custodian`, the `vercel.json` there sets `framework: null`, disables install and build,
+and points the output at this folder. The generated folder is committed; rebuild and commit it
+after a change. See [`vercel/README.md`](vercel/README.md).
 
 ### Why the PR is not a story
 
@@ -330,13 +334,15 @@ baro ran against a local clone with the OpenAI backend, run `run-1589768`.
 `recordings/baro-inc-1/` holds the run id, the watch log, the diff, the commit log, and both test
 outputs. baro produced commit `7c3d7ba`, which replaces the shell string with
 `execFileSync("printf", ["%s", userAgent])`. The host checkout stayed untouched, and the run failed
-its own PR-evidence gate because `--local-only` forbids publishing. No PR exists. The commit was
-not pushed, so `commit.txt` records it from the local clone.
+its own PR-evidence gate because `--local-only` forbids publishing. That run produced no PR and
+pushed nothing, so `commit.txt` records the commit from the local clone. A later dashboard handoff,
+without `--local-only`, opened PR #2 as a checkpoint.
 
 `scripts/patched-check.ts` runs the reproduction against `main` and `7c3d7ba` and records
 `before.attackSucceeded: true`, `after.attackSucceeded: false`. `bun run custodian:ablate` copies
-that object into `eval/results.json`. CUSTODIAN did not write, push, or merge the fix. **No PR is
-claimed.**
+that object into `eval/results.json`. CUSTODIAN did not write or merge the fix. The recording's
+local-only run pushed nothing; the later dashboard handoff pushed its branch and opened PR #2 as a
+checkpoint. That PR is open and unmerged.
 
 The recorded diff applies cleanly to the pinned submodule, so the fix can be re-created from
 committed artifacts alone:
@@ -356,8 +362,9 @@ git -C modules/custodian-scratch checkout -- src/checkout.ts
   tampering.
 - **Not live inference.** The loop, bus, interception, and state are real. The token stream is
   scripted. A live provider switch is future work.
-- **Not a public issue or PR.** The scratch repo is private. The outbox and the goal file are the
-  artifacts; a public issue and a PR remain upside.
+- **Not a PR from the recorded run.** The scratch repo is public, issue #1 is real, and PR #2 is
+  open as a checkpoint. The recorded `--local-only` run itself produced no PR; the dashboard
+  handoff did.
 - **Not a fix by CUSTODIAN.** An independent agent produced the fix commit. CUSTODIAN wrote the
   claim-backed goal. The merge was never in scope.
 - **Not a statistical result.** Ten hand-written scenarios are not a sample. No p-value is quoted.
@@ -365,7 +372,8 @@ git -C modules/custodian-scratch checkout -- src/checkout.ts
   reaches the three-attempt cap and records a reject with "retry cap" in
   `tests/coordinator.test.ts`. The CLI exits after the first window and prints that window's
   verdicts, so the table shows `DEFER`, not the later exhausted decision.
-- **Not a hosted viewer.** The dashboard is local, has no authentication, and serves one operator.
+- **Not a live hosted dashboard.** The local dashboard has no authentication and serves one
+  operator. The replay-only build under `vercel/` is static and cannot start a run, Docker, or baro.
 
 ## Layout
 
@@ -377,20 +385,22 @@ src/inference/  mock runner and the per-scenario scripts
 src/infra/      InfraAdapter, the deterministic SimAdapter and the DockerAdapter
 src/scenarios/  ten fixtures with expected decisions and harm labels
 src/eval/       the three-arm ablation and harm metrics
+src/handoff/    trace to issue and goal
 src/index.ts    CLI
 src/server.ts   dashboard server: child runs, trace polling, replay
 public/         dashboard.html, one file, no build step
 docker/         the Compose edge and app used by the recorded run
-scripts/        ablation, evidence verifier, patched reproduction
+scripts/        ablation, evidence verifier, patched reproduction, handoff, baro, Vercel build
 eval/           results.json, patched.json, the recompute notes
 recordings/     the Docker run and the baro handoff, committed
+vercel/         static replay-only build, committed
 tests/          invariants, airlock, registry, taint, scenarios, live CLI, ablation,
-                dashboard, Docker contract, patched reproduction
+                dashboard, Docker contract, patched reproduction, handoff
 ```
 
 ## Docs
 
-For a live walkthrough, read [`DEMO.md`](DEMO.md). Start with
+For an illustrated walkthrough with a replay link per scenario, read [`DEMO.md`](DEMO.md). Start with
 [`docs/00-thesis.md`](docs/00-thesis.md), then
 [`docs/01-architecture.md`](docs/01-architecture.md), then the
 [judging map](docs/judging.md), which ties every claim to a file and a command. The
